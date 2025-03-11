@@ -10,6 +10,12 @@ Dependencies you can see in the `composer.json` file. Make sure to run `composer
 
 - Find a way to secure /login?destination=https://bad-domain.com. Logic to rewrite the "state" paramter is there but JS does something to prevent it from functioning well
 
+## Start
+
+``` bash
+composer create-project djongov/swiftdashphp .
+```
+
 ## Routing and available variables
 
 Routing provides the following variables for each controller

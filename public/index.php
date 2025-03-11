@@ -12,14 +12,6 @@ if (file_exists($path)) {
     die('<b>' . $path . '</b> file not found. You need to run <b>composer update</b>');
 }
 
-function dd()
-{
-    array_map(function ($x) {
-        var_dump($x);
-    }, func_get_args());
-    die;
-}
-
 use App\App;
 
 // Initialize the app
