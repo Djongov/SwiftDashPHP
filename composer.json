@@ -1,0 +1,30 @@
+{
+    "name": "Djongov/swiftdashphp",
+    "require": {
+        "guzzlehttp/guzzle": "^7.7",
+        "vlucas/phpdotenv": "^5.6",
+        "erusev/parsedown": "^1.7",
+        "nikic/fast-route": "^1.3",
+        "sendgrid/sendgrid": "^8.0",
+        "google/apiclient": "^2.18.2"
+    },
+    "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/",
+            "Components\\": "Components/",
+            "Controllers\\": "Controllers/",
+            "Models\\": "Models/"
+        }
+    },
+    "extra": {
+        "google/apiclient-services": []
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Djongov/SwiftDashPHP.git"
+    },
+    "version": "1.0.0"
+}
