@@ -63,7 +63,7 @@ class Charts
                     text: (val) => val + "/" + ' . $range[1] . ' + "\n(' . $percentage . '%)",
                     subText: "",
                     padding: 4,
-                    fontColor: \'#777\',
+                    fontColor: \'#777\'
                 },
                 responsive: true,
                 title: {

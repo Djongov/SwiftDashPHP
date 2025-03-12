@@ -286,7 +286,7 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
 
 
 // Gauge
-const gaugeChart = (title, parentDiv, width, height, min, max) => {
+const createGaugeChart = (title, parentDiv, width, height, min, max) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     containerDiv.classList.add('w-64');
@@ -297,7 +297,7 @@ const gaugeChart = (title, parentDiv, width, height, min, max) => {
     // Define the gauge chart data
     const remainder = max - min;
     
-    const percentage = ((min / max) * 100).toFixed(1); // Calculate percentage with one decimal place
+    const percentage = ((min / max) * 100).toFixed(0); // Calculate percentage with one decimal place
 
     // Create the gradient
     const ctx = canvas.getContext('2d');
@@ -309,15 +309,29 @@ const gaugeChart = (title, parentDiv, width, height, min, max) => {
     //const ratio = min / max;
     //const gradientColor = ratio > 0.5 ? gradient : '#00c853';  // Green if value is less than half of max
 
+    // Function to generate gradient dynamically
+    const getGradientFillHelper = (ctx, colors) => {
+        let gradient = ctx.createLinearGradient(0, 0, width, 0); // Horizontal gradient
+        let colorStops = colors.length - 1;
+        colors.forEach((color, index) => {
+            gradient.addColorStop(index / colorStops, color);
+        });
+        return gradient;
+    };
+
     let gaugeColor;
-    if (percentage <= 33) {
-        gaugeColor = '#00c853';  // Green
-    } else if (percentage <= 55) {
-        gaugeColor = '#ffeb3b';  // Yellow
-    } else if (percentage <= 75) {
-        gaugeColor = '#ff9800';  // Orange
+    if (percentage >= 0 && percentage <= 25) {
+        gaugeColor = getGradientFillHelper(ctx, ["lime", "green"]);
+    } else if (percentage > 25 && percentage < 50) {
+        gaugeColor = getGradientFillHelper(ctx, ["yellow", "green"]);
+    } else if (percentage >= 50 && percentage < 75) {
+        gaugeColor = getGradientFillHelper(ctx, ["orange", "yellow"]);
+    } else if (percentage >= 75 && percentage <= 85) {
+        gaugeColor = getGradientFillHelper(ctx, ["yellow", "crimson"]);
+    } else if (percentage > 85 && percentage <= 100) {
+        gaugeColor = getGradientFillHelper(ctx, ["crimson", "red"]);
     } else {
-        gaugeColor = '#e53935';  // Red
+        gaugeColor = getGradientFillHelper(ctx, ["green", "lime"]);
     }
 
     const centerTextPlugin = {
@@ -351,8 +365,9 @@ const gaugeChart = (title, parentDiv, width, height, min, max) => {
             datasets: [
                 {
                     data: [min, remainder],
-                    backgroundColor: [gaugeColor, '#e0e0e0'],
+                    backgroundColor: [gaugeColor, 'gray'],
                     borderWidth: 1,
+                    borderColor: "rgba(0,0,0, 0.95)",
                     circumference: 360,  // Half-circle gauge
                     rotation: -Math.PI / 2,  // Start at the top
                     cutout: '75%',  // Make it a doughnut with a hole in the center
@@ -372,18 +387,6 @@ const gaugeChart = (title, parentDiv, width, height, min, max) => {
                     text: `${title} - ${min} out of ${max}`,
                     font: { size: 16, weight: 'bold' },
                     color: '#333',
-                },
-                // When you hover on a datalabel, show count and stuff
-                datalabels: {
-                    display: true,
-                    align: 'middle',
-                    color: '#fff',
-                    backgroundColor: '#000',
-                    borderRadius: 3,
-                    font: {
-                        size: 11,
-                        lineHeight: 1
-                    },
                 }
             }
         }
@@ -394,7 +397,7 @@ const gaugeChart = (title, parentDiv, width, height, min, max) => {
 
 
 /* Donought Chart */
-const donutChart = (title, parentNodeId, width, height, labels, data) => {
+const createDonutChart = (title, parentNodeId, width, height, labels, data) => {
     let parentDiv = document.getElementById(parentNodeId);
     let containerDiv = document.createElement('div');
     parentDiv.appendChild(containerDiv);
@@ -467,7 +470,7 @@ const donutChart = (title, parentNodeId, width, height, labels, data) => {
             labels: labels,
             datasets: [
                 {
-                    label: labels,
+                    label: null,
                     backgroundColor: backgroundColorArray,
                     data: data,
                     borderWidth: 0,

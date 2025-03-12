@@ -196,11 +196,11 @@ if (autoLoadParams.length > 0) {
         const value = JSON.parse(input.value);
         const type = value.type;
         const data = value.data;
-        if (type === 'gauge') {
-            gaugeChart(data.title, data.parentDiv, data.width, data.height, data.data[0], data.data[1]);
+        if (type === 'gaugechart') {
+            createGaugeChart(data.title, data.parentDiv, data.width, data.height, data.data[0], data.data[1]);
         }
-        if (type === 'donutChart') {
-            donutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
+        if (type === 'donutchart') {
+            createDonutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
         }
         if (type === 'piechart') {
             createPieChart(data.title, data.parentDiv, data.width, data.title, data.height, data.labels, data.data);

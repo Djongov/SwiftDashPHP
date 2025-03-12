@@ -106,7 +106,7 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             ]
         ],
         [
-            'type' => 'donutChart',
+            'type' => 'donutchart',
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',
                 'title' => 'donut Chart',
@@ -117,7 +117,7 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             ]
         ],
         [
-            'type' => 'gauge',
+            'type' => 'gaugechart',
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',
                 'title' => 'Gauge chart',
