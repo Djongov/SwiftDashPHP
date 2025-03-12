@@ -161,6 +161,12 @@ if ($os === 'windows') {
             ]
         ];
     }
+    // In IIS there is a column Date and column Time, we can merge them
+    $parsedLog['prasedData'] = array_map(function ($row) {
+        $row['date'] = $row['date'] . ' ' . $row['time'];
+        unset($row['time']);
+        return $row;
+    }, $parsedLog['prasedData']);
     echo '<div id="charts" class="flex flex-row flex-wrap p-6 justify-center">';
     // Create the hidden inputs so the JS can load the charts
     foreach ($chartsArray as $array) {

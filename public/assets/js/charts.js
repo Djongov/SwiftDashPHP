@@ -265,6 +265,14 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
                     text: title,
                     color: textColor,
                 },
+                tooltip: {
+                    mode: 'index', // Show tooltip for all datasets at the same x-value
+                    intersect: false // Ensures tooltip shows for all datasets, not just the hovered one
+                }
+            },
+            interaction: {
+                mode: 'index', // Ensures all dataset values for the same x-axis label are shown
+                intersect: false
             },
             scales: {
                 x: {
@@ -286,7 +294,7 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
                     },
                 },
             },
-        }
+        }        
     });
     lineChart.update();
 }
