@@ -117,6 +117,17 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             ]
         ],
         [
+            'type' => 'donutChart',
+            'data' => [
+                'parentDiv' => 'doughnut-limits-holder',
+                'title' => 'donut Chart',
+                'width' => 300,
+                'height' => 300,
+                'labels' => array_keys($chartData),
+                'data' => array_values($chartData)
+            ]
+        ],
+        [
             'type' => 'linechart',
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',

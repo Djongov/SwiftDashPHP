@@ -199,6 +199,10 @@ if (autoLoadParams.length > 0) {
         if (type === 'doughnut') {
             gauge(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
         }
+        if (type === 'donutChart') {
+            console.log(data.data);
+            donutChart(data.title, data.parentDiv, data.height, data.width, data.labels, data.data);
+        }
         if (type === 'piechart') {
             createPieChart(data.title, data.parentDiv, data.width, data.title, data.height, data.labels, data.data);
         }

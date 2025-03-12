@@ -638,3 +638,149 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
 
     myChart.update();
 };
+
+/* Donought Chart */
+const donutChart = (title, parentNodeId, height, width, labels, data) => {
+    let parentDiv = document.getElementById(parentNodeId);
+    let containerDiv = document.createElement('div');
+    parentDiv.appendChild(containerDiv);
+    containerDiv.classList.add('w-80');
+    containerDiv.style.height = height;
+    containerDiv.style.width = width;
+    let canvas = document.createElement('canvas');
+    canvas.id = `canvas-${generateUniqueId(4)}`;
+    containerDiv.appendChild(canvas);
+
+    // Find out the theme - dark or light
+    let theme = '';
+    if (localStorage.getItem('color-theme')) {
+        if (localStorage.getItem('color-theme') === 'dark') {
+            theme = 'dark';
+        } else {
+            theme = 'light';
+        }
+    } else {
+        theme = 'light';
+    }
+
+    const titleColor = (theme === 'dark') ? '#9ca3af' : '#111827';
+
+    const labelColor = (theme === 'dark') ? '#9ca3af' : '#111827';
+
+    let backgroundColorArray = [];
+    let colorScheme = [];
+    labels.forEach(label => {
+        backgroundColorArray = [
+            'rgba(54, 162, 235, 1)', // blue
+            'rgba(75, 192, 192, 1)', // green
+            'rgba(255, 99, 132, 1)', // red
+            'rgba(255, 159, 64, 1)', // orange
+            'rgba(153, 102, 255, 1)', // purple
+            'rgba(255, 206, 86, 1)', // yellow
+            'rgba(255, 0, 0, 1)', // bright red
+            'rgba(0, 255, 255, 1)', // cyan
+            'rgba(255, 0, 255, 1)', // magenta
+            'rgba(128, 128, 128, 1)' // grey
+        ];
+        //console.log('Assigning color ' + item + ' to chart ' + name);
+        colorScheme = colorScheme.filter(element => element !== item);
+    })
+
+    let total = data.reduce((a, b) => a + b, 0);
+
+    // Custom plugin to add text in the center
+    const centerTextPlugin = {
+        id: 'centerText',
+        beforeDraw: function (chart) {
+            let { width, height, ctx } = chart;
+            let centerX = width / 2;
+            let centerY = height / 2 + height * 0.24; // Adjusted for better centering
+    
+            ctx.save();
+            ctx.font = `bold ${Math.floor(height / 12)}px Arial`; // Reduced font size
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = chart.options.plugins.title.color || '#111827';
+            ctx.fillText(total, centerX, centerY);
+            ctx.restore();
+        }
+    };
+    
+    let chart = new Chart(canvas, {
+        type: 'doughnut',
+        plugins: [ChartDataLabels, centerTextPlugin],
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: labels,
+                    backgroundColor: backgroundColorArray,
+                    data: data,
+                    borderWidth: 0,
+                    borderColor: 'rgba(255,255,255, 0.95)',
+                    weight: 600,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        padding: 20,
+                        color: labelColor,
+                        fontSize: 12,
+                        borderWidth: 1,
+                    }
+                },
+                // Chart Title on top
+                title: {
+                    display: true,
+                    text: title,
+                    padding: {
+                        top: 15,
+                        bottom: 10
+                    },
+                    color: titleColor,
+                    align: 'center',
+                    fullSize: true,
+                    font: {
+                        weight: 'bold',
+                        size: 16
+                    },
+                    position: 'top'
+                },
+                // When you hover on a datalabel, show count and stuff
+                datalabels: {
+                    display: true,
+                    align: 'middle',
+                    color: '#fff',
+                    backgroundColor: '#000',
+                    borderRadius: 3,
+                    font: {
+                        size: 11,
+                        lineHeight: 1
+                    },
+                },
+                doughnutlabel: {
+                    labels: [
+                        {
+                            text: `Total - ${data.reduce((a, b) => a + b, 0)}`,
+                            font: {
+                                size: 30,
+                                family: 'Arial, Helvetica, sans-serif',
+                                weight: 'bold'
+                            },
+                            backgroundColor: 'green',
+                            color: '#777'
+                        }
+                    ]
+                }
+            },
+        }
+    });
+    return chart;
+}
