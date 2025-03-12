@@ -23,6 +23,12 @@ $chartData = [
     'June' => rand(1, 1000),
 ];
 
+$min = 0;
+
+$max = 100;
+
+$randomNumber = rand($min, $max);
+
 echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
     // Pie chart
     echo '<div class="w-full md:w-1/2 lg:w-1/3 p-2">';
@@ -50,12 +56,6 @@ echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
         echo Html::h3('Radial gauge');
 
         echo Html::p('This is a Radial gauge.');
-
-        $min = 0;
-
-        $max = 100;
-
-        $randomNumber = rand($min, $max);
 
         echo Charts::radialGauge('random number ouf of ' . $max, $randomNumber, [$min, $max]);
 
@@ -95,17 +95,6 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
     // initiate an array that will pass the following data into hidden inputs so Javascript can have access to this data on page load and draw the charts
     $chartsArray = [
         [
-            'type' => 'doughnut',
-            'data' => [
-                'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'Gauge chart',
-                'width' => 180,
-                'height' => 180,
-                'labels' => ['used', 'remaining'],
-                'data' => [$randomNumber, $max]
-            ]
-        ],
-        [
             'type' => 'piechart',
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',
@@ -125,6 +114,16 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
                 'height' => 300,
                 'labels' => array_keys($chartData),
                 'data' => array_values($chartData)
+            ]
+        ],
+        [
+            'type' => 'gauge',
+            'data' => [
+                'parentDiv' => 'doughnut-limits-holder',
+                'title' => 'Gauge chart',
+                'width' => 300,
+                'height' => 300,
+                'data' => [$randomNumber, $max]
             ]
         ],
         [

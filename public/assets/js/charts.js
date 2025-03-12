@@ -29,19 +29,7 @@ const createPieChart = (name, parentNodeId, canvasId, containerHeight, container
     const labelColor = (theme === 'dark') ? 'white' : 'black';
 
     let backgroundColorArray = [];
-    /*
-    let colorScheme = [
-        "#25CCF7","#FD7272","#54a0ff","#00d2d3",
-        "#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e",
-        "#16a085","#27ae60","#2980b9","#8e44ad","#2c3e50",
-        "#f1c40f","#e67e22","#e74c3c","#ecf0f1","#95a5a6",
-        "#f39c12","#d35400","#c0392b","#bdc3c7","#7f8c8d",
-        "#55efc4","#81ecec","#74b9ff","#a29bfe","#dfe6e9",
-        "#00b894","#00cec9","#0984e3","#6c5ce7","#ffeaa7",
-        "#fab1a0","#ff7675","#fd79a8","#fdcb6e","#e17055",
-        "#d63031","#feca57","#5f27cd","#54a0ff","#01a3a4"
-    ];
-    */
+
     let colorScheme = [];
     labels.forEach(label => {
         var item = colorScheme[Math.floor(Math.random() * colorScheme.length)];
@@ -78,11 +66,8 @@ const createPieChart = (name, parentNodeId, canvasId, containerHeight, container
             ];
 
         }
-        //console.log('Assigning color ' + item + ' to chart ' + name);
         colorScheme = colorScheme.filter(element => element !== item);
     })
-
-    //const ctx = canvas.getContext('2d');
 
     const chart = new Chart(canvas, {
         type: 'pie',
@@ -299,95 +284,94 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
     lineChart.update();
 }
 
-const doughnutChart = (name, parentNodeId, height, width, labels, data) => {
-    let parentDiv = document.getElementById(parentNodeId);
+
+// Gauge
+const gaugeChart = (title, parentDiv, width, height, min, max) => {
+    let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
-    parentDiv.appendChild(containerDiv);
-    containerDiv.classList.add('w-80');
-    containerDiv.style.height = height;
-    containerDiv.style.width = width;
+    containerDiv.classList.add('w-64');
+    parent.appendChild(containerDiv);
     let canvas = document.createElement('canvas');
-    canvas.id = `canvas-${generateUniqueId(4)}`;
     containerDiv.appendChild(canvas);
 
-    // Find out the theme - dark or light
-    let theme = getCurrentTheme();
+    // Define the gauge chart data
+    const remainder = max - min;
+    
+    const percentage = ((min / max) * 100).toFixed(1); // Calculate percentage with one decimal place
 
-    const titleColor = (theme === 'dark') ? '#9ca3af' : '#111827';
+    // Create the gradient
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);  // Horizontal gradient
+    gradient.addColorStop(0, 'lime');  // Green
+    gradient.addColorStop(1, 'red');  // Red
 
-    const labelColor = (theme === 'dark') ? '#9ca3af' : '#111827';
+    // Calculate how much of the gradient should be green or red based on the current value
+    //const ratio = min / max;
+    //const gradientColor = ratio > 0.5 ? gradient : '#00c853';  // Green if value is less than half of max
 
-    let backgroundColorArray = [];
-    let colorScheme = [];
-    labels.forEach(label => {
-        backgroundColorArray = [
-            'rgba(54, 162, 235, 1)', // blue
-            'rgba(75, 192, 192, 1)', // green
-            'rgba(255, 99, 132, 1)', // red
-            'rgba(255, 159, 64, 1)', // orange
-            'rgba(153, 102, 255, 1)', // purple
-            'rgba(255, 206, 86, 1)', // yellow
-            'rgba(255, 0, 0, 1)', // bright red
-            'rgba(0, 255, 255, 1)', // cyan
-            'rgba(255, 0, 255, 1)', // magenta
-            'rgba(128, 128, 128, 1)' // grey
-        ];
-        //console.log('Assigning color ' + item + ' to chart ' + name);
-        colorScheme = colorScheme.filter(element => element !== item);
-    })
+    let gaugeColor;
+    if (percentage <= 33) {
+        gaugeColor = '#00c853';  // Green
+    } else if (percentage <= 55) {
+        gaugeColor = '#ffeb3b';  // Yellow
+    } else if (percentage <= 75) {
+        gaugeColor = '#ff9800';  // Orange
+    } else {
+        gaugeColor = '#e53935';  // Red
+    }
 
-    //const ctx = canvas.getContext('2d');
+    const centerTextPlugin = {
+        id: 'centerText',
+        beforeDraw: function (chart) {
+            let { width, height, ctx } = chart;
+            let centerX = width / 2;
+            let centerY = height / 2 + height * 0.10; // Adjusted for better centering
+    
+            ctx.save();
+            ctx.font = `bold ${Math.floor(height / 13)}px Arial`; // Reduced font size
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = chart.options.plugins.title.color || '#111827';
+            // First line (min/max)
+            ctx.font = `bold ${Math.floor(height / 14)}px Arial`;
+            ctx.fillText(`${min}/${max}`, centerX, centerY);
 
+            // Second line (percentage) - slightly below the first line
+            ctx.font = `bold ${Math.floor(height / 16)}px Arial`; // Slightly smaller
+            ctx.fillText(`(${percentage}%)`, centerX, centerY + height * 0.06);
+            ctx.restore();
+        }
+    };
+
+    // Create the chart
     let chart = new Chart(canvas, {
         type: 'doughnut',
-        plugins: [ChartDataLabels],
+        plugins: [centerTextPlugin],
         data: {
-            labels: labels,
             datasets: [
                 {
-                    label: name,
-                    backgroundColor: backgroundColorArray,
-                    data: data,
-                    //color: 'red',
-                    borderWidth: 0,
-                    borderColor: 'rgba(255,255,255, 0.95)',
-                    weight: 600,
+                    data: [min, remainder],
+                    backgroundColor: [gaugeColor, '#e0e0e0'],
+                    borderWidth: 1,
+                    circumference: 360,  // Half-circle gauge
+                    rotation: -Math.PI / 2,  // Start at the top
+                    cutout: '75%',  // Make it a doughnut with a hole in the center
                 }
             ]
         },
         options: {
-            hover: {
-                mode: null
-            },
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: true,  // Allow resizing
+            animation: {
+                animateRotate: true,
+                animateScale: true
+            },
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        padding: 20,
-                        color: labelColor,
-                        fontSize: 12,
-                        borderWidth: 1,
-                    }
-                },
-                // Chart Title on top
                 title: {
                     display: true,
-                    text: name.replace('_', ' '),
-                    padding: {
-                        top: 15,
-                        bottom: 10
-                    },
-                    color: titleColor,
-                    align: 'center',
-                    fullSize: true,
-                    font: {
-                        weight: 'bold',
-                        size: 16
-                    },
-                    position: 'top'
+                    text: `${title} - ${min} out of ${max}`,
+                    font: { size: 16, weight: 'bold' },
+                    color: '#333',
                 },
                 // When you hover on a datalabel, show count and stuff
                 datalabels: {
@@ -401,246 +385,16 @@ const doughnutChart = (name, parentNodeId, height, width, labels, data) => {
                         lineHeight: 1
                     },
                 }
-            },
+            }
         }
     });
+
     return chart;
-}
-
-// Gauge
-const createGauge = (parentDiv, title, width, height, currentValue, maxValue) => {
-
-    const percentage = (currentValue / maxValue) * 100;
-
-    const container = document.getElementById(parentDiv);
-
-    const gaugeContainer = document.createElement('div');
-
-    gaugeContainer.classList.add('flex', 'flex-col', 'items-center');
-
-    const titleElement = document.createElement('div');
-    titleElement.classList.add('gauge-title', 'font-semibold');
-    titleElement.textContent = title;
-
-    const gaugeElement = document.createElement('div');
-    gaugeElement.classList.add('gauge');
-    gaugeElement.style.width = `${width}px`;
-    gaugeElement.style.height = `${height}px`;
-
-    const gaugeFill = document.createElement('div');
-    gaugeFill.classList.add('gauge-fill');
-
-    const gaugeText = document.createElement('div');
-    gaugeText.classList.add('gauge-text');
-    gaugeText.textContent = `${currentValue} / ${maxValue}`;
-
-    gaugeElement.appendChild(gaugeFill);
-    gaugeElement.appendChild(gaugeText);
-
-    container.appendChild(gaugeContainer);
-
-    gaugeContainer.appendChild(titleElement);
-    gaugeContainer.appendChild(gaugeElement);
-
-    if (percentage >= 100) {
-        gaugeFill.style.background = `conic-gradient(#FF0000 0% 100%, #FF0000 100% 100%)`;
-    } else if (percentage >= 75) {
-        gaugeFill.style.background = `conic-gradient(#FF0000 0% ${percentage}%, #FF0000 ${percentage}% 100%)`;
-    } else if (percentage >= 50) {
-        gaugeFill.style.background = `conic-gradient(#FFA500 0% ${percentage}%, #FFA500 ${percentage}% 100%)`;
-    } else if (percentage >= 25) {
-        gaugeFill.style.background = `conic-gradient(#FFD700 0% ${percentage}%, #FFD700 ${percentage}% 100%)`;
-    } else {
-        gaugeFill.style.background = `conic-gradient(#4CAF50 0% ${percentage}%, #4CAF50 ${percentage}% 100%)`;
-    }
-}
-
-const gauge = (title, parentNodeId, width, height, labels, deita) => {
-    let parentDiv = document.getElementById(parentNodeId);
-    let containerDiv = document.createElement('div');
-    parentDiv.appendChild(containerDiv);
-    containerDiv.classList.add('m-4');
-    let canvas = document.createElement('canvas');
-    containerDiv.appendChild(canvas);
-    canvas.id = `canvas-${generateUniqueId(4)}`;
-    canvas.height = height;
-    canvas.width = width;
-
-    // Find out the theme - dark or light
-    let theme = getCurrentTheme();
-
-    const titleColor = (theme === 'dark') ? 'white' : 'black';
-
-    // data for the gauge chart
-    // you can supply your own values here
-    // max is the Gauge's maximum value
-    var data = {
-        value: deita[0],
-        max: deita[1],
-        label: "used"
-    };
-
-    let backgroundColor = ''
-
-    if (deita[0] === deita[1]) {
-        backgroundColor = 'red'
-    } else {
-        backgroundColor = ['green', 'gray'];
-    }
-
-    // Chart.js chart's configuration
-    // We are using a Doughnut type chart to 
-    // get a Gauge format chart 
-    // This is approach is fine and actually flexible
-    // to get beautiful Gauge charts out of it
-    const config = {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: [data.value, data.max - data.value],
-                backgroundColor: backgroundColor,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: true,
-            cutoutPercentage: 85,
-            rotation: -90,
-            circumference: 180,
-            tooltips: {
-                enabled: false
-            },
-            legend: {
-                display: false
-            },
-            animation: {
-                animateRotate: true,
-                animateScale: false
-            },
-            title: {
-                display: true,
-                text: title,
-                fontSize: 16
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: title,
-                    padding: {
-                        top: 15,
-                        bottom: 10
-                    },
-                    color: titleColor,
-                    align: 'center',
-                    fullSize: true,
-                    font: {
-                        weight: 'bold',
-                        size: 16
-                    },
-                    position: 'top'
-                },
-                doughnutlabel: {
-                    labels: [
-                        {
-                            text: title,
-                            font: {
-                                size: 30,
-                                family: 'Arial, Helvetica, sans-serif',
-                                weight: 'bold'
-                            },
-                            backgroundColor: 'green',
-                            color: titleColor
-                        }
-                    ]
-                },
-            }
-        }
-    };
-
-    // Create the chart
-    let gaugeChart = new Chart(canvas, config);
-}
-
-// Bar chart
-const createBarChart = (title, parentDiv, width, height, labels, data) => {
-    console.log(data);
-    let parent = document.getElementById(parentDiv);
-    let containerDiv = document.createElement('div');
-    parent.appendChild(containerDiv);
-    containerDiv.classList.add('w-80', 'overflow-auto', 'm-4');
-    containerDiv.style.height = height;
-    containerDiv.style.width = width;
-    let canvas = document.createElement('canvas');
-    // Canvas id will be derived from the title
-    canvas.id = title.replace(' ', '-');
-    containerDiv.appendChild(canvas);
-
-    const colors = [
-        'rgba(54, 162, 235, 1)', // blue
-        'rgba(75, 192, 192, 1)', // green
-        'rgba(255, 99, 132, 1)', // red
-        'rgba(255, 159, 64, 1)', // orange
-        'rgba(153, 102, 255, 1)', // purple
-        'rgba(255, 206, 86, 1)', // yellow
-        'rgba(255, 0, 0, 1)', // bright red
-        'rgba(0, 255, 255, 1)', // cyan
-        'rgba(255, 0, 255, 1)', // magenta
-        'rgba(128, 128, 128, 1)' // grey
-    ];
-
-    // Find the current theme
-    let theme = getCurrentTheme();
-
-    const textColor = (theme === 'dark') ? 'white' : 'black';
-
-    let ctx = canvas.getContext('2d');
-    let myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: title,
-                data: data,
-                backgroundColor: colors.slice(0, data.length),
-                borderColor: colors.slice(0, data.length),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    display: false,
-                    labels: {
-                        padding: 20,
-                        color: textColor,
-                        fontSize: 12,
-                        borderWidth: 1,
-                    }
-                },
-                title: {
-                    display: true,
-                    text: title,
-                    color: textColor,
-                },
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    myChart.update();
 };
 
+
 /* Donought Chart */
-const donutChart = (title, parentNodeId, height, width, labels, data) => {
+const donutChart = (title, parentNodeId, width, height, labels, data) => {
     let parentDiv = document.getElementById(parentNodeId);
     let containerDiv = document.createElement('div');
     parentDiv.appendChild(containerDiv);
@@ -784,3 +538,79 @@ const donutChart = (title, parentNodeId, height, width, labels, data) => {
     });
     return chart;
 }
+
+// Bar chart
+const createBarChart = (title, parentDiv, width, height, labels, data) => {
+    console.log(data);
+    let parent = document.getElementById(parentDiv);
+    let containerDiv = document.createElement('div');
+    parent.appendChild(containerDiv);
+    containerDiv.classList.add('w-80', 'overflow-auto', 'm-4');
+    containerDiv.style.height = height;
+    containerDiv.style.width = width;
+    let canvas = document.createElement('canvas');
+    // Canvas id will be derived from the title
+    canvas.id = title.replace(' ', '-');
+    containerDiv.appendChild(canvas);
+
+    const colors = [
+        'rgba(54, 162, 235, 1)', // blue
+        'rgba(75, 192, 192, 1)', // green
+        'rgba(255, 99, 132, 1)', // red
+        'rgba(255, 159, 64, 1)', // orange
+        'rgba(153, 102, 255, 1)', // purple
+        'rgba(255, 206, 86, 1)', // yellow
+        'rgba(255, 0, 0, 1)', // bright red
+        'rgba(0, 255, 255, 1)', // cyan
+        'rgba(255, 0, 255, 1)', // magenta
+        'rgba(128, 128, 128, 1)' // grey
+    ];
+
+    // Find the current theme
+    let theme = getCurrentTheme();
+
+    const textColor = (theme === 'dark') ? 'white' : 'black';
+
+    let ctx = canvas.getContext('2d');
+    let myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: title,
+                data: data,
+                backgroundColor: colors.slice(0, data.length),
+                borderColor: colors.slice(0, data.length),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    display: false,
+                    labels: {
+                        padding: 20,
+                        color: textColor,
+                        fontSize: 12,
+                        borderWidth: 1,
+                    }
+                },
+                title: {
+                    display: true,
+                    text: title,
+                    color: textColor,
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    myChart.update();
+};
