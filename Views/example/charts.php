@@ -23,6 +23,15 @@ $chartData = [
     'June' => rand(1, 1000),
 ];
 
+$chartDataTwo = [
+    'January' => rand(1, 1000),
+    'February' => rand(1, 1000),
+    'March' => rand(1, 1000),
+    'April' => rand(1, 1000),
+    'May' => rand(1, 1000),
+    'June' => rand(1, 1000),
+];
+
 $min = 0;
 
 $max = 100;
@@ -71,13 +80,12 @@ echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
             'labels' => array_keys($chartData),
             'datasets' => [
                 [
-                    'label' => 'User 1 data',
+                    'label' => 'Data set 1',
                     'data' => array_values($chartData)
                 ],
                 [
-                    'label' => 'User 2 data',
-                    // for the second user we will just use the same data but in reverse order
-                    'data' => array_reverse(array_values($chartData))
+                    'label' => 'Data set 2',
+                    'data' => array_values($chartDataTwo)
                 ]
             ]
         ];
@@ -136,12 +144,12 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
                 'labels' => array_keys($chartData),
                 'datasets' => [
                     [
-                        'label' => 'User 1 data',
+                        'label' => 'Data set 1',
                         'data' => array_values($chartData)
                     ],
                     [
-                        'label' => 'User 2 data',
-                        'data' => array_reverse(array_values($chartData))
+                        'label' => 'Data set 2',
+                        'data' => array_values($chartDataTwo)
                     ]
                 ]
             ]
