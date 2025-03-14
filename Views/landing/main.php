@@ -28,6 +28,9 @@ try {
     return;
 }
 
+if ($usernameArray) {
+  echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
+}
 
 echo Alerts::success('Successfully connected to the database');
 

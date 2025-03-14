@@ -15,21 +15,21 @@ echo Html::p('shortUrls are used to shorten the URLs for the images so they can 
 
 // Let's use this general data for all the charts
 $chartData = [
-    'January' => rand(1, 10),
-    'February' => rand(1, 10),
-    'March' => rand(1, 10),
-    'April' => rand(1, 10),
-    'May' => rand(1, 10),
-    'June' => rand(1, 10),
+    'January' => rand(1, 1000),
+    'February' => rand(1, 1000),
+    'March' => rand(1, 1000),
+    'April' => rand(1, 1000),
+    'May' => rand(1, 1000),
+    'June' => rand(1, 1000),
 ];
 
 $chartDataTwo = [
-    'January' => rand(1, 10),
-    'February' => rand(1, 10),
-    'March' => rand(1, 10),
-    'April' => rand(1, 10),
-    'May' => rand(1, 10),
-    'June' => rand(1, 10),
+    'January' => rand(1, 1000),
+    'February' => rand(1, 1000),
+    'March' => rand(1, 1000),
+    'April' => rand(1, 1000),
+    'May' => rand(1, 1000),
+    'June' => rand(1, 1000),
 ];
 
 $min = 0;
