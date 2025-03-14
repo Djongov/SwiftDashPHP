@@ -1,9 +1,5 @@
 {
-    "name": "djongov/swiftdashphp",
-    "description": "A PHP framework that has modern authentication, MySQL/Postgres/SQLite connection, DataGrid, Forms, Charts, SendGrid and much more.",
-    "version": "v1.0.1",
     "require": {
-        "php": "^8.3",
         "guzzlehttp/guzzle": "^7.7",
         "vlucas/phpdotenv": "^5.6",
         "erusev/parsedown": "^1.7",
@@ -24,10 +20,5 @@
     },
     "extra": {
         "google/apiclient-services": []
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Djongov/SwiftDashPHP.git"
-    },
-    "license": "MIT"
+    }
 }
