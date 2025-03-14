@@ -71,11 +71,13 @@ class Html
     }
     public static function p(string $text, array $extraClasses = []) : string
     {
-        if (!$extraClasses) {
-            return '<p class="mx-2 my-2 break-words">' . $text . '</p>';
-        } else {
-            return '<p class="mx-2 my-2 break-words ' . implode(' ', $extraClasses) . '">' . $text . '</p>';
-        }
+        $defaultClasses = [
+            'break-words',
+            'm-2'
+        ];
+        $classes = array_merge($defaultClasses, $extraClasses);
+
+        return '<p class="' . implode(' ', $classes) . '">' . $text . '</p>';
     }
     public static function small($text, $extraClasses = []) : string
     {
@@ -456,6 +458,10 @@ class Html
     public static function mediumButtonLink($link, $text, $theme) : string
     {
         return '<a class="inline-flex items-center justify-center ml-2 my-2 px-2 py-2 h-10 w-32 md:w-44 mb-2 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
+    }
+    public static function smallButtonLink($link, $text, $theme) : string
+    {
+        return '<a class="px-2 py-1 text-md my-2 inline-flex items-center justify-center text-md leading-7 text-gray-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
     }
     public static function infoBadge($text, $id, $theme) : string
     {

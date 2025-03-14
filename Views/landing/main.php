@@ -52,7 +52,7 @@ $featuresArray = [
   // Charts
   'Charts (via Chart.js and QuickChart.io)' => 'Chart.js and Quickchart.io ready to use chart functions for the most popular chart types. Also easily autoload JS charts only with PHP code with the autoloading mechanism. See more the example ' . Html::a('Charts', '/charts', $theme),
   // Markdown
-  'Markdown rendering' => 'With the power of Parsedown (which sadly as of now is not up to date for PHP 8.4) and some custom classes we have here, you can render locally stored or remotely stored Markdown files automatically styled with Tailwind. Check out the ' . Html::a('Docs', '/docs', $theme) . ' section',
+  'Markdown rendering' => 'With the power of Parsedown (which sadly as of now is not up to date for PHP 8.4) and some custom classes we have here, you can render locally stored or remotely stored Markdown files automatically styled with Tailwind. Check out the ' . Html::a('Docs', '/docs', $theme) . ' section. Here let\'s render some MD below. ' . Html::p(Page::render(ROOT . '/Views/docs/index', $theme)),
   // Forms
   'Forms' => 'This is a big one. All (or almost all) of the buttons that do something on the framework are actually Form Components. Forms component takes out the big headache of creating the form and the submission hurdles of it. Easily do modals too. Built-in CSRF protecton too. Check out the ' . Html::a('Forms', '/forms', $theme) . ' section',
   // API
@@ -77,8 +77,8 @@ echo Html::divBox(Html::ul(array_keys($featuresArray)), ['text-center', 'mx-auto
 
 foreach ($featuresArray as $title => $text) {
   echo Html::horizontalLine();
-  echo Html::h2($title, true, ['my-4']);
-  echo Html::p($text, ['text-center']);
+  echo Html::h2($title, true);
+  echo Html::p($text, ['text-center', 'mx-12']);
 }
 
 // Let's render the mardwon we have for the Auth
@@ -105,7 +105,6 @@ foreach ($currentIssues as $category => $array) {
 }
 
 ?>
-
 
 <!--
 <div class="max-w-sm mx-auto md:mx-4 w-full my-6 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">

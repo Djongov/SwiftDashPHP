@@ -20,6 +20,7 @@ class RequireLogin
             '/docs/*',
             '/api/csp-report',
             '/api/set-lang',
+            '/api/cookie-consent',
             '/register',
             '/auth/azure-ad',
             '/auth/google',

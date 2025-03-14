@@ -6,6 +6,7 @@ use Components\Alerts;
 use Components\Page\Head;
 use Components\Page\Menu;
 use Components\Page\Footer;
+use Components\Page\CookieBanner;
 
 class Page
 {
@@ -24,7 +25,7 @@ class Page
             ],
             '/assets/js/dataTables.js' => [
                 'defer' => 'true',
-                'cache' => false
+                'cache' => true
             ],
             '/assets/js/datagrid.js' => [
                 'defer' => 'true',
@@ -43,9 +44,9 @@ class Page
             'https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js' => [
                 'cache' => true
             ],
-            'https://cdn.jsdelivr.net/npm/apexcharts' => [
-                'cache' => true
-            ],
+            // 'https://cdn.jsdelivr.net/npm/apexcharts' => [
+            //     'cache' => true
+            // ],
             'https://cdn.tailwindcss.com?plugins=typography' => [
                 'cache' => true
             ],
@@ -91,39 +92,40 @@ class Page
         $html .= $this->head($title, $description, $keywords, $thumbimage, $theme);
         $html .= '<body class="h-full antialiased ' . LIGHT_COLOR_SCHEME_CLASS . ' ' . DARK_COLOR_SCHEME_CLASS . ' ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">';
 
-        // Wrapper (ensures full height)
-        $html .= '<div class="flex flex-col min-h-screen ' . BODY_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . '">';
+            // Wrapper (ensures full height)
+            $html .= '<div class="flex flex-col min-h-screen ' . BODY_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . '">';
 
-        // Header (doesn't grow)
-        $html .= $this->header($usernameArray, $menuArray, $isAdmin, $theme);
+                // Header (doesn't grow)
+                $html .= $this->header($usernameArray, $menuArray, $isAdmin, $theme);
 
-        // Loading screen
-        if (SHOW_LOADING_SCREEN) {
-            $html .= '<div id="loading-screen" class="w-fit mx-auto my-12 flex items-center border border-black dark:border-gray-400 ' . LIGHT_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' p-8 rounded z-99999">
+                // Loading screen
+                if (SHOW_LOADING_SCREEN) {
+                    $html .=
+                    '<div id="loading-screen" class="w-fit mx-auto my-12 flex items-center border border-black dark:border-gray-400 ' . LIGHT_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' p-8 rounded z-99999">
                         <div class="animate-spin border-t-4 border-' . $theme . '-500 border-solid rounded-full h-16 w-16"></div>
                         <p class="ml-2">Loading...</p>
                     </div>';
-        }
+                }
 
-        // Ensure main takes up available space
-        $mainContentClass = SHOW_LOADING_SCREEN ? 'hidden' : '';
-        $html .= '<main id="main-content" class="flex-1 ' . $mainContentClass . '">';
+                // Ensure main takes up available space
+                $mainContentClass = SHOW_LOADING_SCREEN ? 'hidden' : '';
+                $html .= '<main id="main-content" class="flex-1 ' . $mainContentClass . '">';
 
-        // Check if the file exists before including it
-        if (file_exists($controlerPath)) {
-            ob_start();
-            include $controlerPath;
-            $html .= ob_get_clean();
-        } else {
-            $html .= Alerts::danger('The file ' . $controlerPath . ' does not exist');
-        }
+                    // Check if the file exists before including it
+                    if (file_exists($controlerPath)) {
+                        ob_start();
+                        include $controlerPath;
+                        $html .= ob_get_clean();
+                    } else {
+                        $html .= Alerts::danger('The file ' . $controlerPath . ' does not exist');
+                    }
 
-        $html .= '</main>'; // Close main (takes up remaining space)
+                $html .= '</main>'; // Close main (takes up remaining space)
 
-        // Footer (remains at the bottom)
-        $html .= $this->footer($theme);
-
-        $html .= '</div>'; // Close wrapper
+                // Footer (remains at the bottom)
+                $html .= $this->footer($theme);
+                $html .= CookieBanner::render($theme);
+            $html .= '</div>'; // Close wrapper
         $html .= '</body>';
 
         return $html;
