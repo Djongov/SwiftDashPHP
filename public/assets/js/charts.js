@@ -1,15 +1,37 @@
 
 /* Charts */
+const colors = [
+    'rgba(54, 162, 235, 1)', // blue
+    'rgba(75, 192, 192, 1)', // green
+    'rgba(255, 99, 132, 1)', // red
+    'rgba(255, 159, 64, 1)', // orange
+    'rgba(153, 102, 255, 1)', // purple
+    'rgba(255, 206, 86, 1)', // yellow
+    'rgba(255, 0, 0, 1)', // bright red
+    'rgba(0, 255, 255, 1)', // cyan
+    'rgba(255, 0, 255, 1)', // magenta
+    'rgba(128, 128, 128, 1)' // grey
+];
 
-const createPieChart = (name, parentNodeId, canvasId, containerHeight, containerWidth, labels, data) => {
-    let parentDiv = document.getElementById(parentNodeId);
+
+const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) => {
+    let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
-    parentDiv.appendChild(containerDiv);
-    containerDiv.classList.add('w-80');
-    containerDiv.style.height = containerHeight;
-    containerDiv.style.width = containerWidth;
+    parent.appendChild(containerDiv);
+
+    // Set explicit container size
+    containerDiv.style.width = width + "px";
+    containerDiv.style.height = height + "px";
+    containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+
     let canvas = document.createElement('canvas');
+
     canvas.id = canvasId;
+
+    // ✅ Set the actual canvas dimensions before rendering
+    canvas.width = width;
+    canvas.height = height;
+    
     containerDiv.appendChild(canvas);
 
     // Find out the theme - dark or light
@@ -90,8 +112,8 @@ const createPieChart = (name, parentNodeId, canvasId, containerHeight, container
             hover: {
                 mode: null
             },
-            responsive: true,
-            maintainAspectRatio: true,
+            responsive: false, // ✅ Disable responsiveness for fixed size
+            maintainAspectRatio: false, // ✅ Allow custom height
             /*
             legendCallback: function(chart) {
                 var text = [];
@@ -182,25 +204,22 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     parent.appendChild(containerDiv);
+
+    // Set explicit container size
+    containerDiv.style.width = width + "px";
+    containerDiv.style.height = height + "px";
+    containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+
     let canvas = document.createElement('canvas');
+    canvas.id = title.replace(' ', '-').toLowerCase() + generateUniqueId(4);
+
+    // ✅ Set the actual canvas dimensions before rendering
+    canvas.width = width;
+    canvas.height = height;
+
     containerDiv.appendChild(canvas);
-    containerDiv.style.height = `${height}px`;
-    containerDiv.style.width = `${width}px`;
 
     let lineDataSets = [];
-
-    const colors = [
-        'rgba(54, 162, 235, 1)', // blue
-        'rgba(75, 192, 192, 1)', // green
-        'rgba(255, 99, 132, 1)', // red
-        'rgba(255, 159, 64, 1)', // orange
-        'rgba(153, 102, 255, 1)', // purple
-        'rgba(255, 206, 86, 1)', // yellow
-        'rgba(255, 0, 0, 1)', // bright red
-        'rgba(0, 255, 255, 1)', // cyan
-        'rgba(255, 0, 255, 1)', // magenta
-        'rgba(128, 128, 128, 1)' // grey
-    ]; // Array of colors
 
     // Find out the theme - dark or light
     let theme = getCurrentTheme();
@@ -232,8 +251,8 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
             labels: labels,
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
+            responsive: false, // ✅ Disable responsiveness for fixed size
+            maintainAspectRatio: false, // ✅ Allow custom height
             plugins: {
                 legend: {
                     position: 'top',
@@ -249,6 +268,7 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
                     display: true,
                     text: title,
                     color: textColor,
+                    fontSize: 16
                 },
                 tooltip: {
                     mode: 'index', // Show tooltip for all datasets at the same x-value
@@ -259,26 +279,26 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
                 mode: 'index', // Ensures all dataset values for the same x-axis label are shown
                 intersect: false
             },
-            scales: {
-                x: {
-                    ticks: {
-                        color: textColor, // Color for x-axis labels
-                        margin: 10,
-                    },
-                    grid: {
-                        color: gridColor, // Color for y-axis grid lines
-                    },
-                },
-                y: {
-                    ticks: {
-                        color: textColor, // Color for y-axis labels
-                        margin: 10,
-                    },
-                    grid: {
-                        color: gridColor, // Color for y-axis grid lines
-                    },
-                },
-            },
+            // scales: {
+            //     x: {
+            //         ticks: {
+            //             color: textColor, // Color for x-axis labels
+            //             margin: 10,
+            //         },
+            //         grid: {
+            //             color: gridColor, // Color for y-axis grid lines
+            //         },
+            //     },
+            //     y: {
+            //         ticks: {
+            //             color: textColor, // Color for y-axis labels
+            //             margin: 10,
+            //         },
+            //         grid: {
+            //             color: gridColor, // Color for y-axis grid lines
+            //         },
+            //     },
+            // },
         }        
     });
     lineChart.update();
@@ -289,9 +309,20 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
 const createGaugeChart = (title, parentDiv, width, height, min, max) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
-    containerDiv.classList.add('w-64');
     parent.appendChild(containerDiv);
+
+    // Set explicit container size
+    containerDiv.style.width = width + "px";
+    containerDiv.style.height = height + "px";
+    containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+
     let canvas = document.createElement('canvas');
+    canvas.id = title.replace(' ', '-').toLowerCase() + generateUniqueId(4);
+
+    // ✅ Set the actual canvas dimensions before rendering
+    canvas.width = width;
+    canvas.height = height;
+
     containerDiv.appendChild(canvas);
 
     // Define the gauge chart data
@@ -375,8 +406,8 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,  // Allow resizing
+            responsive: false, // ✅ Disable responsiveness for fixed size
+            maintainAspectRatio: false, // ✅ Allow custom height
             animation: {
                 animateRotate: true,
                 animateScale: true
@@ -397,15 +428,23 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
 
 
 /* Donought Chart */
-const createDonutChart = (title, parentNodeId, width, height, labels, data) => {
-    let parentDiv = document.getElementById(parentNodeId);
+const createDonutChart = (title, parentDiv, width, height, labels, data) => {
+    let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
-    parentDiv.appendChild(containerDiv);
-    containerDiv.classList.add('w-80');
-    containerDiv.style.height = height;
-    containerDiv.style.width = width;
+    parent.appendChild(containerDiv);
+
+    // Set explicit container size
+    containerDiv.style.width = width + "px";
+    containerDiv.style.height = height + "px";
+    containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+
     let canvas = document.createElement('canvas');
-    canvas.id = `canvas-${generateUniqueId(4)}`;
+    canvas.id = title.replace(' ', '-').toLowerCase() + generateUniqueId(4);
+
+    // ✅ Set the actual canvas dimensions before rendering
+    canvas.width = width;
+    canvas.height = height;
+
     containerDiv.appendChild(canvas);
 
     // Find out the theme - dark or light
@@ -480,8 +519,8 @@ const createDonutChart = (title, parentNodeId, width, height, labels, data) => {
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
+            responsive: false, // ✅ Disable responsiveness for fixed size
+            maintainAspectRatio: false, // ✅ Allow custom height
             plugins: {
                 legend: {
                     display: true,
@@ -544,34 +583,26 @@ const createDonutChart = (title, parentNodeId, width, height, labels, data) => {
 
 // Bar chart
 const createBarChart = (title, parentDiv, width, height, labels, data) => {
-    console.log(data);
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     parent.appendChild(containerDiv);
-    containerDiv.classList.add('w-80', 'overflow-auto', 'm-4');
-    containerDiv.style.height = height;
-    containerDiv.style.width = width;
+
+    // Set explicit container size
+    containerDiv.style.width = width + "px";
+    containerDiv.style.height = height + "px";
+    containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+
     let canvas = document.createElement('canvas');
-    // Canvas id will be derived from the title
-    canvas.id = title.replace(' ', '-');
+    canvas.id = title.replace(' ', '-').toLowerCase() + generateUniqueId(4);
+
+    // ✅ Set the actual canvas dimensions before rendering
+    canvas.width = width;
+    canvas.height = height;
+
     containerDiv.appendChild(canvas);
 
-    const colors = [
-        'rgba(54, 162, 235, 1)', // blue
-        'rgba(75, 192, 192, 1)', // green
-        'rgba(255, 99, 132, 1)', // red
-        'rgba(255, 159, 64, 1)', // orange
-        'rgba(153, 102, 255, 1)', // purple
-        'rgba(255, 206, 86, 1)', // yellow
-        'rgba(255, 0, 0, 1)', // bright red
-        'rgba(0, 255, 255, 1)', // cyan
-        'rgba(255, 0, 255, 1)', // magenta
-        'rgba(128, 128, 128, 1)' // grey
-    ];
-
-    // Find the current theme
+    // Get the current theme
     let theme = getCurrentTheme();
-
     const textColor = (theme === 'dark') ? 'white' : 'black';
 
     let ctx = canvas.getContext('2d');
@@ -588,14 +619,14 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
             }]
         },
         options: {
-            responsive: false,
-            maintainAspectRatio: true,
+            responsive: false, // ✅ Disable responsiveness for fixed size
+            maintainAspectRatio: false, // ✅ Allow custom height
             plugins: {
                 legend: {
                     position: 'top',
                     display: false,
                     labels: {
-                        padding: 20,
+                        padding: 12,
                         color: textColor,
                         fontSize: 12,
                         borderWidth: 1,
@@ -605,14 +636,35 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
                     display: true,
                     text: title,
                     color: textColor,
+                    fontSize: 20
                 },
+                datalabels: {
+                    anchor: "center",
+                    align: "center",
+                    color: "white",
+                    backgroundColor: "black",
+                    borderColor: "black",
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    font: {
+                        weight: 'bold',
+                        size: 12,
+                    }
+                }
             },
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: textColor,
+                        font: {
+                            size: 12,
+                        }
+                    },
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 
     myChart.update();

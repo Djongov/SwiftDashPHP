@@ -63,7 +63,8 @@ class Charts
                     text: (val) => val + "/" + ' . $range[1] . ' + "\n(' . $percentage . '%)",
                     subText: "",
                     padding: 4,
-                    fontColor: \'#777\'
+                    fontColor: \'#777\',
+                    fontWeight: \'bold\',
                 },
                 responsive: true,
                 title: {
@@ -73,7 +74,8 @@ class Charts
                     color: \'#777\',
                     align: \'center\',
                     position: \'top\',
-                    fullSize: false
+                    fullSize: false,
+                    fontWeight: \'bold\'
                 },
                 legend: {
                     display: false,
@@ -244,22 +246,130 @@ class Charts
                 responsive: true,
                 title: {
                     display: true,
-                    fontSize: 20,
+                    fontSize: 16,
                     text: \'' . $title . '\',
                     color: \'black\',
                     align: \'center\',
                     position: \'top\',
-                    fullSize: true
+                    fullSize: true,
+                    fontWeight: \'bold\'
                 },
                 legend: {
                     display: true,
-                    position: \'right\',
-                    align: \'start\',
-                    fontSize: 9
+                    position: \'top\',
+                    align: \'center\',
+                    fontSize: 9,
+                    labels: {
+                        padding: 20,
+                        color: \'black\',
+                        fontSize: 12,
+                        borderWidth: 1,
+                    }
                 }
             }
         }');
         //var_dump($chart->getConfigStr());
-        return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>' : '<figure class="m-1"><img src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>';
+        return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>' : '<figure class="m-1"><img height="' . $height . '" width="' . $width . '" src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>';
+    }
+    public static function barChart(string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false) : string
+    {
+        $chart = new QuickChart([
+            'width' => $width,
+            'height' => $height,
+            'format' => $format,
+        ]);
+
+        $var = '';
+        foreach ($labels as $entry) {
+            $var .= "'$entry',";
+        }
+        // Put an If statement to change colors based on type or label
+        $background_color_string = '[
+            \'rgba(54, 162, 235, 1)\', // blue
+            \'rgba(75, 192, 192, 1)\', // green
+            \'rgba(255, 99, 132, 1)\', // red
+            \'rgba(255, 159, 64, 1)\', // orange
+            \'rgba(153, 102, 255, 1)\', // purple
+            \'rgba(255, 206, 86, 1)\', // yellow
+            \'rgba(255, 0, 0, 1)\', // bright red
+            \'rgba(0, 255, 255, 1)\', // cyan
+            \'rgba(255, 0, 255, 1)\', // magenta
+            \'rgba(128, 128, 128, 1)\' // grey
+        ]';
+
+
+        $chart->setConfig('{
+            type: "bar",
+            data: {
+                labels: [' . $var . '],
+                datasets: [{
+                    label: "' . $title . '",
+                    backgroundColor: ' . $background_color_string . ',
+                    data: [' . implode(",", $data) . '],
+                    borderColor: \'rgba(0,0,0, 0.95)\',
+                    borderWidth: 0,
+                    weight: 600,
+                    pointBackgroundColor: function(context) {
+                        var index = context.dataIndex;
+                        var value = context.dataset.data[index];
+                        return value === \'DenyList\' ? \'green\' : \'blue\'
+                    }
+                }]
+            },
+            options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        fontSize: 20,
+                        text: \'' . $title . '\',
+                        color: \'#777\',
+                        align: \'center\',
+                        position: \'top\',
+                        fullSize: true
+                    },
+                    legend: {
+                        display: false,
+                        position: \'top\',
+                        align: \'top\',
+                        labels: {
+                            fontColor: \'#777\',
+                            fontStyle: \'bold\',
+                            fontSize: 12,
+                            padding: 12
+                        }
+                    },
+                    plugins: {
+                        doughnutlabel: {
+                            // labels: [
+                            //     {
+                            //         text: \'' . array_sum($data) . '\',
+                            //         font: {
+                            //             size: \'30\',
+                            //             family: \'Arial, Helvetica, sans-serif\',
+                            //             weight: \'bold\'
+                            //         },
+                            //         backgroundColor: \'green\',
+                            //         color: \'#777\'
+                            //     }
+                            // ]
+                        },
+                        datalabels: {
+                            anchor: "center",
+                            align: "center",
+                            color: "white",
+                            backgroundColor: "black",
+                            borderColor: "black",
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            font: {
+                                weight: \'bold\',
+                                size: 12,
+                            }
+                        }
+                    },
+                }
+            }');
+
+        return ($shortUrl) ?  '<figure class="m-2"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" width="' . $width . '" height="' . $height . '" /></figure>' : '<figure class="m-2"><img src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" width="' . $width . '" height="' . $height . '" /></figure>';
     }
 }

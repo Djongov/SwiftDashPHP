@@ -73,8 +73,6 @@ define("THEME_COLORS",
     'gray',
     'slate',
     'stone',
-    'zinc',
-    'neutral'
 ]);
 
 // This is the text while in the light mode

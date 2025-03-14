@@ -77,7 +77,7 @@ return function (RouteCollector $router) {
     $router->addRoute('GET', '/adminx/firewall', [$viewsFolder . '/admin/firewall.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/queries', [$viewsFolder . '/admin/queries.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/mailer', [$viewsFolder . '/admin/mailer.php', $genericMetaAdminDataArray]);
-    $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64encode.php', $genericMetaAdminDataArray]);
+    $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64.php', $genericMetaAdminDataArray]);
 
     // Admin API
     $router->addRoute('POST', '/api/admin/csp/add', [$viewsFolder . '/api/admin/csp/add.php']);
@@ -88,7 +88,7 @@ return function (RouteCollector $router) {
     $router->addRoute('POST', '/api/tools/clear-error-file', [$viewsFolder . '/api/tools/clear-error-file.php']);
     $router->addRoute('POST', '/api/tools/export-csv', [$viewsFolder . '/api/tools/export-csv.php']);
     $router->addRoute('POST', '/api/tools/export-tsv', [$viewsFolder . '/api/tools/export-tsv.php']);
-    $router->addRoute('POST', '/api/tools/base64encode', [$viewsFolder . '/api/tools/base64encode.php']);
+    $router->addRoute('POST', '/api/tools/base64', [$viewsFolder . '/api/tools/base64.php']);
     $router->addRoute('POST', '/api/tools/php-info-parser', [$viewsFolder . '/api/tools/php-info-parser.php']);
 
     /* API Routes */

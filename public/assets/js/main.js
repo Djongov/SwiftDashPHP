@@ -184,9 +184,6 @@ const scrollFunction = () => {
 // When the user clicks on the button, scroll to the top of the document
 scrollToTopButton.addEventListener("click", backToTop);
 
-
-
-
 /* Autload stuff */
 
 const autoLoadParams = document.querySelectorAll('input[type="hidden"][name="autoload"]');
@@ -203,7 +200,7 @@ if (autoLoadParams.length > 0) {
             createDonutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
         }
         if (type === 'piechart') {
-            createPieChart(data.title, data.parentDiv, data.width, data.title, data.height, data.labels, data.data);
+            createPieChart(data.title, data.parentDiv, data.title, data.height, data.width, data.labels, data.data);
         }
         if (type === 'linechart') {
             createLineChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.datasets);

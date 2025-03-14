@@ -15,21 +15,21 @@ echo Html::p('shortUrls are used to shorten the URLs for the images so they can 
 
 // Let's use this general data for all the charts
 $chartData = [
-    'January' => rand(1, 1000),
-    'February' => rand(1, 1000),
-    'March' => rand(1, 1000),
-    'April' => rand(1, 1000),
-    'May' => rand(1, 1000),
-    'June' => rand(1, 1000),
+    'January' => rand(1, 10),
+    'February' => rand(1, 10),
+    'March' => rand(1, 10),
+    'April' => rand(1, 10),
+    'May' => rand(1, 10),
+    'June' => rand(1, 10),
 ];
 
 $chartDataTwo = [
-    'January' => rand(1, 1000),
-    'February' => rand(1, 1000),
-    'March' => rand(1, 1000),
-    'April' => rand(1, 1000),
-    'May' => rand(1, 1000),
-    'June' => rand(1, 1000),
+    'January' => rand(1, 10),
+    'February' => rand(1, 10),
+    'March' => rand(1, 10),
+    'April' => rand(1, 10),
+    'May' => rand(1, 10),
+    'June' => rand(1, 10),
 ];
 
 $min = 0;
@@ -40,41 +40,31 @@ $randomNumber = rand($min, $max);
 
 echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
     // Pie chart
-    echo '<div class="w-full md:w-1/2 lg:w-1/3 p-2">';
+    echo '<div>';
 
-        echo Html::h3('Pie chart');
-
-        echo Html::p('This is a pie chart.');
-
-        echo Charts::doughnutOrPieChart('pie', 'Pie chart', array_keys($chartData), array_values($chartData));
+        echo Charts::doughnutOrPieChart('pie', 'Pie Chart', array_keys($chartData), array_values($chartData));
 
     echo '</div>';
     // Doughnut chart
-    echo '<div class="w-full md:w-1/2 lg:w-1/3 p-2">';
+    echo '<div>';
 
-        echo Html::h3('Doughnut chart');
+        echo Charts::doughnutOrPieChart('donut', 'donut Chart',array_keys($chartData), array_values($chartData));
 
-        echo Html::p('This is a doughnut chart.');
+    echo '</div>';
+    // Bar gauge
+    echo '<div>';
 
-        echo Charts::doughnutOrPieChart('doughnut', 'Doughnut chart',array_keys($chartData), array_values($chartData));
+        echo Charts::barChart('Bar chart', array_keys($chartData), array_values($chartData));
 
     echo '</div>';
     // Radial gauge
-    echo '<div class="w-full md:w-1/2 lg:w-1/3 p-2">';
-
-        echo Html::h3('Radial gauge');
-
-        echo Html::p('This is a Radial gauge.');
+    echo '<div>';
 
         echo Charts::radialGauge('random number ouf of ' . $max, $randomNumber, [$min, $max]);
 
     echo '</div>';
     // Line chart
-    echo '<div class="w-full md:w-1/2 lg:w-1/3 p-2">';
-
-        echo Html::h3('Line chart');
-
-        echo Html::p('This is a line chart.');
+    echo '<div>';
 
         $lineChartData = [
             'labels' => array_keys($chartData),
@@ -125,12 +115,23 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             ]
         ],
         [
+            'type' => 'barchart',
+            'data' => [
+                'parentDiv' => 'doughnut-limits-holder',
+                'title' => 'Bar chart',
+                'width' => 300,
+                'height' => 300,
+                'labels' => array_keys($chartData),
+                'data' => array_values($chartData)
+            ]
+        ],
+        [
             'type' => 'gaugechart',
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',
                 'title' => 'Gauge chart',
-                'width' => 300,
-                'height' => 300,
+                'width' => 275,
+                'height' => 275,
                 'data' => [$randomNumber, $max]
             ]
         ],
