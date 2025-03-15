@@ -16,7 +16,7 @@ class Footer
                 <span class="text-sm sm:text-center $textClass">© $currentYear <a href="/" class="hover:underline">$siteTitle</a>. All Rights Reserved.</span>
                 <ul class="flex flex-wrap justify-center items-center mt-3 text-sm font-medium sm:mt-0">
                     <li>
-                        <a href="#" class="hover:underline me-4 md:me-6">About</a>
+                        <a id="cookie-consent-link" href="" class="hover:underline me-4 md:me-6">Cookie Consent</a>
                     </li>
                     <li>
                         <a href="/privacy-policy" class="hover:underline me-4 md:me-6">Privacy Policy</a>

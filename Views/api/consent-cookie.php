@@ -11,6 +11,19 @@ if (isset($_POST['consent'])) {
         header('Location: https://www.google.com');
         exit;
     }
+} elseif (isset($_POST['get-consent'])) {
+    if (isset($_COOKIE['cookie-consent'])) {
+        Response::output(Cookies::get('cookie-consent'));
+    } else {
+        Response::output('no consent');
+    }
+} elseif (isset($_POST['delete-consent'])) {
+    if (isset($_COOKIE['cookie-consent'])) {
+        Cookies::delete('cookie-consent');
+        Response::output('consent deleted');
+    } else {
+        Response::output('no consent cookie to delete', 404);
+    }
 } else {
     Response::output('invalid request', 400);
 }

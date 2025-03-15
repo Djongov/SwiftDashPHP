@@ -36,7 +36,7 @@ class CookieBanner {
             ]
         ];
         return '
-        <div id="cookie-banner" class="z-50 fixed bottom-5 left-1/2 transform -translate-x-1/2 border border-gray-700 dark:border-gray-400 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-lg w-full max-w-md">
+        <div id="cookie-banner" class="z-50 fixed bottom-5 left-1/2 transform -translate-x-1/2 border border-gray-700 dark:border-gray-400 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-lg shadow-lg max-w-md">
             <p class="text-sm">We use cookies to enhance your experience. By continuing to use our site, you agree to our use of cookies.</p>
             ' . $cookieListHtml . '
             <div class="mt-3 flex items-center justify-start space-x-3">

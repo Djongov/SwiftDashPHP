@@ -245,8 +245,7 @@ if (ip) {
 // Universal fetch function
 async function fetchData(form, resultDivId = null, resultType = null) {
     const formMethod = form.getAttribute('method'); // Use getAttribute to get PUT/DELETE
-
-    const csrfToken = form.querySelector('input[name="csrf_token"]').value;
+    const csrfToken = (form.querySelector('input[name="csrf_token"]')) ? form.querySelector('input[name="csrf_token"]').value : null;
     
     const fetchOptions = {
         method: formMethod,
@@ -304,7 +303,7 @@ async function fetchData(form, resultDivId = null, resultType = null) {
 
     if (contentType.includes('application/json')) {
         responseData = await response.json();
-        responseType = 'json'; // Mark it as JSON
+        let responseType = 'json'; // Mark it as JSON
     } else {
         responseData = await response.text();
     }
@@ -810,3 +809,170 @@ if (deleteButtons.length > 0) {
         });
     });
 }
+
+const createModal = (id, title, submitButtonName, parentDiv, action) => {
+    let html = `
+     <form id="${id}-form" action="${action}" method="POST">
+        <!-- Main modal -->
+        <div id="${id}-container" class="relative bg-gray-50 dark:bg-gray-700 md:max-w-2xl max-w-full max-h-full md:mx-auto mx-2 border border-gray-700 dark:border-gray-400 shadow overflow-auto">
+            <!-- Modal header -->
+            <div class="mx-4 flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    ${title}
+                </h3>
+                <button id="${id}-x-button" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal content -->
+            <div class="relative overflow-auto max-h-[44rem] rounded-lg dark:bg-gray-700">
+                <div id="${id}-body" class="p-4 md:p-5 space-y-4 break-words">
+                        <p class="text-base leading-relaxed text-gray-700 dark:text-gray-400"></p>
+                </div>
+            </div>
+            <!-- Modal Result -->
+            <div id="${id}-result" class="m-4"></div>
+            <!-- Modal footer -->
+            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button id="${id}-edit" type="submit" class="text-white bg-${theme}-700 hover:bg-${theme}-800 focus:ring-4 focus:outline-none focus:ring-${theme}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-${theme}-600 dark:hover:bg-${theme}-700 dark:focus:ring-${theme}-800">${submitButtonName}</button>
+                <button id="${id}-close-button" type="button" class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-${theme}-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Cancel</button>
+            </div>
+        </div>
+    </form>
+    `;
+
+    const modal = document.createElement('div');
+    modal.id = id;
+    modal.classList.add('overflow-auto', 'fixed', 'top-0', 'right-0', 'left-0', 'z-50', 'justify-center', 'items-center', 'w-full', 'md:inset-0', 'h-[calc(100%-1rem)]', 'max-h-full', 'mt-4');
+    modal.setAttribute('data-modal-backdrop', 'static');
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-hidden', 'true');
+
+    modal.innerHTML = html;
+    parentDiv.appendChild(modal);
+
+    // Return the modal element so event listeners can be added separately
+    return modal;
+};
+
+const initializeModal = (modal, uniqueId) => {
+    // Show the modal
+    modal.classList.remove('hidden');
+
+    // Disable scrolling on the rest of the page
+    document.body.classList.add('overflow-hidden');
+
+    // Blur the body excluding the modal
+    toggleBlur(modal);
+
+    // Get modal buttons
+    const closeXButton = document.getElementById(`${uniqueId}-x-button`);
+    const cancelButton = document.getElementById(`${uniqueId}-close-button`);
+    const cancelButtonsArray = [closeXButton, cancelButton];
+
+    // Function to close the modal
+    const closeModal = () => {
+        modal.remove(); // Remove modal from DOM
+        document.body.classList.remove('overflow-hidden'); // Restore scrolling
+        toggleBlur(modal); // Remove blur effect
+        document.removeEventListener('keydown', handleEscapeKey); // Remove Escape key listener
+    };
+
+    // Function to handle the Escape key press
+    const handleEscapeKey = (event) => {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    };
+
+    // Add click listeners to cancel buttons
+    cancelButtonsArray.forEach(button => {
+        if (button) button.addEventListener('click', closeModal);
+    });
+
+    // Add Escape key listener
+    document.addEventListener('keydown', handleEscapeKey);
+};
+
+// Cookie Consent modal
+const cookieConsentLink = document.getElementById('cookie-consent-link');
+
+if (cookieConsentLink) {
+    cookieConsentLink.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const modalId = 'cookie-consent-modal';
+        const modal = createModal(modalId, 'Cookie Consent', 'Accept', document.body, '/api/cookie-consent');
+        document.body.insertBefore(modal, document.body.firstChild);
+        initializeModal(modal, modalId);
+        // Add a loader until we populate the data
+        let modalBody = document.getElementById(`${modalId}-body`);
+        createLoader(modalBody, `${modalId}-loader`, 'Loading data...');
+        // Now that we have the loader spinning, let's pick up the cookie data
+        const modalForm = document.getElementById(`${modalId}-form`);
+        // Add a input hidden field in the form - get-consent
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'get-consent';
+        hiddenInput.value = 'true';
+        modalForm.appendChild(hiddenInput);
+        // Now let's fetch the data
+        // ✅ Fetch and log the resolved data
+        try {
+            const cookieData = await handleCookieFetchData(modalForm);
+            modalBody.innerHTML = cookieData.data;
+            if (cookieData.data === 'no consent') {
+                modalBody.innerHTML = `You have not consented to cookies use yet. Please click the Accept button on the cookie banner to consent.`;
+            }
+            if (cookieData.data === 'accept') {
+                modalBody.innerHTML = `You have already consented to cookies use.`;
+                // Let's offer the user to revoke the consent
+                document.getElementById(`${modalId}-edit`).innerText = 'Revoke';
+                //Switch the theme with red
+                document.getElementById(`${modalId}-edit`).classList.remove(`bg-${theme}-700`, `hover:bg-${theme}-800`, `focus:ring-${theme}-300`, `dark:bg-${theme}-600`, `dark:hover:bg-${theme}-700`, `dark:focus:ring-${theme}-800`);
+                document.getElementById(`${modalId}-edit`).classList.add('bg-red-700', 'hover:bg-red-800', 'focus:ring-red-300', 'dark:bg-red-600', 'dark:hover:bg-red-700', 'dark:focus:ring-red-800');
+                // Let's create a hidden input field to revoke the consent delete-consent
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'delete-consent';
+                hiddenInput.value = 'true';
+                modalForm.appendChild(hiddenInput);
+                // Remove the get-consent hideen input
+                modalForm.removeChild(document.querySelector('input[name="get-consent"]'));
+                modalForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    // Send the request to revoke the consent
+                    handleCookieFetchData(modalForm).then(data => {
+                        if (data.data === 'consent deleted') {
+                            modalBody.innerHTML = `You have successfully revoked the consent to use cookies.`;
+                            // reload
+                            location.reload();
+                        }
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching cookie data:", error);
+        }
+    });
+}
+
+const handleCookieFetchData = async (formElement) => {
+    try {
+        const response = await fetch('/api/cookie-consent', {
+            method: 'POST',
+            body: new FormData(formElement),
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch data');
+        }
+        const data = await response.json();
+        //console.log('Fetched Data:', data);  // Debugging log
+        return data; // Ensure you return the data here
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null; // Return null if there's an error
+    }
+};

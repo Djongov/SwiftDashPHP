@@ -40,7 +40,8 @@ class Cookies
     }
     public static function delete(string $name) : void
     {
-        setcookie($name, '', time() - 3600);
+        setcookie($name, '', time() - 3600, '/');
+        unset($_COOKIE[$name]);
     }
     public static function exists(string $name) : bool
     {
