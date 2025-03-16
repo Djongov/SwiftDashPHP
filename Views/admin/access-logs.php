@@ -154,8 +154,8 @@ if ($os === 'windows') {
             'data' => [
                 'parentDiv' => 'charts',
                 'title' => $chartType,
-                'width' => 180,
-                'height' => 180,
+                'width' => 250,
+                'height' => 250,
                 'labels' => array_keys($parsedLog['counts'][$chartType]),
                 'data' => array_values($parsedLog['counts'][$chartType])
             ]

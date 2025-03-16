@@ -52,8 +52,8 @@ $domainData = [
     'data' => [
         'parentDiv' => 'csp-charts',
         'title' => 'Domains',
-        'width' => 180,
-        'height' => 180,
+        'width' => 300,
+        'height' => 300,
         'labels' => array_keys($domainsCount),
         'data' => array_values($domainsCount)
     ]
@@ -70,8 +70,8 @@ $violatedDirectivesData = [
     'data' => [
         'parentDiv' => 'csp-charts',
         'title' => 'Violated Directives',
-        'width' => 180,
-        'height' => 180,
+        'width' => 300,
+        'height' => 300,
         'labels' => array_keys($violatedDirectivesCount),
         'data' => array_values($violatedDirectivesCount)
     ]
@@ -88,8 +88,8 @@ $statusCodesData = [
     'data' => [
         'parentDiv' => 'csp-charts',
         'title' => 'Status Codes',
-        'width' => 180,
-        'height' => 180,
+        'width' => 300,
+        'height' => 300,
         'labels' => array_keys($statusCodesCount),
         'data' => array_values($statusCodesCount)
     ]
