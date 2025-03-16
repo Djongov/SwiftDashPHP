@@ -384,12 +384,15 @@ class Html
         $title = $required 
             ? 'title="required ' . htmlspecialchars($label_name) . ' field"' 
             : '';
+        
+        $textColorScheme = TEXT_COLOR_SCHEME;
+        $textDarkColorScheme = TEXT_DARK_COLOR_SCHEME;
 
         return <<<HTML
-    <label {$title} for="{$id}" class="block my-2 text-sm font-medium {TEXT_COLOR_SCHEME} {TEXT_DARK_COLOR_SCHEME}">
-        {$label_name}{$requiredIndicator}
-    </label>
-    HTML;
+        <label {$title} for="{$id}" class="block my-2 text-sm font-medium {$textColorScheme} {$textDarkColorScheme}">
+            {$label_name}{$requiredIndicator}
+        </label>
+        HTML;
     }
     public static function code(string $text, string $codeTitle = '', array $classes = []): string
     {
@@ -398,8 +401,10 @@ class Html
             ? '<p class="font-bold ' . $classString . '">' . htmlspecialchars($codeTitle) . '</p>' 
             : '';
 
+        $lightColorSchemeClass = LIGHT_COLOR_SCHEME_CLASS;
+        $darkColorSchemeClass = DARK_COLOR_SCHEME_CLASS;
         return <<<HTML
-    <pre class="p-4 m-4 max-w-fit overflow-auto {LIGHT_COLOR_SCHEME_CLASS} rounded-lg border border-gray-200 shadow-md {DARK_COLOR_SCHEME_CLASS} dark:border-gray-700 break-words">
+    <pre class="p-4 m-4 max-w-fit overflow-auto {$lightColorSchemeClass} rounded-lg border border-gray-200 shadow-md {$darkColorSchemeClass} dark:border-gray-700 break-words">
         {$titleHtml}
         <code class="c0py">{$text}</code>
     </pre>

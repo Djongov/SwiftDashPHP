@@ -436,7 +436,7 @@ const loaderString = (text = null) => {
     `;
 }
 
-const editModal = (id, entryId) => {
+const editModal = (id, entryId, table) => {
     let html = `
      <form id="${id}-form">
         <!-- Main modal -->
@@ -444,7 +444,7 @@ const editModal = (id, entryId) => {
             <!-- Modal header -->
             <div class="mx-4 flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    Editing entry with id ${entryId}
+                    Editing entry with id ${entryId} in table <u>${table}</u>
                 </h3>
                 <button id="${id}-x-button" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="${id}">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -563,7 +563,7 @@ if (editButtons.length > 0) {
             // First fetch the data from /api/datagrid/get-records
             const uniqueId = generateUniqueId(4);
             // Generate the modal
-            let modal = editModal(uniqueId, button.dataset.id);
+            let modal = editModal(uniqueId, button.dataset.id, button.dataset.table);
             // Insert the modal at the bottom of the first div after the body
             document.body.insertBefore(modal, document.body.firstChild);
             // Now show the modal

@@ -81,6 +81,7 @@ $html .= '<div class="mb-6">';
             if ($dataTypes[$key] === 'datetime') {
                 // We first need to handle null datetime values, which might be true for new records, but we also don't want to add default values
                 if ($value === null) {
+                    $html .= '</div>'; // Close the div otherwise it nests
                     continue;
                 }
                 // Check the database driver to handle datetime values accordingly

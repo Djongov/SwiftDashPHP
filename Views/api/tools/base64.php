@@ -23,5 +23,5 @@ if (isset($_POST['decode']) && !isset($_POST['encode'])) {
     if (!is_string($_POST['decode'])) {
         Response::output('decode param must be a string', 400);
     }
-    echo '<div class="container break-words">' . Html::code(base64_decode($_POST['decode'])) . '</div>';
+    echo '<div class="container break-words">' . Html::code(htmlspecialchars(base64_decode($_POST['decode']))) . '</div>';
 }
