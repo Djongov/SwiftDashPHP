@@ -34,6 +34,8 @@ if ($usernameArray) {
 
 echo Alerts::success('Successfully connected to the database');
 
+echo "<div>";
+
 echo Html::h1('Welcome to SwiftDashPHP', true);
 
 echo Html::p('SwiftDashPHP is a modern, open-source PHP framework for quickly building powerful applications.', ['text-center']);
@@ -84,6 +86,7 @@ foreach ($featuresArray as $title => $text) {
   echo Html::p($text, ['text-center', 'mx-12']);
 }
 
+echo "</div>";
 // Let's render the mardwon we have for the Auth
 //echo Page::render(ROOT . '/Views/docs/authentication', $theme);
 

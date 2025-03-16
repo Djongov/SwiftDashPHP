@@ -1,43 +1,111 @@
-# SwiftDashPHP
+# Welcome to SwiftDashPHP
 
-A framework for quickly deploying apps (best suited for dashboard apps) that will run the most modern PHP version, has MySQL DB and authentication methods such as local, Microsoft Entra ID (Azure AD), Microsoft LIVE, Google out of the box and a lot of nice components such as DataGrid and Forms. Suitable for monolith or microservices. Has content-security-policy reporting endpoint, Firewall to filter traffic and much more. Ready for deployment anywhere, on Windows IIS, Apache, Nginx and Docker containers. Supports out of the box color dark/light and color themes as well as user and admin panels. All written in pure PHP. Good for learning too.
+SwiftDashPHP is a modern, open-source PHP framework for quickly building powerful applications.
 
-## Dependencies
+No Magic - Pure PHP behind and pure JS for front parts
 
-Dependencies you can see in the `composer.json` file. Make sure to run `composer update` on fresh pulls.
+Makes it easy to start with built-in features such as:
 
-## To Do
+- Authentication for local, Google, MS (live and Azure)
+- Support for MySQL/MariaDB/SQlite/Postgres
+- TailwindCSS
+- DataGrid with powerful features
+- Charts (via Chart.js and QuickChart.io)
+- Markdown rendering
+- Forms
+- API
+- Admin Panel
+- HTML Components
+- User Settings
+- Easy containerization with Docker
+- Dark Mode
+- Localisation
+- SendGrid mailsender
 
-- Find a way to secure /login?destination=https://bad-domain.com. Logic to rewrite the "state" paramter is there but JS does something to prevent it from functioning well
+---
 
-## Start
+## Authentication for local, Google, MS (live and Azure)
 
-``` bash
-composer create-project djongov/swiftdashphp .
-```
+SwiftDashPHP comes with a built-in authentication system that is easy to use and customize. Check it out on our [Docs section](/docs/authentication). We also have security features such as a Firewall that stops IPs from accessing parts we want to protect, as well as parts that we want to keep public.
 
-## Routing and available variables
+---
 
-Routing provides the following variables for each controller
+## Support for MySQL/MariaDB/SQlite/Postgres
 
-**GET** requests
+SwiftDashPHP supports MySQL, MariaDB, SQLite, and Postgres. You can easily switch between them by changing the `.env` file. The database connection is handled by PDO, with very little magic in between, taking advantage of the agnostic nature of PDO. There is no ORM, so you write your own queries.
 
-``$usernameArray`` - An array holding user info
+---
 
-``$isAdmin`` - A boolean if the user is an admin
+## TailwindCSS
 
-**POST**, **PUT**, **DELETE** and other REST methods
+SwiftDashPHP uses TailwindCSS for styling. The framework uses a global `$theme` variable which can be switched easily and utilizes Tailwind's native colors such as sky, cyan, emerald, teal, blue, indigo, violet, purple, fuchsia, pink, red, rose, orange, yellow, amber, lime, gray, slate, stone. Each user has their own styling based on these colors. There is also global theming for light and dark modes, based on constants in the config file. The dark/light switch is based on the dark class mode in TailwindCSS. Everything comes ready with a switcher, default system theming, chart theming, and requires very little effort on your part.
 
-``$vars`` - An array holding 4 keys
+---
 
-**usernameArray** (An array holding user info)
+## DataGrid with powerful features
 
-**isAdmin** (A boolean if the user is an admin)
+SwiftDashPHP comes with a powerful DataGrid component (based on Datatables) that allows you to display data in a table with features such as sorting, filtering, pagination, and more. It can display PHP Arrays, DB queries, whole DB tables, and provides CRUD for those. More on [DataGrid](/datagrid).
 
-**loggedIn** (A boolean if the user is an admin)
+---
 
-**theme** (a string holind the user theme)
+## Charts (via Chart.js and QuickChart.io)
 
-## DataGrid
+Chart.js and Quickchart.io are ready-to-use chart functions for the most popular chart types. You can also easily autoload JS charts only with PHP code using the autoloading mechanism. See more in the example [Charts](/charts).
 
-max_input_vars needs to be account for
+---
+
+## Markdown rendering
+
+With the power of Parsedown (which, as of now, is not up to date for PHP 8.4) and some custom classes we have here, you can render locally stored or remotely stored Markdown files automatically styled with Tailwind. Check out the [Docs](/docs) section. Here let's render some MD below.
+
+## Forms
+
+This is a big one. All (or almost all) of the buttons that do something on the framework are actually Form Components. The Forms component takes out the big headache of creating the form and the submission hurdles of it. You can easily create modals too. Built-in CSRF protection is also included. Check out the [Forms](/forms) section.
+
+---
+
+## API
+
+Since it's PHP, we know doing API endpoints is not hard. The framework helps a bit with some Response classes and some API checks, along with a few other tools like JWT capabilities and API keys.
+
+---
+
+## Admin Panel
+
+We have an Admin panel which is basic but cool and expandable.
+
+---
+
+## HTML Components
+
+We have an HTML component which has static HTML methods providing HTML elements. DataGrid and Forms components are using it, as well as normal HTML output, for standardized output everywhere.
+
+---
+
+## User Settings
+
+Comes with a user settings page as well, built-in with some features.
+
+---
+
+## Easy containerization with Docker
+
+Tested to run in a container with a ready-to-use Dockerfile that can get the app running on major cloud platforms in a few clicks.
+
+---
+
+## Dark Mode
+
+Built-in Dark/Light mode.
+
+---
+
+## Localisation
+
+The foundation for localisation is there; you just need to expand it. A working language switcher is also included.
+
+---
+
+## SendGrid mailsender
+
+API endpoint for sending mails and a TinyMCE endpoint for sending manually.
