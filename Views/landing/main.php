@@ -30,7 +30,9 @@ try {
 
 if ($usernameArray) {
   echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
+  echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
 }
+
 
 echo Alerts::success('Successfully connected to the database');
 

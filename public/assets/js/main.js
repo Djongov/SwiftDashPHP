@@ -849,7 +849,7 @@ const createModal = (id, title, submitButtonName, parentDiv, action) => {
     modal.classList.add('overflow-auto', 'fixed', 'top-0', 'right-0', 'left-0', 'z-50', 'justify-center', 'items-center', 'w-full', 'md:inset-0', 'h-[calc(100%-1rem)]', 'max-h-full', 'mt-4');
     modal.setAttribute('data-modal-backdrop', 'static');
     modal.setAttribute('tabindex', '-1');
-    modal.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('aria-hidden', 'false');
 
     modal.innerHTML = html;
     parentDiv.appendChild(modal);
@@ -872,21 +872,6 @@ const initializeModal = (modal, uniqueId) => {
     const closeXButton = document.getElementById(`${uniqueId}-x-button`);
     const cancelButton = document.getElementById(`${uniqueId}-close-button`);
     const cancelButtonsArray = [closeXButton, cancelButton];
-
-    // Function to close the modal
-    const closeModal = () => {
-        modal.remove(); // Remove modal from DOM
-        document.body.classList.remove('overflow-hidden'); // Restore scrolling
-        toggleBlur(modal); // Remove blur effect
-        document.removeEventListener('keydown', handleEscapeKey); // Remove Escape key listener
-    };
-
-    // Function to handle the Escape key press
-    const handleEscapeKey = (event) => {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    };
 
     // Add click listeners to cancel buttons
     cancelButtonsArray.forEach(button => {
@@ -976,3 +961,44 @@ const handleCookieFetchData = async (formElement) => {
         return null; // Return null if there's an error
     }
 };
+
+function attachTooltip(targetElement, tooltipContent) {
+    // Create tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.innerHTML = tooltipContent;
+    tooltip.style.position = 'absolute';
+    tooltip.style.padding = '5px 10px';
+    tooltip.style.background = 'black';
+    tooltip.style.color = 'white';
+    tooltip.style.borderRadius = '4px';
+    tooltip.style.fontSize = '12px';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.display = 'none';
+    tooltip.style.zIndex = '9999';
+    document.body.appendChild(tooltip);
+  
+    // Event listeners
+    targetElement.addEventListener('mouseover', (e) => {
+      tooltip.style.left = (e.pageX + 10) + 'px';
+      tooltip.style.top = (e.pageY + 10) + 'px';
+      tooltip.style.display = 'block';
+    });
+  
+    targetElement.addEventListener('mousemove', (e) => {
+      tooltip.style.left = (e.pageX + 10) + 'px';
+      tooltip.style.top = (e.pageY + 10) + 'px';
+    });
+  
+    targetElement.addEventListener('mouseout', () => {
+      tooltip.style.display = 'none';
+    });
+  }
+  
+  const tooltipElements = document.querySelectorAll('.tooltip');
+
+  if (tooltipElements.length > 0) {
+    tooltipElements.forEach((element) => {
+        element.classList.add('mouse-pointer');
+      attachTooltip(element, element.getAttribute('data-tooltip'));
+    });
+  }
