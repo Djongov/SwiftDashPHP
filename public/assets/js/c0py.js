@@ -37,23 +37,43 @@ const copyToClipboard = () => {
             // Set the click event handler for copying to clipboard
             button.addEventListener("click", () => {
                 const textToCopy = element.textContent || element.innerText;
-                navigator.clipboard.writeText(textToCopy)
-                    .then(() => {
-                        div1.textContent = 'Copied';
-                        button.querySelector("svg").classList.replace(`text-${theme}-500`, "text-red-500");
-                    })
-                    .catch(error => {
+            
+                // Check if running on HTTP
+                if (window.location.protocol === "http:") {
+                    // Fallback for HTTP (optional, can be removed if you only want to show a message)
+                    try {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = textToCopy;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+            
+                        div1.textContent = 'Copied (Fallback)';
+                    } catch (err) {
                         div1.textContent = 'Failed to copy';
-                        console.error("Failed to copy text:", error);
-                    });
-
+                        console.error("Fallback failed:", err);
+                    }
+                } else {
+                    // Clipboard API for HTTPS
+                    navigator.clipboard.writeText(textToCopy)
+                        .then(() => {
+                            div1.textContent = 'Copied';
+                            button.querySelector("svg").classList.replace(`text-${theme}-500`, "text-red-500");
+                        })
+                        .catch(error => {
+                            div1.textContent = 'Failed to copy';
+                            console.error("Failed to copy text:", error);
+                        });
+                }
+            
                 div1.classList.remove('hidden');
-
+            
                 setTimeout(() => {
                     div1.classList.add('hidden');
                     button.querySelector("svg").classList.replace("text-red-500", `text-${theme}-500`);
                 }, 1000);
-            });
+            });            
         }
     });
 };
