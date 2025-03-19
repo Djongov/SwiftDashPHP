@@ -350,7 +350,7 @@ class DB
         $value = strtolower($value);
 
         // SQLite data type mappings
-        if (str_starts_with($value, 'integer') || str_starts_with($value, 'int')) {
+        if (str_starts_with($value, 'integer') || str_starts_with($value, 'int') || str_starts_with($value, 'smallint') || str_starts_with($value, 'bigint')) {
             $type = 'int';
         }
         if (str_starts_with($value, 'real') || str_starts_with($value, 'float') || str_starts_with($value, 'double') || str_starts_with($value, 'numeric') || str_starts_with($value, 'decimal')) {
