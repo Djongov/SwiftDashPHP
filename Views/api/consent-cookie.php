@@ -2,6 +2,7 @@
 
 use App\Core\Cookies;
 use App\Api\Response;
+use App\Core\Session;
 
 if (isset($_POST['consent'])) {
     if ($_POST['consent'] === 'accept') {
@@ -20,6 +21,8 @@ if (isset($_POST['consent'])) {
 } elseif (isset($_POST['delete-consent'])) {
     if (isset($_COOKIE['cookie-consent'])) {
         Cookies::delete('cookie-consent');
+        // Destroy the session too
+        Session::reset();
         Response::output('consent deleted');
     } else {
         Response::output('no consent cookie to delete', 404);
