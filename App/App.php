@@ -50,9 +50,9 @@ class App
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:
                 if ($httpMethod === 'GET' && !str_contains($uri, '/api/')) {
-                    $loginInfoArray = RequireLogin::check(false);
+                    $loginInfo = RequireLogin::check(false);
                     // Theme
-                    $theme = (isset($loginInfoArray['usernameArray']['theme'])) ? $loginInfoArray['usernameArray']['theme'] : COLOR_SCHEME;
+                    $theme = (isset($loginInfo['usernameArray']['theme'])) ? $loginInfo['usernameArray']['theme'] : COLOR_SCHEME;
                     $errorPage = new Page();
                     echo $errorPage->build(
                         '404 Not Found', // Title
@@ -61,9 +61,9 @@ class App
                         OG_LOGO, // Thumbimage
                         $theme, // Theme
                         MAIN_MENU, // Menu
-                        $loginInfoArray['usernameArray'], // Username array
+                        $loginInfo['usernameArray'], // Username array
                         dirname($_SERVER['DOCUMENT_ROOT']) . '/Views/errors/error.php', // Controller
-                        $loginInfoArray['isAdmin'] // isAdmin
+                        $loginInfo['isAdmin'] // isAdmin
                     );
                 } else {
                     // For non-GET requests, provide an API response
@@ -78,41 +78,58 @@ class App
                 break;
 
             case \FastRoute\Dispatcher::FOUND:
-                $controllerName = $routeInfo[1][0]; // the controller file
-                // This is how we can tell if it's an API endpoint
-                $api = (str_contains($controllerName, '/api/')) ? true : false;
-                // Now let's capture all the parameters $routeInfo[1][1]['metadata']
-                $params = isset($routeInfo[1][1]['metadata']) ? $routeInfo[1][1]['metadata'] : [];
-                // Include and execute the PHP file
-                if (file_exists($controllerName)) {
-                    $loginInfoArray = RequireLogin::check($api);
-                    // Assign some variables to pass on to the view for general use
-                    $usernameArray = $loginInfoArray['usernameArray'];
-                    $vars['usernameArray'] = $usernameArray;
-                    $loggedIn = $loginInfoArray['loggedIn'];
-                    $vars['loggedIn'] = $loggedIn;
-                    $isAdmin = $loginInfoArray['isAdmin'];
-                    $vars['isAdmin'] = $isAdmin;
-                    $theme = (isset($usernameArray['theme'])) ? $usernameArray['theme'] : COLOR_SCHEME;
-                    $vars['theme'] = $theme;
-                    /* Do login check */
-                    if ($api) {
-                        include_once $controllerName;
-                    } else {
-                        if ($httpMethod === 'GET') {
-                            if (!empty($params)) {
-                                $menuArray = $params['menu'];
-                                $page = new Page();
-                                echo $page->build($params['title'], $params['description'], $params['keywords'], $params['thumbimage'], $theme, $menuArray, $usernameArray, $controllerName, $isAdmin);
-                            } else {
-                                include_once $controllerName;
-                            }
-                        } else {
-                            include_once $controllerName;
-                        }
-                    }
+                $controllerInfo = $routeInfo[1];
+                $controllerName = $controllerInfo[0]; // Path to controller file
+            
+                // Determine if it's an API endpoint
+                $isApi = str_contains($controllerName, '/api/');
+            
+                // Extract route metadata parameters if any
+                $params = $controllerInfo[1]['metadata'] ?? [];
+            
+                if (!file_exists($controllerName)) {
+                    throw new \Exception("Controller file ({$controllerName}) not found");
+                }
+            
+                // Check login status
+                $loginInfo = RequireLogin::check($isApi);
+                $vars['usernameArray'] = $loginInfo['usernameArray'];
+                $vars['isAdmin'] = $loginInfo['isAdmin'];
+                $vars['loggedIn'] = $loginInfo['loggedIn'];
+            
+                // Set theme (fallback to default if not set)
+                $vars['theme'] = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+            
+                // API Endpoints: Directly include and run
+                if ($isApi) {
+                    // Add those variables so they are available for API calls too before the include
+                    $usernameArray = $vars['usernameArray'];
+                    $isAdmin = $vars['isAdmin'];
+                    $theme = $vars['theme'];
+                    $loggedIn = $vars['loggedIn'];
+
+                    include_once $controllerName;
+
+                    break;
+                }
+            
+                // Non-API Endpoints
+                if ($httpMethod === 'GET' && !empty($params)) {
+                    $menuArray = $params['menu'] ?? [];
+                    $page = new Page();
+                    echo $page->build(
+                        $params['title'],
+                        $params['description'],
+                        $params['keywords'],
+                        $params['thumbimage'],
+                        $vars['theme'],
+                        $menuArray,
+                        $vars['usernameArray'],
+                        $controllerName,
+                        $vars['isAdmin']
+                    );
                 } else {
-                    throw new \Exception('Controller file (' . $controllerName . ') not found');
+                    include_once $controllerName;
                 }
                 break;
         }

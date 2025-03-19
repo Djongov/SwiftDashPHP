@@ -12,8 +12,6 @@ $checks->checkParams(['table', 'id', 'columns'], $_POST);
 // We need the most strict checks for this endpoint
 $checks->apiChecks();
 
-$theme = $loginInfoArray['usernameArray']['theme']; // This comes from the router
-
 // We will only fetch the columns that are passed in the request
 
 $selectColumnsArray = explode(',', $_POST['columns']);
