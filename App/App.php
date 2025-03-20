@@ -63,7 +63,8 @@ class App
                         MAIN_MENU, // Menu
                         $loginInfo['usernameArray'], // Username array
                         dirname($_SERVER['DOCUMENT_ROOT']) . '/Views/errors/error.php', // Controller
-                        $loginInfo['isAdmin'] // isAdmin
+                        $loginInfo['isAdmin'], // isAdmin
+                        $routeInfo
                     );
                 } else {
                     // For non-GET requests, provide an API response
@@ -126,7 +127,8 @@ class App
                         $menuArray,
                         $vars['usernameArray'],
                         $controllerName,
-                        $vars['isAdmin']
+                        $vars['isAdmin'],
+                        $routeInfo // Pass route info to the controllers that are GET and build a page
                     );
                 } else {
                     include_once $controllerName;
