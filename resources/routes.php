@@ -69,6 +69,7 @@ return function (RouteCollector $router) {
     $router->addRoute('GET', '/adminx', [$viewsFolder . '/admin/index.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/server', [$viewsFolder . '/admin/server.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/users', [$viewsFolder . '/admin/users.php', $genericMetaAdminDataArray]);
+    $router->addRoute('GET', '/adminx/api-access-log', [$viewsFolder . '/admin/api-access-log.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/cache', [$viewsFolder . '/admin/cache.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/system-logs', [$viewsFolder . '/admin/system-logs.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/csp-reports', [$viewsFolder . '/admin/csp/csp-reports.php', $genericMetaAdminDataArray]);

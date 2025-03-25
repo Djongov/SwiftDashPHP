@@ -16,6 +16,9 @@ define("ADMIN_MENU", [
     'Users' => [
         'link' => '/adminx/users',
     ],
+    'API Access Log' => [
+        'link' => '/adminx/api-access-log',
+    ],
     'Cache' => [
         'link' => '/adminx/cache',
     ],

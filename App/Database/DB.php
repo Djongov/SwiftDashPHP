@@ -10,12 +10,13 @@ class DB
     private $pdo;
 
     public function __construct(
-        string $host = DB_HOST,
-        string $username = DB_USER,
-        string $password = DB_PASS,
+        ?string $host = DB_HOST,
+        ?string $username = DB_USER,
+        ?string $password = DB_PASS,
         string $database = DB_NAME,
-        int $port = DB_PORT,
-        string $driver = DB_DRIVER
+        ?int $port = DB_PORT,
+        string $driver = DB_DRIVER,
+        ?bool $ssl = DB_SSL
     ) {
         $config = [
             'driver' => $driver,
@@ -24,7 +25,8 @@ class DB
             'username' => $username,
             'password' => $password,
             'port' => $port,
-            'driver' => $driver
+            'driver' => $driver,
+            'ssl' => $ssl
         ];
 
         $this->connect($config);
@@ -41,7 +43,7 @@ class DB
         }
     
         $dsn = $this->buildDsn($config);
-        $options = $this->getPDOOptions();
+        $options = $this->getPDOOptions($config['ssl']);
     
         try {
             $this->pdo = new \PDO($dsn, $config['username'], $config['password'], $options);
@@ -91,7 +93,7 @@ class DB
             }
 
             // Add SSL options if enabled
-            if (defined("DB_SSL") && DB_SSL) {
+            if ($config['ssl']) {
                 $dsn .= "sslmode=require;";
                 // Add CA certificate path
                 $dsn .= "sslrootcert=" . constant('DB_CA_CERT') . ";";
@@ -102,11 +104,11 @@ class DB
     }
 
 
-    private function getPDOOptions(): array
+    private function getPDOOptions(bool $ssl): array
     {
         // You can add any default PDO options here if needed
         $options = [];
-        if (defined("DB_SSL") && DB_SSL) {
+        if ($ssl) {
             $options[\PDO::MYSQL_ATTR_SSL_CA] = constant('DB_CA_CERT');
         }
         $options[\PDO::ATTR_EMULATE_PREPARES] = false;

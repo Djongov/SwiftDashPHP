@@ -31,6 +31,42 @@ try {
 if ($usernameArray) {
   echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
   echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
+
+  // Let's try to connect to SQLite DB while the main connection is to a MySQL DB
+  try {
+    $newDb = new App\Database\DB(null, null, null, 'dashboard', null, 'sqlite', false);
+    
+    $pdonew = $newDb->getConnection();
+    } catch (\PDOException $e) {
+      $errorMessage = $e->getMessage();
+      error_log("Caught PDOException: " . $errorMessage);
+    
+      // MySQL error code 1049 is for unknown database
+      if (str_contains($errorMessage, 'Unknown database')) {
+          // Pick up the database name from the error
+          $databaseName = explode('Unknown database ', $errorMessage)[1];
+          $errorMessage = 'Database ' . $databaseName . ' not found. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
+      }
+      // Postgres 08006 is for connection failure database does not exist
+      if (str_contains($errorMessage, 'does not exist')) {
+          $databaseName = explode('database ', $errorMessage)[1];
+          $errorMessage = 'Database ' . $databaseName . '. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
+      }
+      echo Alerts::danger($errorMessage); // Handle the exception
+      return;
+    }
+    
+    // Let's query the other db with select * from users
+    
+    $stmt = $pdonew->query('SELECT name FROM sqlite_master WHERE type=\'table\' ORDER BY name;');
+    
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $newArray = [];
+    foreach ($result as $table) {
+      $newArray[] = $table['name'];
+    }
+    echo \Components\DataGrid::fromData('From SQLite', $newArray, $theme);
 }
 
 

@@ -59,7 +59,7 @@ class AccessLog
         $createAcceptedParams = ['request_id', 'api_key', 'status_code'];
         foreach ($data as $key => $value) {
             if (!in_array($key, $createAcceptedParams)) {
-                return ['error' => 'Invalid parameter ' . $key, 'status' => 400];
+                throw new AccessLogException('Invalid parameter ' . $key, 400);
             }
         }
         // Make sure that the required parameters are passed
@@ -67,11 +67,11 @@ class AccessLog
         // Check if the required parameters are passed
         foreach ($requiredParams as $name) {
             if (!array_key_exists($name, $data)) {
-                return ['error' => 'missing parameter \'' . $name . '\'', 'status' =>  400];
+                throw new AccessLogException('parameter \'' . $name . '\' is required', 400);
             }
             // need to check if the parameter is empty but not use empty() as it returns incorrect for value 0
             if ($data[$name] === null || $data[$name] === '') {
-                return ['error' => 'parameter \'' . $name . '\' cannot be empty', 'status' =>  400];
+                throw new AccessLogException('parameter \'' . $name . '\' cannot be empty', 400);
             }
         }
 

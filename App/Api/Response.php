@@ -29,7 +29,7 @@ class Response
         // Record the request in the access log
         (new AccessLog())->add([
             'request_id' => $requestId,
-            'api_key' => getApiKeyFromHeaders(),
+            'api_key' => getApiKeyFromHeaders() ?? 'no api key',
             'status_code' => $statusCode
         ]);
         return json_encode(
@@ -37,6 +37,7 @@ class Response
                 'result' => $responseStatus,
                 'timestampUTC' => gmdate(self::$dateFormat),
                 'serverResponseTimeMs' => self::responseTime(),
+                'client_ip' => currentIP(),
                 'requestId' => $requestId,
                 'data' => $data
             ],
@@ -63,14 +64,23 @@ class Response
                 }
             }
         };
+        $requestId = self::requestId();
         // Populate the XML document with data
         $arrayToXml([
             'result' => $responseStatus,
             'timestampUTC' => gmdate(self::$dateFormat),
             'serverResponseTimeMs' => self::responseTime(),
-            'requestId' => self::requestId(),
+            'requestId' => $requestId,
             'data' => $data
         ], $xml);
+
+        
+        // Record the request in the access log
+        (new AccessLog())->add([
+            'request_id' => $requestId,
+            'api_key' => getApiKeyFromHeaders() ?? 'no api key',
+            'status_code' => $statusCode
+        ]);
 
         return $xml->asXML(); // Return the XML as a string
     }
