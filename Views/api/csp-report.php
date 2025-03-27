@@ -24,7 +24,7 @@ if (!isset($jsonArray['csp-report'])) {
 }
 
 // Now let's check if the directives are present
-$expectedDirectives = ['document-uri', 'referrer', 'violated-directive', 'effective-directive', 'original-policy', 'disposition', 'blocked-uri', 'status-code', 'script-sample'];
+$expectedDirectives = ['document-uri', 'referrer', 'violated-directive', 'effective-directive', 'original-policy', 'disposition', 'blocked-uri', 'status-code'];
 
 foreach ($expectedDirectives as $directive) {
     if (!isset($jsonArray['csp-report'][$directive])) {
