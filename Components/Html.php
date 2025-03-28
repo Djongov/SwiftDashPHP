@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components;
 
 class Html
 {
-    public static function h1($text, $center = false, $extraClasses = []) : string
+    public static function h1($text, $center = false, $extraClasses = []): string
     {
         if ($center) {
             array_push($extraClasses, 'text-center');
@@ -15,7 +17,7 @@ class Html
             return '<h1 class="mx-2 my-2 text-2xl md:text-3xl lg:text-4xl font-bold leading-none tracking-tight ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' ' . implode(' ', $extraClasses) . '">' . $text . '</h1>';
         }
     }
-    public static function h2($text, $center = false, $extraClasses = []) : string
+    public static function h2($text, $center = false, $extraClasses = []): string
     {
         if ($center) {
             array_push($extraClasses, 'text-center');
@@ -27,7 +29,7 @@ class Html
             return '<h2 class="mx-2 my-2 text-xl md:text-2xl lg:text-3xl font-bold leading-none tracking-tight ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' ' . implode(' ', $extraClasses) . '">' . $text . '</h2>';
         }
     }
-    public static function h3($text, $center = false, $extraClasses = []) : string
+    public static function h3($text, $center = false, $extraClasses = []): string
     {
         if ($center) {
             array_push($extraClasses, 'text-center');
@@ -38,7 +40,7 @@ class Html
             return '<h3 class="mx-2 my-2 text-md md:text-md lg:text-xl font-bold ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' break-words ' . implode(' ', $extraClasses) . '">' . $text . '</h3>';
         }
     }
-    public static function h4($text, $center = false, $extraClasses = []) : string
+    public static function h4($text, $center = false, $extraClasses = []): string
     {
         if ($center) {
             array_push($extraClasses, 'text-center');
@@ -49,7 +51,7 @@ class Html
             return '<h4 class="mx-2 my-2 text-md font-bold ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' break-words ' . implode(' ', $extraClasses) . '">' . $text . '</h4>';
         }
     }
-    public static function h5($text, $center = false, $extraClasses = []) : string
+    public static function h5($text, $center = false, $extraClasses = []): string
     {
         if ($center) {
             array_push($extraClasses, 'text-center');
@@ -61,7 +63,7 @@ class Html
         }
     }
     // Anchor
-    public static function a($text, $href, $theme, $target = '_self', $extraClasses = []) : string
+    public static function a($text, $href, $theme, $target = '_self', $extraClasses = []): string
     {
         if (!$extraClasses) {
             return '<a href="' . $href . '" target="' . $target . '" class="text-' . $theme . '-500 hover:underline dark:text-' . $theme . '-400">' . $text . '</a>';
@@ -69,7 +71,7 @@ class Html
             return '<a href="' . $href . '" target="' . $target . '" class="text-' . $theme . '-500 hover:underline dark:text-' . $theme . '-400 ' . implode(' ', $extraClasses) . '">' . $text . '</a>';
         }
     }
-    public static function p(string $text, array $extraClasses = []) : string
+    public static function p(string $text, array $extraClasses = []): string
     {
         $defaultClasses = [
             'break-words',
@@ -79,7 +81,7 @@ class Html
 
         return '<p class="' . implode(' ', $classes) . '">' . $text . '</p>';
     }
-    public static function small($text, $extraClasses = []) : string
+    public static function small($text, $extraClasses = []): string
     {
         if (!$extraClasses) {
             return '<small class="my-2 break-words text-center">' . $text . '</small>';
@@ -87,7 +89,7 @@ class Html
             return '<small class="my-2 break-words text-center ' . implode(' ', $extraClasses) . '">' . $text . '</small>';
         }
     }
-    public static function warningParagraph($text, $extraClasses = []) : string
+    public static function warningParagraph($text, $extraClasses = []): string
     {
         if (!$extraClasses) {
             return '<p class="mx-2 my-2 text-red-500 font-semibold">' . $text . '</p>';
@@ -95,7 +97,7 @@ class Html
             return '<p class="mx-2 my-2 text-red-500 font-semibold ' . implode(' ', $extraClasses) . '">' . $text . '</p>';
         }
     }
-    public static function divBox($content, $extraClasses = []) : string
+    public static function divBox($content, $extraClasses = []): string
     {
         if (!$extraClasses) {
             return '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">' . $content . '</div>';
@@ -104,7 +106,7 @@ class Html
         }
     }
     /* Form elements */
-    public static function input(string $size, string $type, ?string $id, string $name, string $title, mixed $value, string $placeholder, string $description, string $label_name, string $theme, bool $disabled, bool $required, bool $readOnly, bool $encased = true, ?int $min = null, ?int $max = null, float|int|null $step = null, $pattern = '', $extraClasses = [], $dataAttributes = []) : string
+    public static function input(string $size, string $type, ?string $id, string $name, string $title, mixed $value, string $placeholder, string $description, string $label_name, string $theme, bool $disabled, bool $required, bool $readOnly, bool $encased = true, ?int $min = null, ?int $max = null, float|int|null $step = null, $pattern = '', $extraClasses = [], $dataAttributes = []): string
     {
         if ($disabled || $readOnly) {
             $theme = 'red';
@@ -174,7 +176,7 @@ class Html
 
         // Extra classes now
         $inputClasses = array_merge($inputClasses, $extraClasses);
-        
+
         // First get some of the meta data
         $disabled = $disabled ? 'disabled' : '';
         $requiredOriginal = $required;
@@ -219,9 +221,9 @@ class Html
         $html = '';
         if ($encased) {
             $html .= '<div class="my-4">';
-                if ($label_name !== '') {
-                    $html .= self::label($id, $label_name, $requiredOriginal);
-                }
+            if ($label_name !== '') {
+                $html .= self::label($id, $label_name, $requiredOriginal);
+            }
                 $html .= $inputHtml;
                 $html .= ($description !== '') ? '<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">' . $description . '</p>' : '';
             $html .= '</div>';
@@ -230,7 +232,6 @@ class Html
         }
 
         return $html;
-        
     }
     public static function textArea(
         ?string $id,
@@ -251,7 +252,7 @@ class Html
     ): string {
         // Generate unique ID if not provided
         $id ??= uniqid();
-    
+
         // Prepare attributes
         $attributes = self::buildAttributes([
             'id' => $id,
@@ -265,14 +266,14 @@ class Html
             'required' => $required ? 'required' : null,
             'readonly' => $readonly ? 'readonly' : null,
         ], $dataAttributes);
-    
+
         // Build textarea HTML
         $textareaHtml = sprintf(
             '<textarea %s>%s</textarea>',
             $attributes,
             htmlspecialchars($value)
         );
-    
+
         // Build outer container with label and description
         return sprintf(
             '<div class="my-4">%s%s%s</div>',
@@ -281,14 +282,15 @@ class Html
             $description ? sprintf('<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">%s</p>', $description) : ''
         );
     }
-    
-    private static function buildAttributes(array $attributes, array $dataAttributes = []): string {
+
+    private static function buildAttributes(array $attributes, array $dataAttributes = []): string
+    {
         // Merge regular attributes and data attributes
         $mergedAttributes = array_merge(
             array_filter($attributes, fn($value) => $value !== null),
             array_map(fn($key, $value) => "data-$key=\"$value\"", array_keys($dataAttributes), $dataAttributes)
         );
-    
+
         // Build a string of attributes
         return implode(' ', array_map(
             fn($key, $value) => is_numeric($key) ? $value : "$key=\"$value\"",
@@ -296,8 +298,9 @@ class Html
             $mergedAttributes
         ));
     }
-    
-    private static function buildInputClasses(string $theme, array $extraClasses): string {
+
+    private static function buildInputClasses(string $theme, array $extraClasses): string
+    {
         // Core input classes
         $baseClasses = [
             'w-full', 'p-2', 'text-sm', BODY_COLOR_SCHEME_CLASS, 'appearance-none', 'border-2',
@@ -306,7 +309,7 @@ class Html
             'dark:bg-gray-900', 'dark:border-gray-600', 'dark:placeholder-gray-400', 'dark:text-white',
             "dark:focus:ring-$theme-500", "dark:focus:border-$theme-500"
         ];
-    
+
         // Combine with extra classes
         return implode(' ', array_merge($baseClasses, $extraClasses));
     }
@@ -325,7 +328,7 @@ class Html
     ): string {
         // Generate a unique ID if not provided
         $id = $id ?: uniqid($name);
-    
+
         // Prepare description with popover if provided
         $descriptionHtml = '';
         if (!empty($description)) {
@@ -340,7 +343,7 @@ class Html
     </i>
     HTML;
         }
-    
+
         // Convert boolean attributes to HTML attributes
         $attributes = [
             'disabled' => $disabled ? 'disabled' : '',
@@ -348,12 +351,12 @@ class Html
             'checked' => $checked ? 'checked' : '',
             'required' => $required ? 'required' : '',
         ];
-    
+
         $attributeString = implode(' ', array_filter($attributes));
-    
+
         // Extra classes
         $extraClassesString = !empty($extraClasses) ? implode(' ', $extraClasses) : '';
-    
+
         // Checkbox input and label HTML
         return <<<HTML
     <div class="mt-2">
@@ -377,14 +380,14 @@ class Html
     }
     public static function label(string $id, string $label_name, bool $required): string
     {
-        $requiredIndicator = $required 
-            ? '<span class="text-red-500"> *</span>' 
+        $requiredIndicator = $required
+            ? '<span class="text-red-500"> *</span>'
             : '';
-        
-        $title = $required 
-            ? 'title="required ' . htmlspecialchars($label_name) . ' field"' 
+
+        $title = $required
+            ? 'title="required ' . htmlspecialchars($label_name) . ' field"'
             : '';
-        
+
         $textColorScheme = TEXT_COLOR_SCHEME;
         $textDarkColorScheme = TEXT_DARK_COLOR_SCHEME;
 
@@ -397,8 +400,8 @@ class Html
     public static function code(string $text, string $codeTitle = '', array $classes = []): string
     {
         $classString = implode(' ', $classes);
-        $titleHtml = $codeTitle !== '' 
-            ? '<p class="font-bold ' . $classString . '">' . htmlspecialchars($codeTitle) . '</p>' 
+        $titleHtml = $codeTitle !== ''
+            ? '<p class="font-bold ' . $classString . '">' . htmlspecialchars($codeTitle) . '</p>'
             : '';
 
         $lightColorSchemeClass = LIGHT_COLOR_SCHEME_CLASS;
@@ -410,33 +413,33 @@ class Html
     </pre>
     HTML;
     }
-    public static function horizontalLine() : string
+    public static function horizontalLine(): string
     {
         return '<hr class="my-4 border-gray-300 sm:mx-auto dark:border-gray-700">';
     }
-    public static function selectInputClasses($theme) : string
+    public static function selectInputClasses($theme): string
     {
         return 'ml-2 p-1 text-sm text-gray-900 border outline-none border-gray-300 rounded ' . BODY_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' focus:ring-' . $theme . '-500 focus:border-' . $theme . '-500  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-' . $theme . '-500 dark:focus:border-' . $theme . '-500';
     }
-    public static function badge($text, $theme) : string
+    public static function badge($text, $theme): string
     {
         return '<span class="inline-block py-px px-2 mb-4 text-xs leading-5 text-gray-900 bg-' . $theme . '-200 font-medium uppercase rounded-full shadow-sm">' . $text . '</span>';
     }
-    public static function waveSeparator($theme, $color_strength_one, $color_strength_two, $color_strength_three) : string
+    public static function waveSeparator($theme, $color_strength_one, $color_strength_two, $color_strength_three): string
     {
         $html = '<div class="w-full">';
         $html .= '<svg viewBox="0 0 1428 154" version="1.1" xmlns="http://www.w3.org/2000/svg"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g class="fill-' . $theme . '-' . $color_strength_one . '" fill-rule="nonzero"><path d="M0,0 C90.7283404,0.927527913 147.912752,27.187927 291.910178,59.9119003 C387.908462,81.7278826 543.605069,89.334785 759,82.7326078 C469.336065,156.254352 216.336065,153.6679 0,74.9732496" opacity="0.3"></path><path d="M100,104.708498 C277.413333,72.2345949 426.147877,52.5246657 546.203633,45.5787101 C666.259389,38.6327546 810.524845,41.7979068 979,55.0741668 C931.069965,56.122511 810.303266,74.8455141 616.699903,111.243176 C423.096539,147.640838 250.863238,145.462612 100,104.708498 Z" opacity="0.3"></path><path d="M1046,51.6521276 C1130.83045,29.328812 1279.08318,17.607883 1439,40.1656806 L1439,120 C1271.17211,77.9435312 1140.17211,55.1609071 1046,51.6521276 Z" id="Path-4" class="fill-' . $theme . '-' . $color_strength_two . '"></path></g><g transform="translate(-4, 60)" class="fill-' . $theme . '-' . $color_strength_three . '" fill-rule="nonzero"><path d="M0.457,34.035 C57.086,53.198 98.208,65.809 123.822,71.865 C181.454,85.495 234.295,90.29 272.033,93.459 C311.355,96.759 396.635,95.801 461.025,91.663 C486.76,90.01 518.727,86.372 556.926,80.752 C595.747,74.596 622.372,70.008 636.799,66.991 C663.913,61.324 712.501,49.503 727.605,46.128 C780.47,34.317 818.839,22.532 856.324,15.904 C922.689,4.169 955.676,2.522 1011.185,0.432 C1060.705,1.477 1097.39,3.129 1121.236,5.387 C1161.703,9.219 1208.621,17.821 1235.4,22.304 C1285.855,30.748 1354.351,47.432 1440.886,72.354 L1441.191,104.352 L1.121,104.031 L0.457,14.035 Z"></path></g></g></svg>';
         $html .= '</div>';
         return $html;
     }
-    public static function waveSeparatorLight($theme, $color_strength_one) : string
+    public static function waveSeparatorLight($theme, $color_strength_one): string
     {
         $html = '<div class="w-full">';
         $html .= '<svg viewBox="0 0 1428 154" version="1.1" xmlns="http://www.w3.org/2000/svg"><title>background waves</title><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-4, 60)" class="fill-' . $theme . '-' . $color_strength_one . '" fill-rule="nonzero"><path d="M0.457,34.035 C57.086,53.198 98.208,65.809 123.822,71.865 C181.454,85.495 234.295,90.29 272.033,93.459 C311.355,96.759 396.635,95.801 461.025,91.663 C486.76,90.01 518.727,86.372 556.926,80.752 C595.747,74.596 622.372,70.008 636.799,66.991 C663.913,61.324 712.501,49.503 727.605,46.128 C780.47,34.317 818.839,22.532 856.324,15.904 C922.689,4.169 955.676,2.522 1011.185,0.432 C1060.705,1.477 1097.39,3.129 1121.236,5.387 C1161.703,9.219 1208.621,17.821 1235.4,22.304 C1285.855,30.748 1354.351,47.432 1440.886,72.354 L1441.191,104.352 L1.121,104.031 L0.457,14.035 Z"></path></g></g></svg>';
         $html .= '</div>';
         return $html;
     }
-    public static function waveSeparatorLeft($theme, $color_strength_one) : string
+    public static function waveSeparatorLeft($theme, $color_strength_one): string
     {
         $html = '<div class="w-full">';
         $html .= '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 160" ><g _ngcontent-ccg-c38=""><g data-name="background shapes"><path class="fill-' . $theme . '-' . $color_strength_one . '" opacity="0.3" d="M1001.3,183.07c-477.77,0-702.14-122.79-949.95-122.79Q24.46,60.28,0,61V193.12H1024V182.93Q1012.81,183.07,1001.3,183.07Z"></path></g></g></svg>';
@@ -444,7 +447,7 @@ class Html
         return $html;
     }
 
-    public static function waveSeparatorBottom($theme, $color_strength_one, $flipped = false) : string
+    public static function waveSeparatorBottom($theme, $color_strength_one, $flipped = false): string
     {
         $html = '<div class="w-full">';
         if ($flipped) {
@@ -456,19 +459,19 @@ class Html
         $html .= '</div>';
         return $html;
     }
-    public static function bigButtonLink($link, $text, $theme) : string
+    public static function bigButtonLink($link, $text, $theme): string
     {
         return '<a class="my-2 inline-flex items-center justify-center px-7 py-3 h-14 w-full md:w-auto mb-2 md:mb-0 md:mr-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
     }
-    public static function mediumButtonLink($link, $text, $theme) : string
+    public static function mediumButtonLink($link, $text, $theme): string
     {
         return '<a class="inline-flex items-center justify-center ml-2 my-2 px-2 py-2 h-10 w-32 md:w-44 mb-2 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
     }
-    public static function smallButtonLink($link, $text, $theme) : string
+    public static function smallButtonLink($link, $text, $theme): string
     {
         return '<a class="px-2 py-1 text-md my-2 inline-flex items-center justify-center text-md leading-7 text-gray-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
     }
-    public static function infoBadge($text, $id, $theme) : string
+    public static function infoBadge($text, $id, $theme): string
     {
         $html = '';
         $html .= '<i data-popover-target="' . $id . '" class="w-3 mx-1 h-6 text-gray-100 bg-' . $theme . '-500 text-center cursor-pointer ml-1 rounded-full border border-gray-300">i';
@@ -480,7 +483,7 @@ class Html
         $html .= '</i>';
         return $html;
     }
-    public static function loadSpinner($id, $loadingText, $theme, $hidden = true) : string
+    public static function loadSpinner($id, $loadingText, $theme, $hidden = true): string
     {
         if ($hidden) {
             $hiddenClass = 'hidden';
@@ -499,19 +502,19 @@ class Html
         $html .= '</div>';
         return $html;
     }
-    public static function submitButton($id, $text, $theme) : string
+    public static function submitButton($id, $text, $theme): string
     {
         return '<button id="' . $id . '" type="submit" class="mt-2 ml-2 my-2 text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 focus:ring-4 focus:ring-' . $theme . '-300 font-medium rounded-lg text-sm p-2 me-2 mb-2 dark:bg-' . $theme . '-600 dark:hover:bg-' . $theme . '-700 focus:outline-none dark:focus:ring-' . $theme . '-800">' . $text . '</button>';
     }
-    public static function submitButtonX($id, $title) : string
+    public static function submitButtonX($id, $title): string
     {
         return '<button id="' . $id . '" type="submit" class="cursor-pointer hover:text-red-700" title="' . $title . '">&#10060;</button>';
     }
-    public static function simpleButton($id, $text, $theme) : string
+    public static function simpleButton($id, $text, $theme): string
     {
         return '<button id="' . $id . '" type="button" class="w-16 h-10 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 focus:ring-' . $theme . '-500 focus:ring-offset-' . $theme . '-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg">' . $text . '</button>';
     }
-    public static function toggleCheckBox($id, $name, $text, $checked, $theme, $disabled = false) : string
+    public static function toggleCheckBox($id, $name, $text, $checked, $theme, $disabled = false): string
     {
         if ($checked) {
             $checked = 'checked';
@@ -533,11 +536,11 @@ class Html
         $html .= '</div>';
         return $html;
     }
-    public static function searchInput($theme) : string
+    public static function searchInput($theme): string
     {
         return '<input type="search" class="filterSearch my-2 py-2 px-4 w-48 h-8 text-sm ' . BODY_COLOR_SCHEME_CLASS . ' outline-none appearance-none border border-gray-300 rounded-lg text-gray-700 leading-tight focus:outline-none focus:' . BODY_COLOR_SCHEME_CLASS . ' focus:border-' . $theme . '-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-' . $theme . '-500 dark:focus:border-' . $theme . '-500" placeholder="search..." />';
     }
-    public static function popOver($text, $id, $theme = 'gray') : string
+    public static function popOver($text, $id, $theme = 'gray'): string
     {
         $html = '';
         $html .= '<button data-popover-target="' . $id . '" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-1 text-' . $theme . '-400 hover:text-' . $theme . '-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button>';
@@ -548,15 +551,15 @@ class Html
         $html .= '</div>';
         return $html;
     }
-    public static function backButton(string $theme) : string
+    public static function backButton(string $theme): string
     {
         return '<button class="back-button mx-auto py-3 px-5 leading-5 text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium text-center focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm">Go Back</button>';
     }
-    public static function blockquote($text, $theme) : string
+    public static function blockquote($text, $theme): string
     {
         return '<blockquote class="my-4 p-4 text-lg text-gray-900 bg-' . $theme . '-100 dark:bg-gray-800 dark:text-gray-300 border-l-4 border-' . $theme . '-500 rounded-lg">' . $text . '</blockquote>';
     }
-    public static function ul(array $items) : string
+    public static function ul(array $items): string
     {
         $html = '';
         $html .= '<ul class="list-disc list-inside">';

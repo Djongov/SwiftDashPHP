@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Components\Alerts;
 use Components\Html;
@@ -29,42 +31,42 @@ try {
 }
 
 if ($usernameArray) {
-  echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
-  echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
+    echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
+    echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
 
   // Let's try to connect to SQLite DB while the main connection is to a MySQL DB
-  try {
-    $newDb = new App\Database\DB(null, null, null, 'dashboard', null, 'sqlite', false);
-    
-    $pdonew = $newDb->getConnection();
+    try {
+        $newDb = new App\Database\DB(null, null, null, 'dashboard', null, 'sqlite', false);
+
+        $pdonew = $newDb->getConnection();
     } catch (\PDOException $e) {
-      $errorMessage = $e->getMessage();
-      error_log("Caught PDOException: " . $errorMessage);
-    
-      // MySQL error code 1049 is for unknown database
-      if (str_contains($errorMessage, 'Unknown database')) {
-          // Pick up the database name from the error
-          $databaseName = explode('Unknown database ', $errorMessage)[1];
-          $errorMessage = 'Database ' . $databaseName . ' not found. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
-      }
-      // Postgres 08006 is for connection failure database does not exist
-      if (str_contains($errorMessage, 'does not exist')) {
-          $databaseName = explode('database ', $errorMessage)[1];
-          $errorMessage = 'Database ' . $databaseName . '. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
-      }
-      echo Alerts::danger($errorMessage); // Handle the exception
-      return;
+        $errorMessage = $e->getMessage();
+        error_log("Caught PDOException: " . $errorMessage);
+
+        // MySQL error code 1049 is for unknown database
+        if (str_contains($errorMessage, 'Unknown database')) {
+            // Pick up the database name from the error
+            $databaseName = explode('Unknown database ', $errorMessage)[1];
+            $errorMessage = 'Database ' . $databaseName . ' not found. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
+        }
+        // Postgres 08006 is for connection failure database does not exist
+        if (str_contains($errorMessage, 'does not exist')) {
+            $databaseName = explode('database ', $errorMessage)[1];
+            $errorMessage = 'Database ' . $databaseName . '. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
+        }
+        echo Alerts::danger($errorMessage); // Handle the exception
+        return;
     }
-    
+
     // Let's query the other db with select * from users
-    
+
     $stmt = $pdonew->query('SELECT name FROM sqlite_master WHERE type=\'table\' ORDER BY name;');
-    
+
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $newArray = [];
     foreach ($result as $table) {
-      $newArray[] = $table['name'];
+        $newArray[] = $table['name'];
     }
     echo \Components\DataGrid::fromData('From SQLite', $newArray, $theme);
 }
@@ -91,7 +93,7 @@ $featuresArray = [
   'TailwindCSS' => 'SwiftDashPHP uses TailwindCSS for styling. The framework uses a global <b>$theme</b> variable which can be switched easily and is using the tailwind native colors such as ' .
   implode(', ', THEME_COLORS) . '. Also each user has its own styling based on the same colors. There is also a global theming for the light and dark mode which is based on the some constants in the config file. And finally the dark/light switch is based on the dark class mode in TailwindCSS. All comes ready with a swticher, default system theming, chart theming and very little for you to care about.',
   // DataGrid
-  'DataGrid with powerful features' => 'SwiftDashPHP comes with a powerful DataGrid component (based on Datatables) that allows you to display data in a table with features such as sorting, filtering, pagination, and more. Can display PHP Arrays, DB queries, whole DB tables and provides CRUD for those. More on ' . Html::a('DataGrid' , '/datagrid', $theme),
+  'DataGrid with powerful features' => 'SwiftDashPHP comes with a powerful DataGrid component (based on Datatables) that allows you to display data in a table with features such as sorting, filtering, pagination, and more. Can display PHP Arrays, DB queries, whole DB tables and provides CRUD for those. More on ' . Html::a('DataGrid', '/datagrid', $theme),
   // Charts
   'Charts (via Chart.js and QuickChart.io)' => 'Chart.js and Quickchart.io ready to use chart functions for the most popular chart types. Also easily autoload JS charts only with PHP code with the autoloading mechanism. See more the example ' . Html::a('Charts', '/charts', $theme),
   // Markdown
@@ -119,9 +121,9 @@ $featuresArray = [
 echo Html::divBox(Html::ul(array_keys($featuresArray)), ['text-center', 'mx-auto']);
 
 foreach ($featuresArray as $title => $text) {
-  echo Html::horizontalLine();
-  echo Html::h2($title, true);
-  echo Html::p($text, ['text-center', 'mx-12']);
+    echo Html::horizontalLine();
+    echo Html::h2($title, true);
+    echo Html::p($text, ['text-center', 'mx-12']);
 }
 
 echo "</div>";
@@ -144,8 +146,8 @@ echo Html::horizontalLine();
 echo Html::h2('Current Issues', true, ['mt-10']);
 
 foreach ($currentIssues as $category => $array) {
-  echo Html::h3($category, true);
-  echo Components\Table::auto($array);
+    echo Html::h3($category, true);
+    echo Components\Table::auto($array);
 }
 
 ?>

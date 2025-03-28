@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Path: Models/AccessLog.php
 
@@ -17,8 +19,8 @@ class AccessLog extends BasicModel
 {
     private $table = 'api_access_log';
     private $mainColumn = 'request_id';
-    
-    public function setter($table, $mainColumn) : void
+
+    public function setter($table, $mainColumn): void
     {
         $this->table = $table;
         $this->mainColumn = $mainColumn;
@@ -30,7 +32,7 @@ class AccessLog extends BasicModel
      * @param      string|int $param the id or the ip in CIDR notation
      * @return     string bool
      */
-    public function exists(string|int $param) : bool
+    public function exists(string|int $param): bool
     {
         $db = new DB();
 
@@ -54,7 +56,7 @@ class AccessLog extends BasicModel
      * @return     array returns the IP data as an associative array and if no parameter is provided, returns fetch_all
      * @throws     AccessLogException
      */
-    public function get(string|int|null $param = null, ?string $sort = null, ?int $limit = null, ?string $orderBy = null) : array
+    public function get(string|int|null $param = null, ?string $sort = null, ?int $limit = null, ?string $orderBy = null): array
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -83,7 +85,7 @@ class AccessLog extends BasicModel
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         }
     }
-    public function add(array $data) : void
+    public function add(array $data): void
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -96,7 +98,7 @@ class AccessLog extends BasicModel
             throw (new AccessLogException())->generic($e->getMessage(), 400);
         }
     }
-    public function delete(int $id, string $deletedBy) : bool
+    public function delete(int $id, string $deletedBy): bool
     {
         // Check if IP exists
         if (!$this->exists($id)) {
@@ -113,7 +115,7 @@ class AccessLog extends BasicModel
             throw (new AccessLogException())->notDeleted();
         }
     }
-    public function deleteAll() : bool
+    public function deleteAll(): bool
     {
         $db = new DB();
         $pdo = $db->getConnection();

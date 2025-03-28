@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Path: App/Exceptions/FirewallException.php
 
@@ -8,19 +10,19 @@ namespace App\Exceptions;
 
 class FirewallException extends TemplateException
 {
-    public function ipAlreadyExists() : self
+    public function ipAlreadyExists(): self
     {
         return new self('IP already exists', 409);
     }
-    public function ipDoesNotExist() : self
+    public function ipDoesNotExist(): self
     {
         return new self('IP does not exist', 404);
     }
-    public function ipNotUpdated() : self
+    public function ipNotUpdated(): self
     {
         return new self('IP not updated', 500);
     }
-    public function invalidIP() : self
+    public function invalidIP(): self
     {
         return new self('invalid IP', 400);
     }

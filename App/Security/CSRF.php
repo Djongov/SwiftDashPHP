@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Security;
 
 class CSRF
 {
-    public static function generate() : string
+    public static function generate(): string
     {
         return bin2hex(random_bytes(35));
     }
-    public static function create() : string
+    public static function create(): string
     {
         if (isset($_SESSION['csrf_token'])) {
             return $_SESSION['csrf_token'];
@@ -18,7 +20,7 @@ class CSRF
             return $token;
         }
     }
-    public static function createTag() : string
+    public static function createTag(): string
     {
         $token = self::create();
         return '<input type="hidden" name="csrf_token" value="' . $token . '" />';

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
@@ -12,7 +14,7 @@ use PDOException;
 
 class Install
 {
-    public function start() : string
+    public function start(): string
     {
         $html = '';
         $html .= Html::h2('Database does not exist, attempting to create it', true);
@@ -83,9 +85,8 @@ class Install
             } elseif (DB_DRIVER === 'sqlite') {
                 $dsnWithDb = 'sqlite:' . dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools/' . DB_NAME . '.db';
             }
-            
+
             $conn = new PDO($dsnWithDb, DB_USER, DB_PASS, $options);
-            
         } catch (PDOException $e) {
             Response::output('Database selection error: ' . $e->getMessage(), 400);
         }
@@ -168,5 +169,4 @@ class Install
             Response::output('Inserting csp_approved_domains rule for domain ' . $domain . ' error: ' . $e->getMessage(), 400);
         }
     }
-
 }

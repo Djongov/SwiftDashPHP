@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Core;
 
 class Session
 {
-    public static function start() : void
+    public static function start(): void
     {
         // Only start session if the consent cookie is set and the value is accept
         if (isset($_COOKIE['cookie-consent']) && $_COOKIE['cookie-consent'] === 'accept') {
@@ -29,7 +31,7 @@ class Session
         }
     }
     // Reset the session
-    public static function reset() : void
+    public static function reset(): void
     {
         session_unset();
         session_destroy();

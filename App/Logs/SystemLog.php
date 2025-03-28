@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Logs;
 
@@ -9,7 +11,7 @@ use App\Utilities\General;
 
 class SystemLog
 {
-    public static function write(string $message, string $category) : void
+    public static function write(string $message, string $category): void
     {
         $username = AuthToken::get() != null ? JWT::extractUserName(AuthToken::get()) : 'unknown';
         $db = new DB();

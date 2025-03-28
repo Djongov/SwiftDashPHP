@@ -1,12 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components\Page;
 
 use Components\ThemeSwitcher;
 use Components\LanguageSwitcher;
+
 class Menu
 {
-    public static function render(array $array, array $usernameArray, bool $isAdmin, string $theme) : string
+    public static function render(array $array, array $usernameArray, bool $isAdmin, string $theme): string
     {
         // Start the nav
         $html = '<nav class="px-2 ' . LIGHT_COLOR_SCHEME_CLASS . ' border-gray-200 dark:border-gray-700 ' . DARK_COLOR_SCHEME_CLASS . '">';
@@ -102,19 +105,19 @@ class Menu
         $html .= '</nav>';
         return $html;
     }
-    public static function dropDownUserMenu(string $name, string $theme, bool $isAdmin, ?string $picture) : string
+    public static function dropDownUserMenu(string $name, string $theme, bool $isAdmin, ?string $picture): string
     {
         $html = '<div class="flex md:order-2">';
             $html .= '<div class="flex items-center justify-between ml-2">';
                 $html .= '<div class="flex items-center">';
                     // Now the profile picture
-                    if ($picture !== null && !empty($picture)) {
-                        $html .= '<img class="w-8 h-8 rounded-full" src="' . $picture . '" alt="' . $name . '" />';
-                    } else {
-                        $html .= '<svg class="ml-1 w-12 h-12 stroke-' . $theme . '-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
+        if ($picture !== null && !empty($picture)) {
+            $html .= '<img class="w-8 h-8 rounded-full" src="' . $picture . '" alt="' . $name . '" />';
+        } else {
+            $html .= '<svg class="ml-1 w-12 h-12 stroke-' . $theme . '-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>';
-                    }
+        }
                     // Button to open the dropdown
                     $html .= '<button id="' . uniqid() . '" data-dropdown-toggle="userAvatarDropDownNavBar" class="ml-1 flex justify-between items-center py-2 pr-4 pl-3 w-full font-medium hover:bg-' . $theme . '-500 rounded hover:text-gray-100 truncate max-w-sm cursor-pointer">
                             ' . $name;
@@ -130,18 +133,18 @@ class Menu
             // Open the <ul>
                 $html .= '<ul class="py-1 text-sm ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '" aria-labelledby="dropdownLargeButton">';
                 // Display the admin menus to admin users
-                foreach (USERNAME_DROPDOWN_MENU as $name => $array) {
-                    if ($array['admin'] && $isAdmin) {
-                        $html .= '<li>';
-                        $html .= '<a href="' . $array['path'] . '" class="block py-2 px-4 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">' . $name . '</a>';
-                        $html .= '</li>';
-                    } elseif (!$array['admin']) {
-                        // Display non-admin menu items to all users
-                        $html .= '<li>';
-                        $html .= '<a href="' . $array['path'] . '" class="block py-2 px-4 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">' . $name . '</a>';
-                        $html .= '</li>';
-                    }
-                }
+        foreach (USERNAME_DROPDOWN_MENU as $name => $array) {
+            if ($array['admin'] && $isAdmin) {
+                $html .= '<li>';
+                $html .= '<a href="' . $array['path'] . '" class="block py-2 px-4 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">' . $name . '</a>';
+                $html .= '</li>';
+            } elseif (!$array['admin']) {
+                // Display non-admin menu items to all users
+                $html .= '<li>';
+                $html .= '<a href="' . $array['path'] . '" class="block py-2 px-4 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">' . $name . '</a>';
+                $html .= '</li>';
+            }
+        }
                 $html .= '</ul>';
             $html .= '</div>';
         $html .= '</div>';

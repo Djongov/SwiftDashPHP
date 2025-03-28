@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace App\Security;
 
 use App\Database\DB;
@@ -7,7 +10,8 @@ use App\Logs\SystemLog;
 
 class Firewall
 {
-    public static function cirdMatch ($ip, $range) {
+    public static function cirdMatch($ip, $range)
+    {
         list($subnet, $bits) = explode('/', $range);
         if ($bits === null) {
             $bits = 32;
@@ -19,7 +23,8 @@ class Firewall
         return ($ip & $mask) == $subnet;
     }
 
-    public static function activate() {
+    public static function activate()
+    {
         // Find out the real client IP
         $client_ip = currentIP();
         $db = new DB();

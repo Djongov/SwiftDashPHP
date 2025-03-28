@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Api;
 
@@ -13,13 +15,13 @@ class Response
     {
         return round((microtime(true) - START_TIME) * 1000);
     }
-    public static function requestId() : string
+    public static function requestId(): string
     {
-        
+
         $requestId = random_bytes(16);
         return bin2hex($requestId);
     }
-    public static function responseJson(mixed $data, int $statusCode) : string
+    public static function responseJson(mixed $data, int $statusCode): string
     {
         $responseStatus = 'success';
         if ($statusCode >= 400) {
@@ -54,7 +56,7 @@ class Response
         $xml = new \SimpleXMLElement('<response/>');
 
         // Helper function to convert data to XML
-        $arrayToXml = function($data, $xml) use (&$arrayToXml) {
+        $arrayToXml = function ($data, $xml) use (&$arrayToXml) {
             foreach ($data as $key => $value) {
                 if (is_array($value)) {
                     $subnode = $xml->addChild((string) $key);
@@ -74,7 +76,7 @@ class Response
             'data' => $data
         ], $xml);
 
-        
+
         // Record the request in the access log
         (new AccessLog())->add([
             'request_id' => $requestId,
@@ -84,7 +86,7 @@ class Response
 
         return $xml->asXML(); // Return the XML as a string
     }
-    public static function decideContentType() : string
+    public static function decideContentType(): string
     {
         $headerValue = self::$contentType; // Default to JSON
         if (isset($_GET['format']) && $_GET['format'] === 'xml') {
@@ -92,7 +94,7 @@ class Response
         }
         return $headerValue; // Return the correct header value
     }
-    public static function output(mixed $data, int $statusCode = 200) : string
+    public static function output(mixed $data, int $statusCode = 200): string
     {
         if ($statusCode === 204) {
             http_response_code(204);
@@ -103,7 +105,7 @@ class Response
         http_response_code($statusCode);
         // Determine the response method to use
         $responseMethod = $contentType === 'application/xml' ? 'responseXml' : 'responseJson';
-    
+
         // Call the response method dynamically
         echo self::$responseMethod($data, $statusCode);
         exit();

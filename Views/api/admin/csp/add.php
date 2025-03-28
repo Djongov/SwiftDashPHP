@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Api\Checks;
@@ -7,7 +9,7 @@ use App\Security\Firewall;
 
 Firewall::activate();
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 // Perform the API checks
 $checks->apiAdminChecks();
@@ -48,7 +50,7 @@ if ($rowCount > 0) {
 
 $stmt = $pdo->prepare('INSERT INTO csp_approved_domains (domain, created_by) VALUES (?,?)');
 
-$stmt->execute([$domain, $vars['usernameArray']['username']]);
+$stmt->execute([$domain, $loginInfo['usernameArray']['username']]);
 
 $rowCount = $stmt->rowCount();
 

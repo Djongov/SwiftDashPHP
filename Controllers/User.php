@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // This is the model of the User Api
 namespace Controllers;
@@ -10,7 +12,7 @@ use App\Exceptions\UserExceptions;
 
 class User
 {
-    public function get(string|int|null $username = null) : array
+    public function get(string|int|null $username = null): array
     {
         $user = new UserModel();
         try {
@@ -21,7 +23,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception getting user', 'Invalid username or password');
         }
     }
-    public function create(array $data, string $provider) : void
+    public function create(array $data, string $provider): void
     {
         if (!in_array($provider, SUPPORTED_AUTH_PROVIDERS)) {
             Response::output('Provider not supported. Must be on of ' . implode(', ', SUPPORTED_AUTH_PROVIDERS), 400);
@@ -36,7 +38,7 @@ class User
             $this->createLocalUser($data);
         }
     }
-    public function createAzureUser(array $data, bool $returnResult = true) : void
+    public function createAzureUser(array $data, bool $returnResult = true): void
     {
         // $data is the contents of the JWT token, so we need to do some transformations before we can use it
         $insertData = [];
@@ -75,7 +77,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception creating azure provider user', 'unable to create user');
         }
     }
-    public function createMsLiveUser(array $data, bool $returnResult = true) : void
+    public function createMsLiveUser(array $data, bool $returnResult = true): void
     {
         // $data is the contents of the JWT token, so we need to do some transformations before we can use it
         $insertData = [];
@@ -114,7 +116,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception creating mslive provider user', 'unable to create user');
         }
     }
-    public function createGoogleUser(array $data, bool $returnResult = true) : void
+    public function createGoogleUser(array $data, bool $returnResult = true): void
     {
         // $data is the contents of the JWT token, so we need to do some transformations before we can use it
         $insertData = [];
@@ -154,7 +156,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception creating google provider user', 'unable to create user');
         }
     }
-    public function createLocalUser(array $data, bool $returnResult = true) : void
+    public function createLocalUser(array $data, bool $returnResult = true): void
     {
         if (!isset($data['email'])) {
             $data['email'] = $data['username'];
@@ -189,7 +191,7 @@ class User
         }
     }
 
-    public function update(array $data, int $id) : void
+    public function update(array $data, int $id): void
     {
         $user = new UserModel();
         try {
@@ -201,7 +203,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception updating user with id ' . $id . ' and data ' . json_encode($data), 'unable to update user');
         }
     }
-    public function delete(int $id) : void
+    public function delete(int $id): void
     {
         $user = new UserModel();
         $this->deleteProfilePicture($id);
@@ -216,7 +218,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception deleting user with id ' . $id, 'unable to delete user');
         }
     }
-    public function updateLastLogin(string $username) : void
+    public function updateLastLogin(string $username): void
     {
         // First check if the user exists
         $updatedUser = new UserModel();
@@ -230,7 +232,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception updating last login for username ' . $username, 'unable to update last login');
         }
     }
-    public function saveAzureProfilePicture(string $username, string $response) : void
+    public function saveAzureProfilePicture(string $username, string $response): void
     {
         $imageName = $username . '_' . uniqid() . '.jpeg';
         $imageRelativePath = '/assets/images/profile/' . $imageName;
@@ -256,7 +258,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: error saving azure profile picture', 'unable to save profile picture');
         }
     }
-    public function deleteProfilePicture(int $id) : void
+    public function deleteProfilePicture(int $id): void
     {
         $user = new UserModel();
 
@@ -283,7 +285,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception deleting profile picture', 'unable to delete profile picture');
         }
     }
-    private function handleUserErrorsApiResponse(\Exception $e, string $verboseError, string $publicError) : void
+    private function handleUserErrorsApiResponse(\Exception $e, string $verboseError, string $publicError): void
     {
         if (ERROR_VERBOSE) {
             Response::output($verboseError . '. Error: ' . $e->getMessage());

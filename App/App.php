@@ -1,18 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
-use App\RequireLogin;
 use App\Page;
-use App\Core\Session;
 use App\Api\Response;
 
 class App
 {
-    public function init() : void
+    public function init(): void
     {
         // Start session
-        Session::start();
+        \App\Core\Session::start();
 
         // Create a nonce for the session, that can be used for Azure AD authentication. It's important this stays above calling the site-settings.php file, as it's used there
         if (!isset($_SESSION['nonce'])) {
@@ -44,13 +44,21 @@ class App
         if ($pos = strpos($uri, '?')) {
             $uri = substr($uri, 0, $pos);
         }
+
         $uri = rawurldecode($uri);
+
+        $isApi = str_contains($uri, '/api/') ?? false;
+
+        // Go through the login check
+        $loginInfo = \App\RequireLogin::check($isApi);
+
+        extract($loginInfo);
 
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {
+            /* Handle 404 Not Found */
             case \FastRoute\Dispatcher::NOT_FOUND:
-                if ($httpMethod === 'GET' && !str_contains($uri, '/api/')) {
-                    $loginInfo = RequireLogin::check(false);
+                if ($httpMethod === 'GET' && !$isApi) {
                     // Theme
                     $theme = (isset($loginInfo['usernameArray']['theme'])) ? $loginInfo['usernameArray']['theme'] : COLOR_SCHEME;
                     $errorPage = new Page();
@@ -71,49 +79,44 @@ class App
                     Response::output('api endpoint (' . $uri . ') not found', 404);
                 }
                 break;
-
+            /* Handle 405 Method Not Allowed */
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
                 // Handle 405 Method Not Allowed
                 Response::output('Method not allowed. Allowed methods are: ' . implode(',', $allowedMethods), 405);
                 break;
-
+            /* Handle FOUND ROUTE OK */
             case \FastRoute\Dispatcher::FOUND:
                 $controllerInfo = $routeInfo[1];
                 $controllerName = $controllerInfo[0]; // Path to controller file
-            
-                // Determine if it's an API endpoint
-                $isApi = str_contains($controllerName, '/api/');
-            
+
                 // Extract route metadata parameters if any
                 $params = $controllerInfo[1]['metadata'] ?? [];
-            
+
                 if (!file_exists($controllerName)) {
-                    throw new \Exception("Controller file ({$controllerName}) not found");
+                    throw new \Exception("Controller file ($controllerName) not found");
                 }
-            
+
                 // Check login status
-                $loginInfo = RequireLogin::check($isApi);
-                $vars['usernameArray'] = $loginInfo['usernameArray'];
-                $vars['isAdmin'] = $loginInfo['isAdmin'];
-                $vars['loggedIn'] = $loginInfo['loggedIn'];
-            
-                // Set theme (fallback to default if not set)
-                $vars['theme'] = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-            
+                // $loginInfo['usernameArray'] = $loginInfo['usernameArray'];
+                // $loginInfo['isAdmin'] = $loginInfo['isAdmin'];
+                // $loginInfo['loggedIn'] = $loginInfo['loggedIn'];
+
+                // // Set theme (fallback to default if not set)
+                // $loginInfo['theme'] = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+
                 // API Endpoints: Directly include and run
                 if ($isApi) {
                     // Add those variables so they are available for API calls too before the include
-                    $usernameArray = $vars['usernameArray'];
-                    $isAdmin = $vars['isAdmin'];
-                    $theme = $vars['theme'];
-                    $loggedIn = $vars['loggedIn'];
+                    $usernameArray = $loginInfo['usernameArray'];
+                    $isAdmin = $loginInfo['isAdmin'];
+                    $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+                    $loggedIn = $loginInfo['loggedIn'];
 
                     include_once $controllerName;
 
                     break;
                 }
-            
                 // Non-API Endpoints
                 if ($httpMethod === 'GET' && !empty($params)) {
                     $menuArray = $params['menu'] ?? [];
@@ -123,11 +126,11 @@ class App
                         $params['description'],
                         $params['keywords'],
                         $params['thumbimage'],
-                        $vars['theme'],
+                        $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME,
                         $menuArray,
-                        $vars['usernameArray'],
+                        $loginInfo['usernameArray'],
                         $controllerName,
-                        $vars['isAdmin'],
+                        $loginInfo['isAdmin'],
                         $routeInfo // Pass route info to the controllers that are GET and build a page
                     );
                 } else {

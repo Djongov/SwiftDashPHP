@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication;
 
@@ -11,7 +13,7 @@ use App\Logs\SystemLog;
 
 class Google
 {
-    public static function getSignatures(string $kid) : array
+    public static function getSignatures(string $kid): array
     {
         // Fetch the x5c from Google
         $client = new HttpClient('https://www.googleapis.com/oauth2/v3/certs');
@@ -60,7 +62,6 @@ class Google
             return false;
         }
         return true;
-
     }
     public static function verifyIdToken(string $idToken)
     {
@@ -109,7 +110,7 @@ class Google
             }
             // Save the token in the cache
             IdTokenCache::save($idToken);
-            SystemLog::write('Token for '. $payload['email'] . ' verified and saved', 'Google Auth');
+            SystemLog::write('Token for ' . $payload['email'] . ' verified and saved', 'Google Auth');
         } else {
             // If it exists, let's check if it's the same token, if not we will save it
             //echo 'Pulling token';
@@ -119,7 +120,6 @@ class Google
             // Check if the Token's expiration is different from the cached one
             $tokenExpiration = JWT::parseTokenPayLoad($idToken)['exp'];
             if ($tokenExpiration !== $cachedTokenExpiration) {
-
                 // Replace the token with the current one but verify it first
                 $client = new Client(['client_id' => GOOGLE_CLIENT_ID]);
                 $client->setHttpClient(new \GuzzleHttp\Client(['verify' => CURL_CERT, 'timeout' => 60, 'http_errors' => false]));

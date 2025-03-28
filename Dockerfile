@@ -36,12 +36,6 @@ RUN apt-get update \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && chmod +x /usr/local/bin/composer \
     && composer install --no-dev --optimize-autoloader --no-interaction \
-    && if [ -f vendor/erusev/parsedown/Parsedown.php ]; then \
-        sed -i "s/\$class = 'language-'.\$language;/\$class = 'language-'.\$language . ' c0py';/g" vendor/erusev/parsedown/Parsedown.php; \
-        sed -i "s/(\\\$Line, array \\\$Block = null)/(\\\$Line, array|null \\\$Block = null)/g" vendor/erusev/parsedown/Parsedown.php; \
-    else \
-        echo "File vendor/erusev/parsedown/Parsedown.php not found"; \
-    fi \
     && a2enmod rewrite \
     && a2enmod headers \
     && mkdir /var/run/sshd \

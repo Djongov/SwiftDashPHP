@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Components\Alerts;
 use Components\Html;
@@ -6,7 +8,6 @@ use App\Logs\IISLogParser;
 use Components\DataGrid;
 use App\Security\Firewall;
 use App\Api\Response;
-
 
 // First firewall check
 Firewall::activate();
@@ -89,22 +90,22 @@ $files = array_map(function ($file) use ($dir) {
 
 // Display the files
 echo '<div class="flex flex-row flex-wrap my-4">';
-    foreach ($files as $file) {
-        echo '<div class="max-w-lg mx-auto p-2 my-2 flex flex-col justify-center items-center border border-gray-900 dark:border-gray-400 rounded-lg">';
-            echo Html::a($file['file'], '?file=' . $file['file'], $theme, '_self', ['ml-4']);
-            echo Html::p(date('Y-m-d H:i:s', $file['time']), ['text-center']);
-            // Calculate if it is bytes, KB or MB
-            $delimiter = 1000000;
-            // Now let's do a variable for the KB or MB
-            $naming = 'MB';
-            if ($file['size'] < 1000000) {
-                $delimiter = 1000;
-                $naming = 'KB';
-            }
-
-            echo Html::p('Size: ' . round($file['size'] / $delimiter, 2) . ' ' . $naming, ['text-center']);
-        echo '</div>';
+foreach ($files as $file) {
+    echo '<div class="max-w-lg mx-auto p-2 my-2 flex flex-col justify-center items-center border border-gray-900 dark:border-gray-400 rounded-lg">';
+        echo Html::a($file['file'], '?file=' . $file['file'], $theme, '_self', ['ml-4']);
+        echo Html::p(date('Y-m-d H:i:s', $file['time']), ['text-center']);
+        // Calculate if it is bytes, KB or MB
+        $delimiter = 1000000;
+        // Now let's do a variable for the KB or MB
+        $naming = 'MB';
+    if ($file['size'] < 1000000) {
+        $delimiter = 1000;
+        $naming = 'KB';
     }
+
+        echo Html::p('Size: ' . round($file['size'] / $delimiter, 2) . ' ' . $naming, ['text-center']);
+        echo '</div>';
+}
 echo '</div>';
 
 // Now if a files is chosen
@@ -176,4 +177,3 @@ if ($os === 'windows') {
     // Now display the data grid
     echo DataGrid::fromData($file, $parsedLog['prasedData'], $theme);
 }
-

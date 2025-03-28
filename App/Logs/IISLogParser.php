@@ -1,7 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Logs;
-
 
 class IISLogParser
 {
@@ -110,7 +111,7 @@ class IISLogParser
         // For top IPs, we need to find if c-ip or CH-Connecting-IP is present to prevail
         $mainIpColumn = 'c-ip';
 
-        foreach($parsedData[0] as $key => $value) {
+        foreach ($parsedData[0] as $key => $value) {
             if ($key === 'CF-Connecting-IP') {
                 $mainIpColumn = 'CF-Connecting-IP';
                 break;

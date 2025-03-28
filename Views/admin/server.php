@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Components\Forms;
 use Components\Html;
@@ -70,7 +72,6 @@ if (empty($errorLog)) {
         echo Forms::render($loadErrorFileArray);
         echo Forms::render($clearErrorFileformArray);
     echo '</div>';
-
 }
 
 

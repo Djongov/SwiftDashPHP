@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Api\Checks;
@@ -9,8 +11,7 @@ use App\Logs\SystemLog;
 
 // GET /api/user
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
-    $checks = new Checks($vars, []);
+    $checks = new Checks($loginInfo, []);
     $checks->apiChecksNoCSRF();
 
     $user = new User();
@@ -55,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     // This endpoint is for creating a new local user.
-    $checks = new Checks($vars, $_POST);
+    $checks = new Checks($loginInfo, $_POST);
     $checks->apiChecksNoUser();
 
     // Create the user
@@ -109,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
     $userId = (int) $routeInfo[2]['id'];
 
-    $checks = new Checks($vars, $data);
+    $checks = new Checks($loginInfo, $data);
     $checks->apiChecks();
 
     // Get the user data based on the ID
@@ -128,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         // fallback to email
         $dbUserDataFromToken = $tokenData['email'];
     }
-    
+
     // Check if user id in path matches the one in the token, unless the user is an admin
     if ($dbUserData['username'] !== $dbUserDataFromToken) {
         Response::output('You cannot edit another user data', 401);
@@ -148,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             Response::output('only administrators can change roles', 401);
         }
     }
-    
+
 
     unset($data['confirm_password']);
     unset($data['csrf_token']);
@@ -172,7 +173,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $user->update($data, (int) $userId);
 }
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-
     // Let's check if the csrf token is passed as a query string in the DELETE request
     if (!isset($_GET['csrf_token'])) {
         Response::output('Missing CSRF Token', 401);
@@ -187,13 +187,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $userId = (int) $routeInfo[2]['id'];
 
-    $checks = new Checks($vars, []);
+    $checks = new Checks($loginInfo, []);
     $checks->apiChecksDelete($_GET['csrf_token']);
 
     $tokenData = JWT::parseTokenPayLoad(AuthToken::get());
 
     $dbUserData = $user->get($userId);
-    
+
     // Let's comapre
     if (isset($tokenData['preferred_username'])) {
         $dbUserDataFromToken = $tokenData['preferred_username'];

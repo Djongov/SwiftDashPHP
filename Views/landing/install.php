@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Install;
 use Components\Alerts;
@@ -46,7 +48,6 @@ try {
     // Create PDO object if not already initialized for SQLite
     $pdo ??= new PDO($dsn, DB_USER, DB_PASS, $options);
     echo Alerts::info('Successfully connected to the database. Nothing to do here.');
-
 } catch (PDOException $e) {
     $error = $e->getMessage();
     try {

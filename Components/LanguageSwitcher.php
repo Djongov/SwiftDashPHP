@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components;
 
@@ -7,7 +9,7 @@ use App\Security\CSRF;
 
 class LanguageSwitcher
 {
-    public static function render($theme) : string
+    public static function render($theme): string
     {
         // Start the form HTML
         $html = '';
@@ -20,12 +22,13 @@ class LanguageSwitcher
                 'bg' => 'Български', // Bulgarian
             ];
 
-            function getLanguageFlag($code) {
+            function getLanguageFlag($code)
+            {
                 $flags = [
                     'en' => '🇬🇧',  // UK flag directly as an emoji
                     'bg' => '🇧🇬',  // Bulgaria flag directly as an emoji (corrected)
                 ];
-            
+
                 return $flags[$code] ?? '';  // Returns the flag for the language code, or an empty string if not found
             }
             // Loop through languages and set the selected one
@@ -36,11 +39,11 @@ class LanguageSwitcher
 
             // Close the select dropdown
             $html .= '</select>';
-            
+
             // CSRF token for security
             $html .= CSRF::createTag();
-        $html .= '</form>';
-        
-        return $html;
+            $html .= '</form>';
+
+            return $html;
     }
 }

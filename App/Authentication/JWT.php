@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication;
 
@@ -202,7 +204,7 @@ class JWT
         } elseif (isset($payload['preferred_username'])) {
             return $payload['preferred_username'];
         // Google ID token doesn't have preferred_username
-        } elseif(isset($payload['email'])) {
+        } elseif (isset($payload['email'])) {
             return $payload['email'];
         } else {
             return '';

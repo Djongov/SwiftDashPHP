@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Authentication\JWT;
@@ -69,13 +71,13 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
     } elseif (isset($request['access_token'])) {
         // Find out the username in the token
         $username = JWT::parseTokenPayLoad($request['access_token'])['upn'];
-        
+
         try {
             AccessToken::save($request['access_token'], $username);
         } catch (Exception $e) {
             Response::output($e->getMessage(), 400);
         }
-        
+
         // Remove the username query string from state
         if (isset($_POST['state'])) {
             $split = explode("&", $_POST['state']);
@@ -93,7 +95,6 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
     if (isset($response['error_description'])) {
         // AADSTS70008: The provided authorization code or refresh token has expired due to inactivity. Send a new interactive authorization request for this user and resource
         if (str_contains($response['error_description'], 'AADSTS70008') || str_contains($response['error_description'], 'AADSTS54005')) {
-
             $data = [
                 'client_id' => ENTRA_ID_CLIENT_ID,
                 'response_type' => 'code',
@@ -153,13 +154,13 @@ if (isset($_POST['code'], $_POST['state'])) {
         $username = $_POST['state'];
         // However it is in /url&username=upn format, so let's extract the username
         $username = explode('=', $username)[1];
-        
+
         try {
             AccessToken::save($request['access_token'], $username);
         } catch (Exception $e) {
             Response::output($e->getMessage(), 400);
         }
-        
+
         // Remove the username query string from state
         $split = explode("&", $_POST['state']);
         $state = $_POST['state'] ?? '/';

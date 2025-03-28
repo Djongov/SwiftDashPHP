@@ -1,9 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components\Page;
+
 class Footer
 {
-    public static function render($theme) : string
+    public static function render($theme): string
     {
         $html = '';
         $siteTitle = SITE_TITLE;

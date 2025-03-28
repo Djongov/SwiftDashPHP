@@ -1,8 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace App\Request;
 
-class NativeHttp {
-    public static function get(string $url, array $headers = [], bool $sslIgnore = false) : array
+class NativeHttp
+{
+    public static function get(string $url, array $headers = [], bool $sslIgnore = false): array
     {
         // Options
         $options = [
@@ -26,7 +30,7 @@ class NativeHttp {
 
         return json_decode($response, true);
     }
-    public static function post(string $url, array $data, bool $sendJson = false, array $headers = [], bool $sslIgnore = false) : array
+    public static function post(string $url, array $data, bool $sendJson = false, array $headers = [], bool $sslIgnore = false): array
     {
         // Pack data
         if ($sendJson) {
@@ -39,7 +43,7 @@ class NativeHttp {
             'http' => [
                 'method' => 'POST',
                 'ignore_errors' => true,
-                'content' =>$data
+                'content' => $data
             ]
         ];
         if (!$sslIgnore) {
@@ -63,7 +67,7 @@ class NativeHttp {
 
         return json_decode($response, true);
     }
-    
+
     private static function getResponseCode($responseHeader)
     {
         if ($responseHeader != null) {

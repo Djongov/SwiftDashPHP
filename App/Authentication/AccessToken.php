@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication;
 
@@ -6,12 +8,12 @@ use Models\Core\DBCache;
 
 class AccessToken
 {
-    public static function dbGet(string $username) : array
+    public static function dbGet(string $username): array
     {
         $cachedToken = DBCache::get('access_token', $username);
         return ($cachedToken) ? $cachedToken : [];
     }
-    public static function get(string $username, $scope = 'https://graph.microsoft.com/user.read') : string
+    public static function get(string $username, $scope = 'https://graph.microsoft.com/user.read'): string
     {
         $cachedToken = self::dbGet($username);
         if ($cachedToken) {
@@ -30,10 +32,10 @@ class AccessToken
             exit();
         }
     }
-    public static function save(string $token, string $username) : string
+    public static function save(string $token, string $username): string
     {
         $parsedToken = JWT::parseTokenPayLoad($token);
-    
+
         // If it is a mslive token it will not be decoded
         if (!$parsedToken) {
             $parsedToken = [
@@ -41,7 +43,7 @@ class AccessToken
                 'aud' => 'https://graph.microsoft.com'
             ];
         }
-        
+
         $expiration = date('Y-m-d H:i:s', $parsedToken['exp']);
 
         // If the username doesn't have an access token

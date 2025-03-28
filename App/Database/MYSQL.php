@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /* Not supposed to be used */
 
 declare(strict_types=1);
@@ -89,21 +91,21 @@ class MYSQL
         }
         try {
             if ($stmt->execute()) {
-        if (stripos($query, "SELECT") !== false) {
-            $result = $stmt->get_result();
-            $link->close();
-            return $result;
-        } else {
-            $link->close();
-            return $stmt;
-        }
-    } else {
-        $error = $stmt->error;
-        // Debugging statement 3: Print the error message
-        echo "Debug MySQL Error: $error\n";
-        $link->close();
-        Response::output($error, 400);
-    }
+                if (stripos($query, "SELECT") !== false) {
+                    $result = $stmt->get_result();
+                    $link->close();
+                    return $result;
+                } else {
+                    $link->close();
+                    return $stmt;
+                }
+            } else {
+                $error = $stmt->error;
+                // Debugging statement 3: Print the error message
+                echo "Debug MySQL Error: $error\n";
+                $link->close();
+                Response::output($error, 400);
+            }
         } catch (Exception $e) {
             $link->close();
             Response::output($e->getMessage(), 400);
@@ -171,7 +173,8 @@ class MYSQL
         return $resultArray;
     }
     // This is used in the get-records datagrid API to present the data in the correct input type
-    public static function mapDataTypesArray(string $value) {
+    public static function mapDataTypesArray(string $value)
+    {
         if (str_starts_with($value, 'tinyint')) {
             return 'bool';
         }

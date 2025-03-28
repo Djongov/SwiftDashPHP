@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use FastRoute\RouteCollector;
 use App\Markdown\Page;
@@ -51,7 +53,7 @@ return function (RouteCollector $router) {
     $router->addRoute('GET', '/forms', [$viewsFolder . '/example/forms.php', $genericMetaDataArray]);
     $router->addRoute('GET', '/datagrid', [$viewsFolder . '/example/datagrid.php', $genericMetaDataArray]);
     $router->addRoute('GET', '/dummy', [$viewsFolder . '/example/dummy.php', $genericMetaDataArray]);
-    
+
     // Auth
     $router->addRoute('POST', '/auth/local', [$viewsFolder . '/auth/local.php']);
     $router->addRoute('GET', '/auth/google', [$viewsFolder . '/auth/google.php']);
@@ -62,7 +64,7 @@ return function (RouteCollector $router) {
     $router->addRoute('GET', '/auth/azure/request-access-token', [$viewsFolder . '/auth/azure/request-access-token.php']);
     $router->addRoute('POST', '/auth/azure/azure-ad-code-exchange', [$viewsFolder . '/auth/azure/azure-ad-code-exchange.php']);
     $router->addRoute('POST', '/auth/azure/mslive-code-exchange', [$viewsFolder . '/auth/azure/mslive-code-exchange.php']);
-    
+
     // CSP report endpoiont
     $router->addRoute('POST', '/api/csp-report', [$viewsFolder . '/api/csp-report.php']);
     // Admin

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Utilities;
 
@@ -13,7 +15,7 @@ class General
         $length = ($length < 4) ? 4 : $length;
         return bin2hex(random_bytes(($length - ($length % 2)) / 2));
     }
-    public static function currentBrowser() : ?string
+    public static function currentBrowser(): ?string
     {
         return $_SERVER['HTTP_USER_AGENT'] ?? null;
     }
@@ -35,25 +37,25 @@ class General
 
         return false; // No match found
     }
-    public static function isAssocArray(array $array) : bool
+    public static function isAssocArray(array $array): bool
     {
         // If the array is empty, treat it as not associative
         if (empty($array)) {
             return false;
         }
-        
+
         // Check the first key to determine if it's an associative array
         $firstKey = array_key_first($array);
-        
+
         // If the first key is not an integer, it's an associative array
         if (!is_int($firstKey)) {
             return true;
         }
-        
+
         // If the keys are sequential numeric keys starting from 0
         return array_keys($array) !== range(0, count($array) - 1);
     }
-    public static function isMultiDimensionalArray(array $array) : bool
+    public static function isMultiDimensionalArray(array $array): bool
     {
         foreach ($array as $element) {
             if (is_array($element)) {
@@ -106,11 +108,11 @@ class General
         }, array_keys($array), $array);
     }
     // Random RGBA
-    public static function randomRGBA($opacity = 1) : string
+    public static function randomRGBA($opacity = 1): string
     {
         return 'rgba(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . $opacity . ')';
     }
-    public static function isValidDatetime(string $datetime) : bool
+    public static function isValidDatetime(string $datetime): bool
     {
         $formats = [
             'Y-m-d H:i:s',
@@ -129,7 +131,7 @@ class General
         return false;
     }
     // Convert any date to UTC
-    public static function convertToUTC(string $date, string $format = 'Y-m-d H:i') : string
+    public static function convertToUTC(string $date, string $format = 'Y-m-d H:i'): string
     {
         // get the current timezone
         $timezone = date_default_timezone_get();
@@ -144,7 +146,7 @@ class General
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $dateString);
         return $dateTime && $dateTime->format('Y-m-d H:i:s') === $dateString;
     }
-    public static function base64url_encode(string $input, int $nopad = 1, int $wrap = 0) : string
+    public static function base64url_encode(string $input, int $nopad = 1, int $wrap = 0): string
     {
         $data  = base64_encode($input);
 
@@ -167,17 +169,17 @@ class General
         }
     }
 
-    public static function base64url_decode($input) : string
+    public static function base64url_decode($input): string
     {
         return base64_decode(strtr($input, '-_,', '+/='));
     }
-    public static function decodeUnicodeString($str) : string
+    public static function decodeUnicodeString($str): string
     {
         return preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
             return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
         }, $str);
     }
-    public static function countryCodeToLocale($countryCode) : string
+    public static function countryCodeToLocale($countryCode): string
     {
         $countryCodeToLocale = [
             'AF' => 'fa_AF',
@@ -379,7 +381,7 @@ class General
             'ZM' => 'en_ZM',
             'ZW' => 'en_ZW',
         ];
-    
+
         // Default to 'en_US' if the country code is not found
         return $countryCodeToLocale[strtoupper($countryCode)] ?? 'en_US';
     }

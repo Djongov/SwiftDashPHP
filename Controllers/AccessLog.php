@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Path: Controllers/Api/Firewall.php
 
@@ -22,7 +24,7 @@ class AccessLog
      * @return     string json api response
      * @throws     AccessLogException
      */
-    public function get(?string $ip, ?string $sort = null, ?int $limit = null, ?string $orderBy = null) : array
+    public function get(?string $ip, ?string $sort = null, ?int $limit = null, ?string $orderBy = null): array
     {
         // Let's do some validation here
         $sort = (!$sort) ? 'ASC' : strtoupper($sort);
@@ -52,7 +54,7 @@ class AccessLog
         }
         return $response;
     }
-    public function add(array $data) : array
+    public function add(array $data): array
     {
         $response = [];
         // Filter for invalid parameters
@@ -111,7 +113,7 @@ class AccessLog
      * @return     string json api response
      * @throws     AccessLogException
      */
-    public function delete(int $id, string $deletedBy) : array
+    public function delete(int $id, string $deletedBy): array
     {
         $response = [];
         $firewall = new AccessLogModel();

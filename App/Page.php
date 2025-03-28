@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
@@ -10,7 +12,7 @@ use Components\Page\CookieBanner;
 
 class Page
 {
-    public function head(string $title, string $description, array $keywords, string $thumbimage) : string
+    public function head(string $title, string $description, array $keywords, string $thumbimage): string
     {
         // Load these scripts
         $scriptsArray = [
@@ -69,7 +71,7 @@ class Page
         ];
         return Head::render($title, $description, $keywords, $thumbimage, $scriptsArray, $cssArray);
     }
-    public function header($usernameArray, $menuArray, $isAdmin, $theme) : string
+    public function header($usernameArray, $menuArray, $isAdmin, $theme): string
     {
         $html = '';
         $html .= '<header>';
@@ -77,16 +79,16 @@ class Page
         $html .= '</header>';
         return $html;
     }
-    public function menu($array, $theme, $usernameArray, $isAdmin) : string
+    public function menu($array, $theme, $usernameArray, $isAdmin): string
     {
         // If the array is empty, don't render the menu
         return (!empty($array)) ? Menu::render($array, $usernameArray, $isAdmin, $theme) : '';
     }
-    public function footer($theme) : string
+    public function footer($theme): string
     {
         return Footer::render($theme);
     }
-    public function build(string $title, string $description, array $keywords, string $thumbimage, string $theme, array $menuArray, array $usernameArray, string $controlerPath, bool $isAdmin, array $routeInfo) : string
+    public function build(string $title, string $description, array $keywords, string $thumbimage, string $theme, array $menuArray, array $usernameArray, string $controlerPath, bool $isAdmin, array $routeInfo): string
     {
         $html = '';
         $html .= $this->head($title, $description, $keywords, $thumbimage, $theme);
@@ -99,26 +101,26 @@ class Page
                 $html .= $this->header($usernameArray, $menuArray, $isAdmin, $theme);
 
                 // Loading screen
-                if (SHOW_LOADING_SCREEN) {
-                    $html .=
-                    '<div id="loading-screen" class="w-fit mx-auto my-12 flex items-center border border-black dark:border-gray-400 ' . LIGHT_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' p-8 rounded z-99999">
+        if (SHOW_LOADING_SCREEN) {
+            $html .=
+            '<div id="loading-screen" class="w-fit mx-auto my-12 flex items-center border border-black dark:border-gray-400 ' . LIGHT_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' p-8 rounded z-99999">
                         <div class="animate-spin border-t-4 border-' . $theme . '-500 border-solid rounded-full h-16 w-16"></div>
                         <p class="ml-2">Loading...</p>
                     </div>';
-                }
+        }
 
                 // Ensure main takes up available space
                 $mainContentClass = SHOW_LOADING_SCREEN ? 'hidden' : '';
                 $html .= '<main id="main-content" class="flex-1 ' . $mainContentClass . '">';
 
                     // Check if the file exists before including it
-                    if (file_exists($controlerPath)) {
-                        ob_start();
-                        include $controlerPath;
-                        $html .= ob_get_clean();
-                    } else {
-                        $html .= Alerts::danger('The file ' . $controlerPath . ' does not exist');
-                    }
+        if (file_exists($controlerPath)) {
+            ob_start();
+            include $controlerPath;
+            $html .= ob_get_clean();
+        } else {
+            $html .= Alerts::danger('The file ' . $controlerPath . ' does not exist');
+        }
 
                 $html .= '</main>'; // Close main (takes up remaining space)
 

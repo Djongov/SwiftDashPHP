@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Core;
 
@@ -6,11 +8,11 @@ use App\Authentication\JWT;
 
 class Cookies
 {
-    public static function set(string $name, string $value, int $expiration = 86400, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = true, string $samesite = 'Lax') : void
+    public static function set(string $name, string $value, int $expiration = 86400, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = true, string $samesite = 'Lax'): void
     {
         setcookie($name, $value, time() + $expiration, $path, $domain, $secure, $httponly);
     }
-    public static function setAuthCookie($token, $expiry = AUTH_COOKIE_EXPIRY) : void
+    public static function setAuthCookie($token, $expiry = AUTH_COOKIE_EXPIRY): void
     {
         // Let's decide whether the connection is over HTTP or HTTPS (later for setting up the cookie)
         $secure = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? false : true;
@@ -34,20 +36,20 @@ class Cookies
             'samesite' => 'Lax' // This unlike the session cookie can be Lax
         ]);
     }
-    public static function get(string $name) : ?string
+    public static function get(string $name): ?string
     {
         return $_COOKIE[$name] ?? null;
     }
-    public static function delete(string $name) : void
+    public static function delete(string $name): void
     {
         setcookie($name, '', time() - 3600, '/');
         unset($_COOKIE[$name]);
     }
-    public static function exists(string $name) : bool
+    public static function exists(string $name): bool
     {
         return isset($_COOKIE[$name]);
     }
-    public static function clear() : void
+    public static function clear(): void
     {
         foreach ($_COOKIE as $name => $value) {
             setcookie($name, '', time() - 3600);

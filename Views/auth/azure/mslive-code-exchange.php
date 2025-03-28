@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Authentication\AccessToken;
@@ -95,7 +97,6 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
     if (isset($response['error_description'])) {
         // AADSTS70008: The provided authorization code or refresh token has expired due to inactivity. Send a new interactive authorization request for this user and resource
         if (str_contains($response['error_description'], 'AADSTS70008') || str_contains($response['error_description'], 'AADSTS54005')) {
-
             $data = [
                 'client_id' => MS_LIVE_CLIENT_ID,
                 'response_type' => 'code',

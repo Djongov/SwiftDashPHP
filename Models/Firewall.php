@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Path: Models/Firewall.php
 
@@ -17,8 +19,8 @@ class Firewall extends BasicModel
 {
     private $table = 'firewall';
     private $mainColumn = 'ip_cidr';
-    
-    public function setter($table, $mainColumn) : void
+
+    public function setter($table, $mainColumn): void
     {
         $this->table = $table;
         $this->mainColumn = $mainColumn;
@@ -30,7 +32,7 @@ class Firewall extends BasicModel
      * @param      string|int $param the id or the ip in CIDR notation
      * @return     string bool
      */
-    public function exists(string|int $param) : bool
+    public function exists(string|int $param): bool
     {
         $db = new DB();
         // If the parameter is an integer, we assume it's an ID
@@ -93,7 +95,7 @@ class Firewall extends BasicModel
      * @throws     FirewallException ipAlreadyExists, notSaved, InvalidIP from formatIp
      * @system_log       IP added to the firewall table, by who and under which id
      */
-    public function save(string $ip, string $createdBy, string $comment = '') : bool
+    public function save(string $ip, string $createdBy, string $comment = ''): bool
     {
         // Format the IP
         $ip = $this->formatIp($ip);
@@ -123,7 +125,7 @@ class Firewall extends BasicModel
      * @throws     FirewallException ipDoesNotExist
      * @system_log IP updated and by who and what data was passed
      */
-    public function update(array $data, int $id, string $updatedBy) : bool
+    public function update(array $data, int $id, string $updatedBy): bool
     {
         $db = new DB();
         // Check if the data matches the columns
@@ -171,7 +173,7 @@ class Firewall extends BasicModel
      * @throws     FirewallException ipDoesNotExist
      * @system_log IP deleted and by who
      */
-    public function delete(int $id, string $deletedBy) : bool
+    public function delete(int $id, string $deletedBy): bool
     {
         // Check if IP exists
         if (!$this->exists($id)) {
@@ -198,7 +200,7 @@ class Firewall extends BasicModel
      * @return     bool
      * @throws     FirewallException invalidIP
      */
-    public function validateIp(string $ip) : bool
+    public function validateIp(string $ip): bool
     {
         $ipExplode = explode('/', $ip);
         $ip = $ipExplode[0];
@@ -221,7 +223,7 @@ class Firewall extends BasicModel
      * @return     string returns a formatted IP in CIDR notation
      * @throws     FirewallException invalidIP from validateIp
      */
-    public function formatIp(string $ip) : string
+    public function formatIp(string $ip): string
     {
         // First run through the validation
         $this->validateIp($ip);

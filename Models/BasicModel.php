@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -7,7 +9,7 @@ use App\Database\DB;
 class BasicModel
 {
     // get columns from the table
-    public function getColumns(string $table) : array
+    public function getColumns(string $table): array
     {
         $db = new DB();
         $describeArray = $db->describe($table);
@@ -22,7 +24,7 @@ class BasicModel
         if ($orderBy) {
             $query .= " ORDER BY $orderBy " . ($sort ?? "ASC");
         }
-        
+
         if ($limit) {
             $query .= " LIMIT $limit";
         }

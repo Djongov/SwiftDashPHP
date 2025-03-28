@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components;
 
@@ -6,7 +8,7 @@ use Components\Html;
 
 class DocsMenu
 {
-    public static function render($base, $tree) : string
+    public static function render($base, $tree): string
     {
         // First let's sort the $tree array so that if there is a index key, it is first
         $indexKey = array_search('index', $tree);
@@ -23,26 +25,26 @@ class DocsMenu
                 $html .= Html::h2(ucfirst(str_replace('/', '', $base)), true);
                 $html .= Html::horizontalLine();
                 $html .= '<ul class="space-y-2 font-medium">';
-                    foreach ($tree as $link) {
-                        $title = str_replace('-', ' ', $link);
-                        if ($link === 'index') {
-                            $link = '';
-                            $title = 'Home';
-                        } else {
-                            $link = '/' . $link;
-                        }
-                        $html .= '<li>';
-                            if ($currentLink === $link) {
-                                $html .= '<a href="' . $base . $link . '" class="flex items-center p-2 rounded-lg dark:text-white bg-gray-100 dark:bg-gray-700 group border border-gray-900 dark:border-gray-400">';
-                            } else {
-                                $html .= '<a href="' . $base . $link . '" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">';
-                            }
+        foreach ($tree as $link) {
+            $title = str_replace('-', ' ', $link);
+            if ($link === 'index') {
+                $link = '';
+                $title = 'Home';
+            } else {
+                $link = '/' . $link;
+            }
+            $html .= '<li>';
+            if ($currentLink === $link) {
+                        $html .= '<a href="' . $base . $link . '" class="flex items-center p-2 rounded-lg dark:text-white bg-gray-100 dark:bg-gray-700 group border border-gray-900 dark:border-gray-400">';
+            } else {
+                            $html .= '<a href="' . $base . $link . '" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">';
+            }
                                 // First letter uppercase
-                                $title = ucfirst($title);
-                                $html .= '<span class="ms-3">' . $title . '</span>';
-                            $html .= '</a>';
-                        $html .= '</li>';
-                    }
+                                    $title = ucfirst($title);
+                                    $html .= '<span class="ms-3">' . $title . '</span>';
+                                    $html .= '</a>';
+                                    $html .= '</li>';
+        }
                 $html .= '</ul>';
             $html .= '</div>';
         $html .= '</aside>';

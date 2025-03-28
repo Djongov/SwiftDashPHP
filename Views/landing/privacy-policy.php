@@ -2,9 +2,9 @@
 
 use Components\Html;
 
-define("THIRD_PARTY_LIST" , []);
+define("THIRD_PARTY_LIST", []);
 
-define("COMPANY_NAME" , "XXXXS");
+define("COMPANY_NAME", "XXXXS");
 
 define("COMPANY_COUNTRY", "Bulgaria");
 

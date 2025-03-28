@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Api\Checks;
@@ -15,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         Response::output('parameters accepted are "cidr" or empty GET', 400);
     }
 
-    $checks = new Checks($vars, $_GET);
+    $checks = new Checks($loginInfo, $_GET);
     $checks->apiChecksNoCSRF();
 
     // check if cidr has been passed
@@ -32,14 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // api/firewall POST, accepts form data with the "cidr" parameter and optional "comment". The user making the request is taken from the router data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $checks = new Checks($vars, $_POST);
+    $checks = new Checks($loginInfo, $_POST);
     $checks->apiChecks();
 
     $checks->checkParams(['cidr'], $_POST);
 
     $comment = $_POST['comment'] ?? '';
 
-    $createdBy = $vars['usernameArray']['username'];
+    $createdBy = $loginInfo['usernameArray']['username'];
 
     $ip = $_POST['cidr'];
 
@@ -66,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
     $update = new Firewall();
 
-    $updatedBy = $vars['usernameArray']['username'];
+    $updatedBy = $loginInfo['usernameArray']['username'];
 
     echo $update->update($data, $routeInfo[2]['id'], $updatedBy);
 }
@@ -90,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         exit();
     }
 
-    $checks = new Checks($vars, $_GET);
+    $checks = new Checks($loginInfo, $_GET);
 
     $checks->checkCSRFDelete($_GET['csrf_token']);
 
@@ -98,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $delete = new Firewall();
 
-    $deletedBy = $vars['usernameArray']['username'];
+    $deletedBy = $loginInfo['usernameArray']['username'];
 
     echo $delete->delete($id, $deletedBy);
 }

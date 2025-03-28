@@ -23,5 +23,5 @@ For non-api called (not /api/) the following variables are exposed on each reque
 For api calls:
 
 - All of the above
-- $vars - an Array holding all the other variables
+- $loginInfo - an Array holding all the other variables
 - $loginInfo - an Array holding the values of $usernameArray, $isAdmin, $loggedIn, $theme in their respective keys. I.e $loginInfo['usernameArray'].

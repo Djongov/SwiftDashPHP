@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Database\DB;
 use App\Api\Response;
 use App\Logs\SystemLog;
 use App\Api\Checks;
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 $checks->checkParams(['table', 'id'], $_POST);
 

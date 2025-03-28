@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
@@ -12,7 +14,7 @@ use App\Authentication\AuthToken;
 
 class RequireLogin
 {
-    public static function check(bool $apiRoute) : array
+    public static function check(bool $apiRoute): array
     {
         $loginExempt = [
             '/',
@@ -37,7 +39,7 @@ class RequireLogin
             '/terms-of-service',
             '/privacy-policy',
         ];
-        
+
         $loggedIn = false;
 
         $isAdmin = false;
@@ -251,7 +253,7 @@ class RequireLogin
 
         // Kill disabled users early
         if (isset($usernameArray["enabled"])) {
-                if ($usernameArray["enabled"] === 0 || $usernameArray["enabled"] === false) {
+            if ($usernameArray["enabled"] === 0 || $usernameArray["enabled"] === false) {
                 echo 'Your user has been disabled';
                 JWT::handleValidationFailure();
                 exit();
@@ -274,6 +276,5 @@ class RequireLogin
             'loggedIn' => $loggedIn,
             'isAdmin' => $isAdmin,
         ];
-
     }
 }

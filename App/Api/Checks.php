@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Api;
 
@@ -18,7 +20,7 @@ class Checks
     /**
      * Checks constructor.
      *
-     * @param array $vars
+     * @param array $loginInfo
      */
     public function __construct(array $userVars, array $data)
     {
@@ -170,11 +172,11 @@ class Checks
      */
     public function loginCheck(): void
     {
-        // Check if $vars['loggedIn'] is set
+        // Check if $loginInfo['loggedIn'] is set
         if (!isset($this->userVars['loggedIn'])) {
             Response::output('You are not logged in (loggedIn not set)', $this->defaultStatusCode);
         }
-        // Check if $vars['loggedIn'] is true
+        // Check if $loginInfo['loggedIn'] is true
         if (!$this->userVars['loggedIn']) {
             Response::output('You are not logged in (loggedIn false)', $this->defaultStatusCode);
         }

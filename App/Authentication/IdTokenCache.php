@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication;
 
@@ -8,17 +10,17 @@ use Models\Core\DBCache;
 class IdTokenCache
 {
     // Check if there is a token in the cache for that username
-    public static function exist(string $username) : bool
+    public static function exist(string $username): bool
     {
         $cachedToken = DBCache::get('id_token', $username);
         return ($cachedToken) ? true : false;
     }
-    public static function get(string $username) : array
+    public static function get(string $username): array
     {
         $cachedToken = DBCache::get('id_token', $username);
         return ($cachedToken) ? $cachedToken : [];
     }
-    public static function save(string $token) : void
+    public static function save(string $token): void
     {
         if (!self::exist($token)) {
             $parsedToken = JWT::parseTokenPayLoad($token);
@@ -36,7 +38,7 @@ class IdTokenCache
             DBCache::create($token, $expiration, 'id_token', $username);
         }
     }
-    public static function update(string $token, string $username) : void
+    public static function update(string $token, string $username): void
     {
         $parsedToken = JWT::parseTokenPayLoad($token);
         // Set the expiration to the token's expiration but convert to mysql datetime

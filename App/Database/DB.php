@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Database;
 
@@ -41,10 +43,10 @@ class DB
                 throw new \PDOException("DB: SQLite database file does not exist: " . $config['dbname']);
             }
         }
-    
+
         $dsn = $this->buildDsn($config);
         $options = $this->getPDOOptions($config['ssl']);
-    
+
         try {
             $this->pdo = new \PDO($dsn, $config['username'], $config['password'], $options);
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -66,7 +68,7 @@ class DB
             throw $e;
         }
     }
-    
+
 
 
 
@@ -115,7 +117,7 @@ class DB
         return $options;
     }
 
-    public function executeQuery(\PDO $pdo, string $sql, array $params = []) : \PDOStatement
+    public function executeQuery(\PDO $pdo, string $sql, array $params = []): \PDOStatement
     {
         try {
             $stmt = $pdo->prepare($sql);
@@ -141,7 +143,7 @@ class DB
         $this->pdo = null;
     }
 
-    public function multiQuery(array $queryArray) : void
+    public function multiQuery(array $queryArray): void
     {
         try {
             $pdo = $this->getConnection();
@@ -160,12 +162,12 @@ class DB
             throw new \PDOException("Error executing multiple queries: " . $e->getMessage());
         }
     }
-    public function getDriver() : string
+    public function getDriver(): string
     {
         $pdo = $this->getConnection();
         return $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
     }
-    public function getTableNames() : array
+    public function getTableNames(): array
     {
         $pdo = $this->getConnection();
         $driver = $this->getDriver();
@@ -210,7 +212,6 @@ class DB
             }
 
             return $dbTables;
-
         } catch (\PDOException $e) {
             if (ERROR_VERBOSE) {
                 throw new \PDOException("Error fetching table names: " . $e->getMessage());
@@ -225,16 +226,16 @@ class DB
             }
         }
     }
-    public function checkDBColumns(array $columns, string $table) : void
+    public function checkDBColumns(array $columns, string $table): void
     {
         $dbTableArray = $this->describe($table);
-    
+
         // Extract column names from the table structure
         $dbColumns = [];
         foreach ($dbTableArray as $row => $type) {
             array_push($dbColumns, $row);
         }
-    
+
         // Check if all columns in the input array exist in the database
         foreach ($columns as $column) {
             if (!in_array($column, $dbColumns)) {
@@ -243,7 +244,7 @@ class DB
         }
     }
 
-    public function checkDBColumnsAndTypes(array $array, string $table) : void
+    public function checkDBColumnsAndTypes(array $array, string $table): void
     {
         $dbTableArray = $this->describe($table);
 
@@ -299,7 +300,7 @@ class DB
         return false;
     }
 
-    private static function normalizeDataType($type) : string
+    private static function normalizeDataType($type): string
     {
         // Convert common MySQL/PostgreSQL data types to PHP types
         $typeMap = [
@@ -345,8 +346,8 @@ class DB
         return $type; // Return original type if no match found
     }
 
-    
-    public function mapDataTypesArray(string $value) : string
+
+    public function mapDataTypesArray(string $value): string
     {
         $type = '';
         $value = strtolower($value);

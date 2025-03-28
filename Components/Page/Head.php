@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components\Page;
 
 class Head
 {
-    public static function render(string $title, string $description, array $keywords, string $thumbimage, array $scriptsArray, array $cssArray) : string
+    public static function render(string $title, string $description, array $keywords, string $thumbimage, array $scriptsArray, array $cssArray): string
     {
         $html = '';
         $html .= '<!DOCTYPE html>' . PHP_EOL;
@@ -50,7 +52,7 @@ class Head
         $html .= '</head>' . PHP_EOL;
         return $html;
     }
-    public static function ogTags(string $title, string $description, string $thumbimage) : string
+    public static function ogTags(string $title, string $description, string $thumbimage): string
     {
         $html = '';
         $html .= '<meta property="og:type" content="website" >' . PHP_EOL;
@@ -63,7 +65,7 @@ class Head
         $html .= '<meta property="og:image:type" content="image/png">' . PHP_EOL;
         return $html;
     }
-    public static function twitterTags(string $title, string $description, string $thumbimage, string $site, string $creator) : string
+    public static function twitterTags(string $title, string $description, string $thumbimage, string $site, string $creator): string
     {
         $html = '';
         $html .= '<meta name="twitter:card" content="summary_large_image" >' . PHP_EOL;
@@ -75,7 +77,7 @@ class Head
         $html .= '<meta name="twitter:image:alt" content="' . SITE_TITLE . ' logo" >' . PHP_EOL;
         return $html;
     }
-    public static function scriptLoad(array $scriptArray) : string
+    public static function scriptLoad(array $scriptArray): string
     {
         $html = '';
         foreach ($scriptArray as $link => $value) {
@@ -97,7 +99,7 @@ class Head
         }
         return $html;
     }
-    public static function cssLoad(array $cssArray) : string
+    public static function cssLoad(array $cssArray): string
     {
         $html = '';
         foreach ($cssArray as $link => $value) {

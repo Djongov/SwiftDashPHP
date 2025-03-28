@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Mail;
 
@@ -54,7 +56,7 @@ class Send
 
 
         $email = new Mail($from, $toArray);
-         
+
         if (defined('SENDGRID_TEMPLATE_ID')) {
             $email->setTemplateId(SENDGRID_TEMPLATE_ID);
         } else {
@@ -75,7 +77,7 @@ class Send
             Response::output('Caught exception: ' .  $e->getMessage() . "\n");
         }
     }
-    
+
     // This proivate method will not only check if the passed 'email' key is set but also if it is a valid email address
     private static function validateRecipients(array &$to)
     {
@@ -100,7 +102,7 @@ class Send
             string(18) "ict.secops@uefa.ch"
             }
         }
-        
+
         */
         // Let's check the structure of $to and make sure it's ok. $to needs to have arrays of email and name keys
         foreach ($to as $index => $recipient) {

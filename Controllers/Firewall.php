@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Path: Controllers/Api/Firewall.php
 
@@ -22,7 +24,7 @@ class Firewall
      * @return     string json api response
      * @throws     FirewallException
      */
-    public function get(string $ip) : string
+    public function get(string $ip): string
     {
         $firewall = new FirewallModel();
         try {
@@ -44,7 +46,7 @@ class Firewall
      * @return     string json api response
      * @throws     FirewallException
      */
-    public function add($ip, $createdBy, $comment = '') : string
+    public function add($ip, $createdBy, $comment = ''): string
     {
         $firewall = new FirewallModel();
         try {
@@ -66,7 +68,7 @@ class Firewall
      * @return     string json api response
      * @throws     FirewallException
      */
-    public function update(array $data, int $id, string $updatedBy) : string
+    public function update(array $data, int $id, string $updatedBy): string
     {
         $firewall = new FirewallModel();
         try {
@@ -87,7 +89,7 @@ class Firewall
      * @return     string json api response
      * @throws     FirewallException
      */
-    public function delete(int $id, string $deletedBy) : string
+    public function delete(int $id, string $deletedBy): string
     {
         $firewall = new FirewallModel();
         try {

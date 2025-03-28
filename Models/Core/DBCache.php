@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Models\Core;
 
@@ -16,16 +18,17 @@ class DBCache implements DBCacheInterface
      * @return array The row from the cache table, if no row is found, an empty array is returned
      * @throws \PDOException
      */
-    public static function get(string $type, string $uniqueProperty) : array
+    public static function get(string $type, string $uniqueProperty): array
     {
         $db = new DB();
         $pdo = $db->getConnection();
 
         $stmt = $pdo->prepare("SELECT * FROM " . self::$table . " WHERE type=? AND unique_property=?");
-        
+
         try {
             $stmt->execute([$type, $uniqueProperty]);
             $array = $stmt->fetch(\PDO::FETCH_ASSOC);
+            SystemLog::write('DBCache get: ' . $type . ' ' . $uniqueProperty, 'DBCache');
             if (!$array) {
                 return [];
             } else {
@@ -48,7 +51,7 @@ class DBCache implements DBCacheInterface
      * @return string The last inserted ID
      * @throws \PDOException
      */
-    public static function create(mixed $value, string $expiration, string $type, string $uniqueProperty) : string
+    public static function create(mixed $value, string $expiration, string $type, string $uniqueProperty): string
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -75,7 +78,7 @@ class DBCache implements DBCacheInterface
      * @return int The number of rows affected
      * @throws \PDOException
      */
-    public static function update(mixed $value, string $expiration, string $type, string $uniqueProperty) : int
+    public static function update(mixed $value, string $expiration, string $type, string $uniqueProperty): string|int
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -84,6 +87,7 @@ class DBCache implements DBCacheInterface
 
         try {
             $stmt->execute([$value, $expiration, $type, $uniqueProperty]);
+            SystemLog::write('DBCache update: ' . $type . ' ' . $uniqueProperty, 'DBCache');
             return $stmt->rowCount();
         } catch (\PDOException $e) {
             SystemLog::write('DBCache update error: ' . $e->getMessage(), self::$errorCategory);
@@ -100,7 +104,7 @@ class DBCache implements DBCacheInterface
     * @return int The number of rows affected
     * @throws \PDOException
     */
-    public static function delete(string $type, string $uniqueProperty) : int
+    public static function delete(string $type, string $uniqueProperty): int
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -109,6 +113,7 @@ class DBCache implements DBCacheInterface
 
         try {
             $stmt->execute([$type, $uniqueProperty]);
+            SystemLog::write('DBCache delete: ' . $type . ' ' . $uniqueProperty, 'DBCache');
             return $stmt->rowCount();
         } catch (\PDOException $e) {
             SystemLog::write('DBCache delete error: ' . $e->getMessage(), self::$errorCategory);

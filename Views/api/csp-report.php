@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Logs\SystemLog;
@@ -67,4 +69,3 @@ try {
     SystemLog::write($e->getMessage(), 'CSP Report Not Saved');
     Response::output($e->getMessage(), $e->getCode());
 }
-

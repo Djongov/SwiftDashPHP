@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Database\DB;
 use Components\Html;
@@ -125,4 +127,3 @@ foreach ($autoloadArray as $array) {
 }
 
 echo '<div id="dataGridDataLoader" class="max-w-full mx-2 my-12 flex flex-wrap flex-row justify-center items-center"></div>';
-

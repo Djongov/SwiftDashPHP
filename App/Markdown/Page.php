@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Markdown;
 
 use Components\Alerts;
 use App\Utilities\Parsers;
-use Parsedown;
+use App\Markdown\Parsedown;
 
 class Page
 {
-    public static function render(string $fileName, string $theme) : string
+    public static function render(string $fileName, string $theme): string
     {
         // Now let's get the contents of the file
         if (file_exists($fileName . '.md') === false) {
@@ -30,7 +32,7 @@ class Page
         $html .= '</article>';
         return $html;
     }
-    public static function renderRemote(string $url, string $theme) : string
+    public static function renderRemote(string $url, string $theme): string
     {
         // Now let's get the contents of the file
         $fileContents = file_get_contents($url);
@@ -52,7 +54,7 @@ class Page
         $html .= '</article>';
         return $html;
     }
-    public static function getMdFilesInDir(string $dir) : array
+    public static function getMdFilesInDir(string $dir): array
     {
         $files = scandir($dir);
         $files = array_diff($files, ['.', '..', 'index.php']);
@@ -61,7 +63,7 @@ class Page
         }, $files);
         return $files;
     }
-    public static function getMetaDataFromMd($file, $folder) : array
+    public static function getMetaDataFromMd($file, $folder): array
     {
         $yamlData = self::readMetaDataFromMd($file, $folder);
 
@@ -82,10 +84,10 @@ class Page
         ];
         return $genericMetaDataArray;
     }
-    public static function readMetaDataFromMd($file, $folder) : array
+    public static function readMetaDataFromMd($file, $folder): array
     {
         $fileContents = file_get_contents($folder . '/' . $file . '.md');
-        
+
         // Find the position of the first occurrence of '---' (start of YAML front matter)
         $frontMatterStart = strpos($fileContents, '---');
 

@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Checks;
 use App\Api\Response;
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 $checks->apiChecksNoCSRFHeader(false);
 

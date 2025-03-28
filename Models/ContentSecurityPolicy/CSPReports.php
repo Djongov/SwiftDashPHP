@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Models\ContentSecurityPolicy;
 
@@ -13,7 +15,7 @@ class CSPReports
      * @param array $data. Array of the CSP report originally sent
      * @return array
      */
-    public function create(array $data) : array
+    public function create(array $data): array
     {
         $jsonData = json_encode($data) ?? null;
         $url = $data['csp-report']['document-uri'] ?? null;

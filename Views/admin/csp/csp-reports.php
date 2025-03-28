@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Security\Firewall;
 use App\Api\Response;
@@ -105,15 +107,15 @@ echo '<div id="csp-charts" class="flex flex-row flex-wrap p-6 justify-center">';
     foreach ($chartsArray as $array) {
         echo '<input type="hidden" name="autoload" value="' . htmlspecialchars(json_encode($array)) . '" />';
     }
-echo '</div>';
+    echo '</div>';
 
 // Let's do a blocked_uri table
-$blockedUri = array_column($cspArray, 'blocked_uri');
+    $blockedUri = array_column($cspArray, 'blocked_uri');
 
 // Let's calculate the total number of blocked_uri based on the occurrence of each key in the $blockedUri array
-$indexedArray = array_count_values($blockedUri);
+    $indexedArray = array_count_values($blockedUri);
 
-echo '<div class="mx-4 max-w-full overflow-auto flex justify-center">';
+    echo '<div class="mx-4 max-w-full overflow-auto flex justify-center">';
     echo DataGrid::fromData('blocked_uri', $indexedArray, $theme, [
         //'sorting' => true,
         'filters' => true,
@@ -122,11 +124,11 @@ echo '<div class="mx-4 max-w-full overflow-auto flex justify-center">';
         'paging' => true,
         'lengthMenu' => [[10, 50, 100, -1], [10, 50, 100, 'All']],
     ]);
-echo '</div>';
+    echo '</div>';
 
-$cspReportsQuery = 'SELECT id,date_created,domain,url,referrer,violated_directive,effective_directive,disposition,blocked_uri,line_number,column_number,source_file,script_sample FROM csp_reports';
+    $cspReportsQuery = 'SELECT id,date_created,domain,url,referrer,violated_directive,effective_directive,disposition,blocked_uri,line_number,column_number,source_file,script_sample FROM csp_reports';
 
-echo DataGrid::fromQuery('csp_reports', $cspReportsQuery, 'CSP Reports', $theme, true, true, [
+    echo DataGrid::fromQuery('csp_reports', $cspReportsQuery, 'CSP Reports', $theme, true, true, [
     'filters' => true,
     'ordering' => true,
     'order' => [0, 'asc'],
@@ -137,6 +139,6 @@ echo DataGrid::fromQuery('csp_reports', $cspReportsQuery, 'CSP Reports', $theme,
     'export' => [
         'csv' => true
     ]
-]);
+    ]);
 
-$db->__destruct();
+    $db->__destruct();

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication\Azure;
 
@@ -65,7 +67,7 @@ class AzureAD
 
         return true;
     }
-    public static function check(string $token) : bool
+    public static function check(string $token): bool
     {
         // Check validity of the token
         if (!JWT::checkExpiration($token)) {
@@ -93,7 +95,6 @@ class AzureAD
         }
 
         return true;
-        
     }
     public static function getSignatures(string $appId, string $tenant, string $header_kid): ?array
     {
@@ -108,7 +109,6 @@ class AzureAD
         $kid_array = [];
 
         if ($result !== null) {
-
             foreach ($result as $keys) {
                 foreach ($keys as $props) {
                     if (in_array($header_kid, $props)) {

@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components;
 
 class Image
 {
-    public static function display($file, $alt = '', $title = '', $width = '100%', $height = 'auto', $link = true, $caption = '') : string
+    public static function display($file, $alt = '', $title = '', $width = '100%', $height = 'auto', $link = true, $caption = ''): string
     {
         $html = '<div class="relative inline-block m-4">'; // Adjust the margin-bottom as needed
         if ($link) {
@@ -21,4 +23,3 @@ class Image
         return $html;
     }
 }
-

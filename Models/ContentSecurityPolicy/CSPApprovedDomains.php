@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Models\ContentSecurityPolicy;
 
@@ -8,7 +10,7 @@ use App\Exceptions\ContentSecurityPolicyExceptions;
 
 class CSPApprovedDomains
 {
-    public function domainExist(string $domain) : bool
+    public function domainExist(string $domain): bool
     {
         $db = new DB();
         $pdo = $db->getConnection();

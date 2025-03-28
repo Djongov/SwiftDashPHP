@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Authentication\JWT;
 use App\Authentication\AuthToken;
 use App\Api\Response;
 
 $state = $_GET['state'] ?? '/';
-
 $username = JWT::extractUserName(AuthToken::get()) ?? die('No username found');
 
 // if (!isset($_GET['provider'])) {
@@ -32,7 +33,7 @@ $data = [
     'login_hint' => $username
 ];
 
-if ($usernameArray['provider'] === 'azure') {
+if ($loginInfo['usernameArray']['provider'] === 'azure') {
     $data = [
         'client_id' => ENTRA_ID_CLIENT_ID,
         'response_type' => 'code',
@@ -45,7 +46,7 @@ if ($usernameArray['provider'] === 'azure') {
         'login_hint' => $username
     ];
     $url = ENTRA_ID_OAUTH_URL;
-} elseif ($usernameArray['provider'] === 'mslive') {
+} elseif ($loginInfo['usernameArray']['provider'] === 'mslive') {
     $data = [
         'client_id' => MS_LIVE_CLIENT_ID,
         'response_type' => 'code',

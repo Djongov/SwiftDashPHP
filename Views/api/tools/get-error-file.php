@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Components\Html;
 use Components\Alerts;
@@ -10,7 +12,7 @@ use Components\DataGrid;
 
 Firewall::activate();
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 // Perform the API checks
 $checks->apiAdminChecksNoJWT();

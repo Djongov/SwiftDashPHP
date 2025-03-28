@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Components\Forms;
 use Components\Html;
 use Components\Alerts;
-    
+
 if (!LOCAL_USER_LOGIN) {
     echo Alerts::danger('Server is set to not allow local logins');
     return;
@@ -81,6 +83,5 @@ echo '<div class="flex items-center justify-center mx-4">
         echo Html::h2('Register', true);
         echo Html::small('Register a new local user account.');
         echo Forms::render($registrationForm);
-    echo '</div>';
-echo '</div>';
-
+        echo '</div>';
+        echo '</div>';

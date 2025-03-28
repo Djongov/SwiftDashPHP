@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace CSP;
 
@@ -7,8 +9,8 @@ use App\Database\DB;
 class Model
 {
     public string $dbTable;
-    
-    public function addPolicy($policy, $description) : bool
+
+    public function addPolicy($policy, $description): bool
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -16,7 +18,7 @@ class Model
         $stmt->execute([$policy, $description]);
         return ($stmt->rowCount() > 0) ? true : false;
     }
-    public function deletePolicy($id) : bool
+    public function deletePolicy($id): bool
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -24,7 +26,7 @@ class Model
         $stmt->execute([$id]);
         return ($stmt->rowCount() > 0) ? true : false;
     }
-    public function getPolicies() : array
+    public function getPolicies(): array
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -32,7 +34,7 @@ class Model
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-    public function getPolicyById($id) : array
+    public function getPolicyById($id): array
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -40,7 +42,7 @@ class Model
         $stmt->execute([$id]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
-    public function getPolicyByDomain($domain) : array
+    public function getPolicyByDomain($domain): array
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -48,7 +50,7 @@ class Model
         $stmt->execute([$domain]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
-    public function updatePolicy($id, $policy, $description) : bool
+    public function updatePolicy($id, $policy, $description): bool
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -56,7 +58,7 @@ class Model
         $stmt->execute([$policy, $description, $id]);
         return ($stmt->rowCount() > 0) ? true : false;
     }
-    public function addApprovedDomain($domain) : bool
+    public function addApprovedDomain($domain): bool
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -64,7 +66,7 @@ class Model
         $stmt->execute([$domain]);
         return ($stmt->rowCount() > 0) ? true : false;
     }
-    public function deleteApprovedDomain($id) : bool
+    public function deleteApprovedDomain($id): bool
     {
         // Delete a domain from the approved list
         $db = new DB();
@@ -72,6 +74,5 @@ class Model
         $stmt = $pdo->prepare("DELETE FROM csp_approved_domains WHERE id=?");
         $stmt->execute([$id]);
         return ($stmt->rowCount() > 0) ? true : false;
-        
     }
 }

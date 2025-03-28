@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Request;
 
@@ -23,7 +25,7 @@ class HttpClient
         ]);
     }
 
-    public function call($method, $path, $data = [], ?string $bearer_token = null, $sendJson = false, $headers = [], $expectJson = true) : mixed
+    public function call($method, $path, $data = [], ?string $bearer_token = null, $sendJson = false, $headers = [], $expectJson = true): mixed
     {
         $method = strtoupper($method);
 
@@ -108,7 +110,7 @@ class HttpClient
         }
     }
     // This method will fetch only the headers of the constructor url
-    public function fetchHeaders() : array
+    public function fetchHeaders(): array
     {
         try {
             $response = $this->client->request('HEAD');

@@ -1,12 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Components\Page;
 
 use Components\Forms;
 use Components\Html;
 
-class CookieBanner {
-    public static function render(string $theme) : string
+class CookieBanner
+{
+    public static function render(string $theme): string
     {
         // If cookie conset is already set, don't show the banner
         if (isset($_COOKIE['cookie-consent']) && $_COOKIE['cookie-consent'] === 'accept') {

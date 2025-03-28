@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -10,7 +12,7 @@ use Models\BasicModel;
 class User extends BasicModel
 {
     // Existence checks
-    public function exists(string|int $param) : bool
+    public function exists(string|int $param): bool
     {
         // If it is an integer, we'll assume it's an id, otherwise we'll assume it's an api key
         $column = is_int($param) ? 'id' : 'username';
@@ -19,12 +21,12 @@ class User extends BasicModel
         $stmt = $pdo->prepare("SELECT * FROM users WHERE $column=?");
         $stmt->execute([$param]);
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        
-        
+
+
         return count($result) > 0;
     }
     // User get
-    public function get(string|int|null $param = null) : array
+    public function get(string|int|null $param = null): array
     {
         $db = new DB();
         $pdo = $db->getConnection();
@@ -62,7 +64,6 @@ class User extends BasicModel
             $stmt = $pdo->prepare("SELECT * FROM users WHERE username=?");
             $stmt->execute([$param]);
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-            
         } catch (\PDOException $e) {
             throw (new UserExceptions())->generic($e->getMessage() . ' and query is: ', 500);
         }
@@ -77,11 +78,11 @@ class User extends BasicModel
         return $result;
     }
     // User creator
-    public function create(array $data) : bool
+    public function create(array $data): bool
     {
         // First check if the user exists
         if ($this->exists($data['username'])) {
-            throw (new UserExceptions)->userAlreadyExists();
+            throw (new UserExceptions())->userAlreadyExists();
         }
 
         $db = new DB();
@@ -104,20 +105,20 @@ class User extends BasicModel
 
         if ($stmt->rowCount() === 0) {
             SystemLog::write('User not created with ' . json_encode($data), 'User API');
-            
-            throw (new UserExceptions)->userNotCreated();
+
+            throw (new UserExceptions())->userNotCreated();
         } else {
             SystemLog::write('User created with ' . json_encode($data), 'User API');
-            
+
             return true;
         }
     }
     // User updater
-    public function update(array $data, int $id) : int
+    public function update(array $data, int $id): int
     {
         // First let's check if the user exists
         if (!$this->exists($id)) {
-            throw (new UserExceptions)->userNotFound();
+            throw (new UserExceptions())->userNotFound();
         }
 
         $db = new DB();
@@ -142,23 +143,25 @@ class User extends BasicModel
         $stmt = $pdo->prepare($query);
         try {
             $stmt->execute(array_values($values));
+            SystemLog::write('User with id ' . $id . ' updated with ' . json_encode($data), 'User API');
         } catch (\PDOException $e) {
             if (ini_get('display_errors') === '1') {
                 throw new \PDOException($e->getMessage());
+            } else {
+                throw (new UserExceptions())->generic('Could not update user', 500);
             }
-            throw new \PDOException('failed to update API key', 500);
         }
 
         $rowCount = $stmt->rowCount();
-        
-        
+
+
         return $rowCount;
     }
     // User Deleter
-    public function delete(string|int $param) : bool
+    public function delete(string|int $param): bool
     {
         if (!$this->exists($param)) {
-            throw (new UserExceptions)->userNotFound();
+            throw (new UserExceptions())->userNotFound();
         } else {
             if (is_string($param)) {
                 $column = 'username';
@@ -170,11 +173,10 @@ class User extends BasicModel
             $stmt = $pdo->prepare('DELETE FROM users WHERE ' . $column . ' =?');
             $stmt->execute([$param]);
             if ($stmt->rowCount() === 0) {
-                
-                throw (new UserExceptions)->userNotDeleted();
+                throw (new UserExceptions())->userNotDeleted();
             } else {
                 SystemLog::write('User with ' . $column . ' ' . $param . ' deleted', 'User API');
-                
+
                 return true;
             }
         }

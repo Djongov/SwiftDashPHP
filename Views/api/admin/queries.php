@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Database\DB;
 use Components\Alerts;
@@ -8,7 +10,7 @@ use App\Security\Firewall;
 
 Firewall::activate();
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 // Perform the API checks
 $checks->apiAdminChecks();

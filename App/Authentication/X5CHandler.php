@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication;
 
@@ -9,7 +11,7 @@ use Models\Core\DBCache;
 
 class X5CHandler
 {
-    public static function load(string $appId, string $tenant, string $kid, string $provider) : bool|string
+    public static function load(string $appId, string $tenant, string $kid, string $provider): bool|string
     {
         $providerValues = ['azure', 'mslive', 'google'];
         if (!in_array($provider, $providerValues)) {
@@ -46,7 +48,7 @@ class X5CHandler
             return (!$newX5c) ? false : $newX5c;
         }
     }
-    public static function fetch(string $appId, string $tenant, string $kid, string $provider) : ?string
+    public static function fetch(string $appId, string $tenant, string $kid, string $provider): ?string
     {
         // We don't have a valid x5c, let's fetch it
         $providerValues = ['azure', 'google'];

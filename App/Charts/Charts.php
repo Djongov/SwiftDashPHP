@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Charts;
 
@@ -9,7 +11,7 @@ class Charts
     // Format values are: svg, png, jpeg, webp
 
     // Radial Gauge good for measuring percentages or values out of max values
-    public static function radialGauge(string $label, int $data, array $range = [0, 100], string|int $width = 250, string|int $height = 250, string $format = 'svg', bool $shortUrl = false) : string
+    public static function radialGauge(string $label, int $data, array $range = [0, 100], string|int $width = 250, string|int $height = 250, string $format = 'svg', bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,
@@ -93,7 +95,7 @@ class Charts
         return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $label . '" alt="' . $label . '" width="' . $width . '" height="' . $height . '"  /></figure>' : '<figure class="m-1"><img src="' . $chart->getUrl() . '" title="' . $label . '" alt="' . $label . '" width="' . $width . '" height="' . $height . '" /></figure>';
     }
     // Donut or Pie chart in one
-    public static function doughnutOrPieChart(string $type, string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false) : string
+    public static function doughnutOrPieChart(string $type, string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,
@@ -271,7 +273,7 @@ class Charts
         //var_dump($chart->getConfigStr());
         return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>' : '<figure class="m-1"><img height="' . $height . '" width="' . $width . '" src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>';
     }
-    public static function barChart(string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false) : string
+    public static function barChart(string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,

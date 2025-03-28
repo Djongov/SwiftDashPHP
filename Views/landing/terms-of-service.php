@@ -1,16 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Let's define some constants
 
-define("COMPANY_NAME" , "XXXXS");
+define("COMPANY_NAME", "XXXXS");
 
 define("COMPANY_EMAIL", "info@template.gamerz-bg.com");
 
 define("COMPANY_COUNTRY", "Bulgaria");
 
-define("COMPANY_PHONE" , "+359XXXXX");
+define("COMPANY_PHONE", "+359XXXXX");
 
-define("COMPANY_ADDRESS" , "XXXX");
+define("COMPANY_ADDRESS", "XXXX");
 
 define("COMPANY_URL", "https://template.gamerz-bg.com");
 

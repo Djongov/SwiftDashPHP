@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Components\Forms;
 use Components\Html;
@@ -41,6 +43,6 @@ echo '<div class="p-4 m-4 max-w-md ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg b
     ];
 
     echo Forms::render($CspApprovedDomainsForm, $theme);
-echo '</div>';
+    echo '</div>';
 
-echo DataGrid::fromDBTable('csp_approved_domains', 'CSP Approved Domains', $theme);
+    echo DataGrid::fromDBTable('csp_approved_domains', 'CSP Approved Domains', $theme);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Authentication;
 
@@ -6,7 +8,7 @@ use App\Core\Cookies;
 
 class AuthToken
 {
-    public static function get() : ?string
+    public static function get(): ?string
     {
         if (AUTH_HANDLER === 'cookie') {
             return $_COOKIE[AUTH_COOKIE_NAME] ?? null;
@@ -16,7 +18,7 @@ class AuthToken
             return null;
         }
     }
-    public static function set($value, $cookieDuration = AUTH_COOKIE_EXPIRY) : void
+    public static function set($value, $cookieDuration = AUTH_COOKIE_EXPIRY): void
     {
         if (AUTH_HANDLER === 'cookie') {
             Cookies::setAuthCookie($value, $cookieDuration);
@@ -24,7 +26,7 @@ class AuthToken
             $_SESSION[AUTH_SESSION_NAME] = $value;
         }
     }
-    public static function unset() : void
+    public static function unset(): void
     {
         if (AUTH_HANDLER === 'cookie') {
             unset($_COOKIE[AUTH_COOKIE_NAME]);
@@ -33,7 +35,6 @@ class AuthToken
             $cleaned_host = $colon_pos !== false ? str_replace($colon_pos, '', $host) : $host;
 
             setcookie(AUTH_COOKIE_NAME, '', -1, '/', $cleaned_host);
-
         } elseif (AUTH_HANDLER === 'session') {
             unset($_SESSION[AUTH_SESSION_NAME]);
         }

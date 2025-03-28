@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Utilities;
 
 class FileSystem
 {
     // Returns the size of a folder in bytes. /1024 /1024 to get MB. echo App\Utilities\FileSystem::folderSize(dirname($_SERVER['DOCUMENT_ROOT'])) / 1024 / 1024 . ' MB'; for project root size
-    public static function folderSize($folderPath) : float
+    public static function folderSize($folderPath): float
     {
         $totalSize = 0;
         $files = scandir($folderPath);

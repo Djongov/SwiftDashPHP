@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Mail\Send;
 use App\Api\Checks;
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 $checks->checkParams(['recipients', 'subject', 'body'], $_POST);
 

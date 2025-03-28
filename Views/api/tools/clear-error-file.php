@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Api\Response;
 use App\Api\Checks;
@@ -7,7 +9,7 @@ use Components\Alerts;
 
 Firewall::activate();
 
-$checks = new Checks($vars, $_POST);
+$checks = new Checks($loginInfo, $_POST);
 
 // Perform the API checks
 $checks->apiAdminChecks();
