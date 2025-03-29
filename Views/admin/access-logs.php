@@ -70,6 +70,33 @@ foreach ($files as $file) {
     }
 }
 
+// Now the POST request to delete the file
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check if the file is set
+    if (!isset($_POST['file'])) {
+        Response::output('No file set', 400);
+    }
+    // Check if the file exists
+    if (!file_exists($dir . '/' . $_POST['file'])) {
+        Response::output('The access log file does not exist', 404);
+    }
+    // Check if the file is writable
+    if (!is_writable($dir . '/' . $_POST['file'])) {
+        Response::output('The access log file is not writable', 403);
+    }
+    // Delete the file
+    if (unlink($dir . '/' . $_POST['file'])) {
+        // Show success message
+        Response::output('The access log file ' . $_POST['file'] . ' was deleted', 200);
+    } else {
+        // Show error message
+        Response::output('The access log file ' . $_POST['file'] . ' could not be deleted', 500);
+    }
+    
+}
+
+$isAccessLogsDirWritable = is_writable($dir);
+
 echo Html::h1('Access Logs', true);
 
 echo Html::p($_ENV['ACCESS_LOGS'], ['text-center']);
@@ -104,6 +131,26 @@ foreach ($files as $file) {
     }
 
         echo Html::p('Size: ' . round($file['size'] / $delimiter, 2) . ' ' . $naming, ['text-center']);
+        // If writable, show the delete button
+        $deleteLogFormOptions = [
+            "inputs" => [
+                "hidden" => [
+                    [
+                        "name" => "file",
+                        "value" => $file['file'],
+                    ]
+                ],
+            ],
+            'theme' => 'red',
+            'action' => '?delete',
+            'reloadOnSubmit' => true,
+            "submitButton" => [
+                "text" => "Submit",
+                'style' => '&#10060;'
+            ]
+        ];
+
+        echo ($isAccessLogsDirWritable) ? \Components\Forms::render($deleteLogFormOptions) : '';
         echo '</div>';
 }
 echo '</div>';

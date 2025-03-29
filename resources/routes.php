@@ -80,7 +80,7 @@ return function (RouteCollector $router) {
     $router->addRoute('GET', '/adminx/system-logs', [$viewsFolder . '/admin/system-logs.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/csp-reports', [$viewsFolder . '/admin/csp/csp-reports.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/csp-approved-domains', [$viewsFolder . '/admin/csp/csp-approved-domains.php', $genericMetaAdminDataArray]);
-    $router->addRoute('GET', '/adminx/access-logs', [$viewsFolder . '/admin/access-logs.php', $genericMetaAdminDataArray]);
+    $router->addRoute(['GET', 'POST'], '/adminx/access-logs', [$viewsFolder . '/admin/access-logs.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/firewall', [$viewsFolder . '/admin/firewall.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/queries', [$viewsFolder . '/admin/queries.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/mailer', [$viewsFolder . '/admin/mailer.php', $genericMetaAdminDataArray]);
