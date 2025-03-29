@@ -9,9 +9,8 @@ use App\Charts\QuickChart;
 class Charts
 {
     // Format values are: svg, png, jpeg, webp
-
     // Radial Gauge good for measuring percentages or values out of max values
-    public static function radialGauge(string $label, int $data, array $range = [0, 100], string|int $width = 250, string|int $height = 250, string $format = 'svg', bool $shortUrl = false): string
+    public function radialGauge(string $label, int $data, array $range = [0, 100], string|int $width = 250, string|int $height = 250, string $format = 'svg', bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,
@@ -22,6 +21,7 @@ class Charts
         $percentage = floor(($data / $range[1]) * 100);
         // Let's set the background color based on the percentage
         // If we are between 0 and 50, we are green, from 50 to 75 we are orange, from 75 to 80 we are crimson, from 80 to 100 we are red
+        // Determine background color dynamically
         if ($percentage >= 0 && $percentage <= 25) {
             $background = 'getGradientFillHelper("horizontal", ["lime", "green"])';
         } elseif ($percentage > 25 && $percentage < 50) {
@@ -36,66 +36,75 @@ class Charts
             $background = 'getGradientFillHelper("horizontal", ["green", "lime"])';
         }
 
-        $chart->setConfig('{
-            type: "radialGauge",
-            data: {
-                datasets: [{
-                    data: [' . $data . '],
-                    backgroundColor: ' . $background . ',
-                    borderWidth: 1,
-                    borderColor: "rgba(0,0,0, 0.95)",
-                    label: "' . $label . '",
-                }]
-            },
-            options: {
-                // See https://github.com/pandameister/chartjs-chart-radial-gauge#options
-                domain: [' . implode(',', $range) . '],
-                trackColor: "rgba(119,119,119, 0.95)",
-                trackBorderWidth: 1,
-                roundedCorners: false,
-                legend: {},
-                title: {
-                    display: true,
-                    text: "' . $label . '"
-                },
-                centerPercentage: 80,
-                centerArea: {
-                    fontSize: 16,
-                    displayText: true,
-                    text: (val) => val + "/" + ' . $range[1] . ' + "\n(' . $percentage . '%)",
-                    subText: "",
-                    padding: 4,
-                    fontColor: \'#777\',
-                    fontWeight: \'bold\',
-                },
-                responsive: true,
-                title: {
-                    display: true,
-                    fontSize: 18,
-                    text: \'' . $label . '\',
-                    color: \'#777\',
-                    align: \'center\',
-                    position: \'top\',
-                    fullSize: false,
-                    fontWeight: \'bold\'
-                },
-                legend: {
-                    display: false,
-                    position: \'right\',
-                    align: \'top\',
-                    labels: {
-                        fontColor: \'#777\',
-                        fontStyle: \'bold\',
-                        fontSize: 14,
-                        padding: 12
-                    }
-                },
-            }
-        }');
+        // Create configuration array
+        $config = [
+            "type" => "radialGauge",
+            "data" => [
+                "datasets" => [[
+                    "data" => [$data],
+                    "backgroundColor" => null, // Placeholder, we'll replace it later
+                    "borderWidth" => 1,
+                    "borderColor" => "rgba(0,0,0, 0.95)",
+                    "label" => $label
+                ]]
+            ],
+            "options" => [
+                "domain" => $range,
+                "trackColor" => "rgba(119,119,119, 0.95)",
+                "trackBorderWidth" => 1,
+                "roundedCorners" => false,
+                "legend" => [],
+                "title" => [
+                    "display" => true,
+                    "text" => $label
+                ],
+                "centerPercentage" => 80,
+                "centerArea" => [
+                    "fontSize" => 16,
+                    "displayText" => true,
+                    "text" => "$data / {$range[1]}\n($percentage%)",
+                    "subText" => "",
+                    "padding" => 4,
+                    "fontColor" => "#777",
+                    "fontWeight" => "bold"
+                ],
+                "responsive" => true,
+                "title" => [
+                    "display" => true,
+                    "fontSize" => 18,
+                    "text" => $label,
+                    "color" => "#777",
+                    "align" => "center",
+                    "position" => "top",
+                    "fullSize" => false,
+                    "fontWeight" => "bold"
+                ],
+                "legend" => [
+                    "display" => false,
+                    "position" => "right",
+                    "align" => "top",
+                    "labels" => [
+                        "fontColor" => "#777",
+                        "fontStyle" => "bold",
+                        "fontSize" => 14,
+                        "padding" => 12
+                    ]
+                ]
+            ]
+        ];
+
+        // Convert config to JSON
+        $jsonConfig = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        // Manually inject `getGradientFillHelper(...)` into JSON
+        $jsonConfig = str_replace('"backgroundColor":null', '"backgroundColor":' . $background, $jsonConfig);
+
+        $chart->setConfig($jsonConfig);
+        
         return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $label . '" alt="' . $label . '" width="' . $width . '" height="' . $height . '"  /></figure>' : '<figure class="m-1"><img src="' . $chart->getUrl() . '" title="' . $label . '" alt="' . $label . '" width="' . $width . '" height="' . $height . '" /></figure>';
     }
     // Donut or Pie chart in one
-    public static function doughnutOrPieChart(string $type, string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
+    public function doughnutOrPieChart(string $type, string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,
@@ -196,7 +205,7 @@ class Charts
 
         return ($shortUrl) ?  '<figure class="m-2"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" width="' . $width . '" height="' . $height . '" /></figure>' : '<figure class="m-2"><img src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" width="' . $width . '" height="' . $height . '" /></figure>';
     }
-    public static function lineChart(string $title, array $data, string|int $width, string|int $height, string $format, bool $shortUrl = false): string
+    public function lineChart(string $title, array $data, string|int $width, string|int $height, string $format, bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,
@@ -249,31 +258,38 @@ class Charts
                 title: {
                     display: true,
                     fontSize: 16,
-                    text: \'' . $title . '\',
-                    color: \'black\',
-                    align: \'center\',
-                    position: \'top\',
+                    text: "' . $title . '",
+                    color: "black",
+                    align: "center",
+                    position: "top",
                     fullSize: true,
-                    fontWeight: \'bold\'
+                    fontWeight: "bold"
                 },
                 legend: {
                     display: true,
-                    position: \'top\',
-                    align: \'center\',
+                    position: "top",
+                    align: "center",
                     fontSize: 9,
                     labels: {
                         padding: 20,
-                        color: \'black\',
+                        color: "black",
                         fontSize: 12,
-                        borderWidth: 1,
+                        borderWidth: 1
                     }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            stepSize: 200  // Forces step size like Chart.js 4+
+                        }
+                    }]
                 }
             }
-        }');
+        }');        
         //var_dump($chart->getConfigStr());
         return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>' : '<figure class="m-1"><img height="' . $height . '" width="' . $width . '" src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>';
     }
-    public static function barChart(string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
+    public function barChart(string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
     {
         $chart = new QuickChart([
             'width' => $width,

@@ -146,7 +146,8 @@ foreach ($files as $file) {
             'reloadOnSubmit' => true,
             "submitButton" => [
                 "text" => "Submit",
-                'style' => '&#10060;'
+                'style' => '&#10060;',
+                'title' => 'Delete the log file',
             ]
         ];
 

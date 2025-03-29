@@ -16,22 +16,25 @@ echo Html::p('We can control which quickchart host we use by setting the QUICKCH
 echo Html::p('shortUrls are used to shorten the URLs for the images so they can be used in emails for example. Also shortURLs are higher quality and are also only available at quickchart.io. ' . Html::a("Read more", "https://quickchart.io/documentation/usage/short-urls-and-templates/#:~:text=To%20generate%20a%20short%20URL,.io%2Fchart%2Fcreate%20.&text=Go%20to%20the%20URL%20in,URLs%20to%20become%20active%20globally.", $theme, '_blank'));
 
 // Let's use this general data for all the charts
+$minRandomChartData = 1;
+$maxRandomChartData = 10;
+
 $chartData = [
-    'January' => rand(1, 1000),
-    'February' => rand(1, 1000),
-    'March' => rand(1, 1000),
-    'April' => rand(1, 1000),
-    'May' => rand(1, 1000),
-    'June' => rand(1, 1000),
+    'January' => rand($minRandomChartData, $maxRandomChartData),
+    'February' => rand($minRandomChartData, $maxRandomChartData),
+    'March' => rand($minRandomChartData, $maxRandomChartData),
+    'April' => rand($minRandomChartData, $maxRandomChartData),
+    'May' => rand($minRandomChartData, $maxRandomChartData),
+    'June' => rand($minRandomChartData, $maxRandomChartData),
 ];
 
 $chartDataTwo = [
-    'January' => rand(1, 1000),
-    'February' => rand(1, 1000),
-    'March' => rand(1, 1000),
-    'April' => rand(1, 1000),
-    'May' => rand(1, 1000),
-    'June' => rand(1, 1000),
+    'January' => rand($minRandomChartData, $maxRandomChartData),
+    'February' => rand($minRandomChartData, $maxRandomChartData),
+    'March' => rand($minRandomChartData, $maxRandomChartData),
+    'April' => rand($minRandomChartData, $maxRandomChartData),
+    'May' => rand($minRandomChartData, $maxRandomChartData),
+    'June' => rand($minRandomChartData, $maxRandomChartData),
 ];
 
 $min = 0;
@@ -40,29 +43,31 @@ $max = 100;
 
 $randomNumber = rand($min, $max);
 
+$chart = new Charts();
+
 echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
     // Pie chart
     echo '<div>';
 
-        echo Charts::doughnutOrPieChart('pie', 'Pie Chart', array_keys($chartData), array_values($chartData));
+        echo $chart->doughnutOrPieChart('pie', 'Pie Chart', array_keys($chartData), array_values($chartData));
 
     echo '</div>';
     // Doughnut chart
     echo '<div>';
 
-        echo Charts::doughnutOrPieChart('donut', 'donut Chart', array_keys($chartData), array_values($chartData));
+        echo $chart->doughnutOrPieChart('donut', 'donut Chart', array_keys($chartData), array_values($chartData));
 
     echo '</div>';
     // Bar gauge
     echo '<div>';
 
-        echo Charts::barChart('Bar chart', array_keys($chartData), array_values($chartData));
+        echo $chart->barChart('Bar chart', array_keys($chartData), array_values($chartData));
 
     echo '</div>';
     // Radial gauge
     echo '<div>';
 
-        echo Charts::radialGauge('random number ouf of ' . $max, $randomNumber, [$min, $max]);
+        echo $chart->radialGauge('random number ouf of ' . $max, $randomNumber, [$min, $max]);
 
     echo '</div>';
     // Line chart
@@ -82,7 +87,7 @@ echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
             ]
         ];
 
-        echo Charts::lineChart('Line chart', $lineChartData, 400, 200, 'svg');
+        echo $chart->lineChart('Line chart', $lineChartData, 400, 200, 'svg');
 
         echo '</div>';
         echo '</div>';
@@ -131,9 +136,9 @@ echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
             'type' => 'gaugechart',
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'Gauge chart',
-                'width' => 275,
-                'height' => 275,
+                'title' => 'random number ouf of ' . $max,
+                'width' => 250,
+                'height' => 250,
                 'data' => [$randomNumber, $max]
             ]
         ],

@@ -35,16 +35,7 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
     containerDiv.appendChild(canvas);
 
     // Find out the theme - dark or light
-    let theme = '';
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'dark') {
-            theme = 'dark';
-        } else {
-            theme = 'light';
-        }
-    } else {
-        theme = 'light';
-    }
+    let theme = getCurrentTheme();
 
     const titleColor = (theme === 'dark') ? 'white' : 'black';
 
@@ -221,7 +212,6 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
 
     let lineDataSets = [];
 
-    // Find out the theme - dark or light
     let theme = getCurrentTheme();
 
     const textColor = (theme === 'dark') ? 'white' : 'black';
@@ -279,26 +269,27 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
                 mode: 'index', // Ensures all dataset values for the same x-axis label are shown
                 intersect: false
             },
-            // scales: {
-            //     x: {
-            //         ticks: {
-            //             color: textColor, // Color for x-axis labels
-            //             margin: 10,
-            //         },
-            //         grid: {
-            //             color: gridColor, // Color for y-axis grid lines
-            //         },
-            //     },
-            //     y: {
-            //         ticks: {
-            //             color: textColor, // Color for y-axis labels
-            //             margin: 10,
-            //         },
-            //         grid: {
-            //             color: gridColor, // Color for y-axis grid lines
-            //         },
-            //     },
-            // },
+            scales: {
+                x: {
+                    ticks: {
+                        color: textColor, // Color for x-axis labels
+                        margin: 10
+
+                    },
+                    grid: {
+                        color: gridColor, // Color for y-axis grid lines
+                    },
+                },
+                y: {
+                    ticks: {
+                        color: textColor, // Color for y-axis labels
+                        margin: 10
+                    },
+                    grid: {
+                        color: gridColor, // Color for y-axis grid lines
+                    },
+                },
+            },
         }        
     });
     lineChart.update();
@@ -324,6 +315,10 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
     canvas.height = height;
 
     containerDiv.appendChild(canvas);
+
+    let theme = getCurrentTheme();
+
+    const titleColor = (theme === 'dark') ? 'white' : 'black';
 
     // Define the gauge chart data
     const remainder = max - min;
@@ -415,9 +410,9 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
             plugins: {
                 title: {
                     display: true,
-                    text: `${title} - ${min} out of ${max}`,
+                    text: `${title}`,
                     font: { size: 16, weight: 'bold' },
-                    color: '#333',
+                    color: titleColor,
                 }
             }
         }
@@ -448,20 +443,11 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
     containerDiv.appendChild(canvas);
 
     // Find out the theme - dark or light
-    let theme = '';
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'dark') {
-            theme = 'dark';
-        } else {
-            theme = 'light';
-        }
-    } else {
-        theme = 'light';
-    }
+    let theme = getCurrentTheme();
 
-    const titleColor = (theme === 'dark') ? '#9ca3af' : '#111827';
+    const titleColor = (theme === 'dark') ? "#E5E7EB" : "#111827";
 
-    const labelColor = (theme === 'dark') ? '#9ca3af' : '#111827';
+    const labelColor = (theme === 'dark') ? "#E5E7EB" : "#111827";
 
     let backgroundColorArray = [];
     let colorScheme = [];
@@ -553,7 +539,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                 datalabels: {
                     display: true,
                     align: 'middle',
-                    color: '#fff',
+                    color: 'white',
                     backgroundColor: '#000',
                     borderRadius: 3,
                     font: {
@@ -571,7 +557,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                                 weight: 'bold'
                             },
                             backgroundColor: 'green',
-                            color: '#777'
+                            color: labelColor
                         }
                     ]
                 }
@@ -603,7 +589,7 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
 
     // Get the current theme
     let theme = getCurrentTheme();
-    const textColor = (theme === 'dark') ? 'white' : 'black';
+    const textColor = (theme === 'dark') ? "#E5E7EB" : "#111827";
 
     let ctx = canvas.getContext('2d');
     let myChart = new Chart(ctx, {
@@ -654,6 +640,15 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
             },
             scales: {
                 y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: textColor,
+                        font: {
+                            size: 12,
+                        }
+                    },
+                },
+                x: {
                     beginAtZero: true,
                     ticks: {
                         color: textColor,

@@ -3,7 +3,9 @@ const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
 const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-const getCurrentTheme = () => localStorage.getItem('color-theme') || 'light';
+const preferedSystemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+
+const getCurrentTheme = () => localStorage.getItem('color-theme') || localStorage.setItem('color-theme', preferedSystemTheme);
 
 const updateChartThemes = () => {
     const isDark = document.documentElement.classList.contains('dark');
