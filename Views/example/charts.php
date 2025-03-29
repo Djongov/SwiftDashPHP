@@ -17,7 +17,7 @@ echo Html::p('shortUrls are used to shorten the URLs for the images so they can 
 
 // Let's use this general data for all the charts
 $minRandomChartData = 1;
-$maxRandomChartData = 10;
+$maxRandomChartData = 1000;
 
 $chartData = [
     'January' => rand($minRandomChartData, $maxRandomChartData),
@@ -89,82 +89,82 @@ echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
 
         echo $chart->lineChart('Line chart', $lineChartData, 400, 200, 'svg');
 
-        echo '</div>';
-        echo '</div>';
+    echo '</div>';
+echo '</div>';
 
-        echo Html::h2('Interactive charts (Chart.js)');
+echo Html::h2('Interactive charts (Chart.js)');
 
-        echo Html::p('We can spawn interactive charts using Chart.js. This is a JavaScript library that allows us to create charts and graphs. We are passing the data to the JavaScript by using hidden inputs with the name "autoload".');
+echo Html::p('We can spawn interactive charts using Chart.js. This is a JavaScript library that allows us to create charts and graphs. We are passing the data to the JavaScript by using hidden inputs with the name "autoload".');
 
-        echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row justify-center items-center">';
+echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row justify-center items-center">';
     // initiate an array that will pass the following data into hidden inputs so Javascript can have access to this data on page load and draw the charts
-        $chartsArray = [
-        [
-            'type' => 'piechart',
-            'data' => [
-                'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'Pie Chart',
-                'width' => 300,
-                'height' => 300,
-                'labels' => array_keys($chartData),
-                'data' => array_values($chartData)
-            ]
-        ],
-        [
-            'type' => 'donutchart',
-            'data' => [
-                'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'donut Chart',
-                'width' => 300,
-                'height' => 300,
-                'labels' => array_keys($chartData),
-                'data' => array_values($chartData)
-            ]
-        ],
-        [
-            'type' => 'barchart',
-            'data' => [
-                'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'Bar chart',
-                'width' => 300,
-                'height' => 300,
-                'labels' => array_keys($chartData),
-                'data' => array_values($chartData)
-            ]
-        ],
-        [
-            'type' => 'gaugechart',
-            'data' => [
-                'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'random number ouf of ' . $max,
-                'width' => 250,
-                'height' => 250,
-                'data' => [$randomNumber, $max]
-            ]
-        ],
-        [
-            'type' => 'linechart',
-            'data' => [
-                'parentDiv' => 'doughnut-limits-holder',
-                'title' => 'Line Chart',
-                'width' => 400,
-                'height' => 200,
-                'labels' => array_keys($chartData),
-                'datasets' => [
-                    [
-                        'label' => 'Data set 1',
-                        'data' => array_values($chartData)
-                    ],
-                    [
-                        'label' => 'Data set 2',
-                        'data' => array_values($chartDataTwo)
-                    ]
+    $chartsArray = [
+    [
+        'type' => 'piechart',
+        'data' => [
+            'parentDiv' => 'doughnut-limits-holder',
+            'title' => 'Pie Chart',
+            'width' => 300,
+            'height' => 300,
+            'labels' => array_keys($chartData),
+            'data' => array_values($chartData)
+        ]
+    ],
+    [
+        'type' => 'donutchart',
+        'data' => [
+            'parentDiv' => 'doughnut-limits-holder',
+            'title' => 'donut Chart',
+            'width' => 300,
+            'height' => 300,
+            'labels' => array_keys($chartData),
+            'data' => array_values($chartData)
+        ]
+    ],
+    [
+        'type' => 'barchart',
+        'data' => [
+            'parentDiv' => 'doughnut-limits-holder',
+            'title' => 'Bar chart',
+            'width' => 300,
+            'height' => 300,
+            'labels' => array_keys($chartData),
+            'data' => array_values($chartData)
+        ]
+    ],
+    [
+        'type' => 'gaugechart',
+        'data' => [
+            'parentDiv' => 'doughnut-limits-holder',
+            'title' => 'random number ouf of ' . $max,
+            'width' => 250,
+            'height' => 250,
+            'data' => [$randomNumber, $max]
+        ]
+    ],
+    [
+        'type' => 'linechart',
+        'data' => [
+            'parentDiv' => 'doughnut-limits-holder',
+            'title' => 'Line Chart',
+            'width' => 400,
+            'height' => 200,
+            'labels' => array_keys($chartData),
+            'datasets' => [
+                [
+                    'label' => 'Data set 1',
+                    'data' => array_values($chartData)
+                ],
+                [
+                    'label' => 'Data set 2',
+                    'data' => array_values($chartDataTwo)
                 ]
             ]
         ]
-        ];
+    ]
+    ];
     // Now go through them and create an input hidden for each
-        foreach ($chartsArray as $array) {
-            echo '<input type="hidden" name="autoload" value="' . htmlspecialchars(json_encode($array)) . '" />';
-        }
-        echo '</div>';
+    foreach ($chartsArray as $array) {
+        echo '<input type="hidden" name="autoload" value="' . htmlspecialchars(json_encode($array)) . '" />';
+    }
+echo '</div>';

@@ -476,10 +476,28 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
         beforeDraw: function (chart) {
             let { width, height, ctx } = chart;
             let centerX = width / 2;
-            let centerY = height / 2 + height * 0.24; // Adjusted for better centering
+    
+            // Dynamically adjust font size based on chart height
+            let fontSize = Math.floor(height / 15);
+            ctx.font = `bold ${fontSize}px Arial`;
+    
+            // Measure text height to improve centering
+            let textMetrics = ctx.measureText(total);
+            let textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+    
+            // Adaptive shift factor based on height ranges
+            let shiftFactor;
+            if (height >= 600) {
+                shiftFactor = height * 0.14; // Larger charts need a smaller relative shift
+            } else if (height >= 400) {
+                shiftFactor = height * 0.190;
+            } else {
+                shiftFactor = height * 0.281; // Smaller charts need a slightly bigger push down
+            }
+    
+            let centerY = height / 2 + shiftFactor - textHeight / 2;
     
             ctx.save();
-            ctx.font = `bold ${Math.floor(height / 12)}px Arial`; // Reduced font size
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = chart.options.plugins.title.color || '#111827';
