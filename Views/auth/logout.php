@@ -7,6 +7,8 @@ use App\Authentication\JWT;
 
 JWT::handleValidationFailure();
 
+\App\Core\Session::reset();
+
 if (!isset($usernameArray['provider']) || empty($usernameArray['provider'])) {
     header('Location: /');
     exit;

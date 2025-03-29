@@ -15,8 +15,8 @@ class UserController
 {
     public function getUser(array $routeInfo, array $loginInfo): void
     {
-        $checks = new Checks($loginInfo, []);
-        $checks->apiChecksNoCSRF();
+        $checks = new Checks($loginInfo, $_GET);
+        $checks->apiChecksNoCSRF(false);
 
         $user = new User();
 
@@ -38,10 +38,30 @@ class UserController
         $userId = $routeInfo[2]['id'];
         $userId = !is_numeric($userId) ? (string) $userId : (int) $userId;
 
-        $userInfoArray = $user->get($userId);
+        try {
+            $dbUserData = $user->get($userId);
 
-        if ($userInfoArray) {
-            Response::output($userInfoArray, 200);
+            $tokenData = JWT::parseTokenPayLoad(AuthToken::get());
+            $dbUserDataFromToken = $tokenData['preferred_username'] ?? $tokenData['username'] ?? $tokenData['email'];
+            // Do not allow users to view other users data unless they are an administrator
+            if ($dbUserData['username'] !== $dbUserDataFromToken && !$loginInfo['isAdmin']) {
+                if (ERROR_VERBOSE) {
+                    Response::output('You cannot view another user data', 401);
+                } else {
+                    Response::output('User not found', 404);
+                }
+            }
+        } catch (\Throwable $e) {
+            SystemLog::write('User GET error: ' . $e->getMessage(), 'User GET error');
+            if (ERROR_VERBOSE) {
+                Response::output($e->getMessage(), $e->getCode());
+            } else {
+                Response::output('User not found', 404);
+            }
+        }
+
+        if ($dbUserData) {
+            Response::output($dbUserData, 200);
         } else {
             Response::output('User not found', 404);
         }

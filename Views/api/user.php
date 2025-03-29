@@ -8,7 +8,7 @@ $controller = new UserController();
 
 // Handle GET requests
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $controller->getUser($routeInfo, $vars);
+    $controller->getUser($routeInfo, $loginInfo);
 }
 
 // Handle POST requests
