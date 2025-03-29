@@ -12,6 +12,11 @@ class Firewall
 {
     public static function cirdMatch($ip, $range)
     {
+        // Allow all IPs by passing one of the below
+        if ($range === '0.0.0.0' || $range === '0.0.0.0/32' || $range === '0.0.0.0/0') {
+            return true;
+        }
+
         list($subnet, $bits) = explode('/', $range);
         if ($bits === null) {
             $bits = 32;
