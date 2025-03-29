@@ -311,3 +311,8 @@ foreach ($required_extensions as $extension) {
 if (!empty($missing_extensions)) {
     die('The following extensions are missing: ' . implode(', ', $missing_extensions));
 }
+
+// Check if the server is running PHP 8.4 or higher
+if (version_compare(PHP_VERSION, '8.4.0', '<')) {
+    die('PHP 8.4 or higher is required');
+}

@@ -39,7 +39,7 @@ class Response
                 'result' => $responseStatus,
                 'timestampUTC' => gmdate(self::$dateFormat),
                 'serverResponseTimeMs' => self::responseTime(),
-                'client_ip' => currentIP(),
+                //'client_ip' => currentIP(),
                 'requestId' => $requestId,
                 'data' => $data
             ],

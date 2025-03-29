@@ -11,6 +11,7 @@ use Models\BasicModel;
 
 class User extends BasicModel
 {
+    public string $table = 'users';
     // Existence checks
     public function exists(string|int $param): bool
     {
@@ -78,40 +79,58 @@ class User extends BasicModel
         return $result;
     }
     // User creator
-    public function create(array $data): bool
+    public function create(array $data): int|string
     {
+        unset($data['csrf_token']);
+        unset($data['confirm_password']);
+        
+        $tableColumns = $this->getColumns($this->table);
+
+        // Now let's check if the structure of the data matches the table
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $tableColumns)) {
+                throw (new UserExceptions())->generic('Invalid field ' . $key, 400);
+            }
+        }
+
         // First check if the user exists
         if ($this->exists($data['username'])) {
             throw (new UserExceptions())->userAlreadyExists();
         }
-
+        
         $db = new DB();
+
+        // Prepare the password
+        if (isset($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
 
         // Now let's check if the structure of the data matches the table
         $db->checkDBColumnsAndTypes($data, 'users');
 
-        $sql = 'INSERT INTO users (';
+        $query = 'INSERT INTO users (';
         $columns = [];
         $values = [];
         foreach ($data as $key => $value) {
             $columns[] = "$key";
             $values[] = '?';
         }
-        $sql .= implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')';
+
+        $query .= implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')';
 
         $pdo = $db->getConnection();
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare($query);
         $stmt->execute(array_values($data));
 
         if ($stmt->rowCount() === 0) {
             SystemLog::write('User not created with ' . json_encode($data), 'User API');
-
             throw (new UserExceptions())->userNotCreated();
-        } else {
-            SystemLog::write('User created with ' . json_encode($data), 'User API');
-
-            return true;
         }
+    
+        $userId = (int) $pdo->lastInsertId();
+        SystemLog::write('User created with ID ' . $userId . ' and data ' . json_encode($data), 'User API');
+    
+        return $userId;
     }
     // User updater
     public function update(array $data, int $id): int
@@ -143,6 +162,7 @@ class User extends BasicModel
         $stmt = $pdo->prepare($query);
         try {
             $stmt->execute(array_values($values));
+            return $stmt->rowCount();
             SystemLog::write('User with id ' . $id . ' updated with ' . json_encode($data), 'User API');
         } catch (\PDOException $e) {
             if (ini_get('display_errors') === '1') {

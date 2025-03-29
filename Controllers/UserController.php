@@ -61,9 +61,7 @@ class UserController
 
         $data = $_POST;
 
-        unset($data['csrf_token']);
-
-        $requiredFields = ['username', 'password', 'confirm_password', 'email'];
+        $requiredFields = ['username', 'password', 'confirm_password', 'email', 'name'];
 
         foreach ($requiredFields as $field) {
             if (!isset($data[$field])) {
@@ -83,13 +81,23 @@ class UserController
         $data['provider'] = 'local';
         $data['enabled'] = 1;
 
-        echo $user->create($data, 'local');
+        try {
+            $newUserId = $user->create($data); // Create the user in the database and return the new user ID
+        } catch (\Throwable $e) {
+            Response::output('User not created: ' . $e->getMessage(), $e->getCode());
+        }
+
+        if ($newUserId) {
+            $userInfoArray = $user->get($newUserId);
+            Response::output($userInfoArray, 201);
+        } else {
+            Response::output('User not created', 400);
+        }
     }
 
     public function updateUser(array $routeInfo, array $loginInfo): void
     {
         $data = Checks::jsonBody();
-
         if (!isset($routeInfo[2]['id'])) {
             Response::output('Missing user id', 400);
             exit();
@@ -126,18 +134,25 @@ class UserController
 
         if (isset($data['picture']) && empty($data['picture'])) {
             $currentPicture = $user->get($userId)['picture'];
-            $profilePicturePath = dirname($_SERVER['DOCUMENT_ROOT']) . '/public' . $currentPicture;
+            $profilePicturePath = ROOT . '/public' . $currentPicture;
             if (file_exists($profilePicturePath)) {
                 unlink($profilePicturePath);
             } else {
                 SystemLog::write('Could not delete the picture: ' . $profilePicturePath . '. Full payload was ' . json_encode($data), 'error');
             }
         }
-
-        $user->update($data, (int) $userId);
+        try {
+            $rowCount = $user->update($data, $userId);
+            if ($rowCount === 0) {
+                Response::output('user not updated', 400);
+            }
+            Response::output('user updated', 200);
+        } catch (\Throwable $e) {
+            Response::output('Invalid field: ' . $e->getMessage(), 400);
+        }
     }
 
-    public function deleteUser(array $routeInfo): void
+    public function deleteUser(array $routeInfo, array $loginInfo): void
     {
         if (!isset($_GET['csrf_token'])) {
             Response::output('Missing CSRF Token', 401);
@@ -151,7 +166,7 @@ class UserController
 
         $userId = (int) $routeInfo[2]['id'];
 
-        $checks = new Checks([], []);
+        $checks = new Checks($loginInfo, []);
         $checks->apiChecksDelete($_GET['csrf_token']);
 
         $tokenData = JWT::parseTokenPayLoad(AuthToken::get());

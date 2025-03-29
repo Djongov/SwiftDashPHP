@@ -87,7 +87,7 @@ class Menu
         }
         $html .= '</ul>';
         $html .= '</div>';
-        $html .= '<div class="flex flex-wrap items-center ml-4">';
+        $html .= '<div class="flex items-center ml-4">';
         // Theme switcher
         $html .= ThemeSwitcher::render();
         if (MULTILINGUAL) {
@@ -119,7 +119,7 @@ class Menu
                                     </svg>';
         }
                     // Button to open the dropdown
-                    $html .= '<button id="' . uniqid() . '" data-dropdown-toggle="userAvatarDropDownNavBar" class="ml-1 flex justify-between items-center py-2 pr-4 pl-3 w-full font-medium hover:bg-' . $theme . '-500 rounded hover:text-gray-100 truncate max-w-sm cursor-pointer">
+                    $html .= '<button id="' . uniqid() . '" data-dropdown-toggle="userAvatarDropDownNavBar" class="ml-1 text-sm flex justify-between items-center p-1 w-full font-medium hover:bg-' . $theme . '-500 rounded hover:text-gray-100 truncate max-w-sm cursor-pointer">
                             ' . $name;
                         // The dropdown arrow
                         $html .= '<svg class="ml-1 w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">

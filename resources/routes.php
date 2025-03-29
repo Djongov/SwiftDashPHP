@@ -6,7 +6,8 @@ use FastRoute\RouteCollector;
 use App\Markdown\Page;
 
 return function (RouteCollector $router) {
-    $viewsFolder = dirname($_SERVER['DOCUMENT_ROOT']) . '/Views';
+    $viewsFolder = ROOT . '/Views';
+    $controllersFolder = ROOT . '/Controllers';
     // include the menu data
     require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/menus/menus.php';
     $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
@@ -30,6 +31,7 @@ return function (RouteCollector $router) {
             'menu' => ADMIN_MENU,
         ]
     ];
+
     /* Views */
 
     // Landing
@@ -60,13 +62,15 @@ return function (RouteCollector $router) {
     $router->addRoute('POST', '/auth/azure-ad', [$viewsFolder . '/auth/azure-ad.php']);
     $router->addRoute(['POST', 'GET'], '/auth/azure-ad-access-token', [$viewsFolder . '/auth/azure-ad-access-token.php']);
     $router->addRoute('GET', '/logout', [$viewsFolder . '/auth/logout.php']);
-    // Azure experiments
+
+    // Azure and MS Live auth
     $router->addRoute('GET', '/auth/azure/request-access-token', [$viewsFolder . '/auth/azure/request-access-token.php']);
     $router->addRoute('POST', '/auth/azure/azure-ad-code-exchange', [$viewsFolder . '/auth/azure/azure-ad-code-exchange.php']);
     $router->addRoute('POST', '/auth/azure/mslive-code-exchange', [$viewsFolder . '/auth/azure/mslive-code-exchange.php']);
 
     // CSP report endpoiont
     $router->addRoute('POST', '/api/csp-report', [$viewsFolder . '/api/csp-report.php']);
+
     // Admin
     $router->addRoute('GET', '/adminx', [$viewsFolder . '/admin/index.php', $genericMetaAdminDataArray]);
     $router->addRoute('GET', '/adminx/server', [$viewsFolder . '/admin/server.php', $genericMetaAdminDataArray]);

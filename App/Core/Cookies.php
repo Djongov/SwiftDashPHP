@@ -40,9 +40,9 @@ class Cookies
     {
         return $_COOKIE[$name] ?? null;
     }
-    public static function delete(string $name): void
+    public static function delete(string $name, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = false): void
     {
-        setcookie($name, '', time() - 3600, '/');
+        setcookie($name, '', time() - 3600, $path, $domain, $secure, $httpOnly);
         unset($_COOKIE[$name]);
     }
     public static function exists(string $name): bool
