@@ -301,7 +301,7 @@ class DataGrid
             $counter++;
             $currentId = $arrays['id'] ?? $counter;
             $html .= '<tr tabindex="' . $indexes . '" data-row-id="' . $currentId . '" class="even:bg-gray-200 odd:bg-gray-100 dark:even:bg-gray-700 dark:odd:bg-gray-600 focus:bg-' . $theme . '-500 dark:focus:bg-gray-500">';
-                $tdClassArray = ['px-4', 'py-2', 'text-sm', 'text-gray-900', 'dark:text-gray-300', 'max-w-xs', 'break-words'];
+                $tdClassArray = ['px-4', 'py-2', 'text-sm', 'text-gray-900', 'dark:text-gray-300', 'max-w-xs', 'break-words', 'focus-within:text-white', 'focus-within:text-semibold'];
             foreach ($arrays as $column => $value) {
                 if ($column === 'id' && $delete) {
                     $html .= '<td class="' . implode(' ', $tdClassArray) . '"><input type="checkbox" value="' . $currentId . '" name="row[]"></td>';

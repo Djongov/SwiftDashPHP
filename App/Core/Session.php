@@ -9,7 +9,7 @@ class Session
     public static function start(): void
     {
         // Only start session if the consent cookie is set and the value is accept
-        if (isset($_COOKIE['cookie-consent']) && $_COOKIE['cookie-consent'] === 'accept') {
+        //if (isset($_COOKIE['cookie-consent']) && $_COOKIE['cookie-consent'] === 'accept') {
             $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
             $secure = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? false : $httpsActive;
             // Session name based on secure connection
@@ -28,7 +28,7 @@ class Session
                 'samesite' => ($secure) ? 'None' : 'Lax' // Set to None because of trip to MS Azure AD authentication endpoint and back but None cannot be used with secure false.
             ]);
             session_start();
-        }
+        //}
     }
     // Reset the session
     public static function reset(): void

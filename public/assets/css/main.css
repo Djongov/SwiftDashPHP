@@ -19,3 +19,8 @@ a[target="_blank"]::after {
     background-repeat: no-repeat; /* Prevent the image from repeating */
     vertical-align: middle; /* Aligns the icon vertically with the text */
 }
+
+tr:focus td {
+    color: white !important;
+    font-weight: 600 !important;
+  }
