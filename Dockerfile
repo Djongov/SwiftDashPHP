@@ -1,5 +1,7 @@
 FROM php:8.4-apache
+
 ARG SSH_PASSWORD
+
 # Copy application and configuration files before executing RUN commands
 COPY . /var/www/html/
 COPY .tools/deployment/default.conf /etc/apache2/sites-available/000-default.conf
@@ -42,6 +44,13 @@ RUN apt-get update \
     && chmod 600 /etc/ssh/sshd_config \
     && chmod +x /usr/local/bin/entrypoint.sh \
     && rm -rf /var/lib/apt/lists/* \
+    \
+    # Enable additional access log for logrotate
+    && touch /var/log/apache2/custom_access.log \
+    && chown www-data:adm /var/log/apache2/custom_access.log \
+    && chmod 644 /var/log/apache2/custom_access.log \
+    && chown www-data:www-data /var/log/apache2/custom_access.log \
+    && echo "/var/log/apache2/custom_access.log {\n    daily\n    rotate 7\n    compress\n    missingok\n    notifempty\n    create 0640 www-data adm\n}" | tee /etc/logrotate.d/apache2-custom > /dev/null \
     && service apache2 restart
 
 EXPOSE 2222 80

@@ -155,6 +155,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $envContent .= $key . '=' . $updatedValue . '' . PHP_EOL;
     }
 
+    $os = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? 'windows' : 'linux';
+
+    if ($os === 'linux') {
+        $envContent .= 'ACCESS_LOGS="/var/log/apache2"' . PHP_EOL;
+    }
 
     $envFilePath = dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env';
 

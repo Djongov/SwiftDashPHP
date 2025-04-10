@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Components\Alerts;
 use Components\Html;
 use App\Logs\IISLogParser;
+use App\Logs\AccessLogsParser;
 use Components\DataGrid;
 use App\Security\Firewall;
 use App\Api\Response;
@@ -17,54 +18,63 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-// Get the dir
+// Get the file path from the environment variable
 if (!isset($_ENV['ACCESS_LOGS'])) {
-    echo Alerts::danger('No access logs directory set in .env file');
+    echo Alerts::danger('No access logs directory (' . $_ENV['ACCESS_LOGS'] . ') set in .env file');
     return;
 }
 
-$dir = $_ENV['ACCESS_LOGS'];
+$filePath = $_ENV['ACCESS_LOGS'];
 
-// Check if the dir exists
-if (!is_dir($dir)) {
-    echo Alerts::danger('The access logs directory does not exist');
+// Check if the directory exists
+if (!is_dir($filePath)) {
+    echo Alerts::danger('The access logs directory (' . $filePath . ') does not exist');
     return;
 }
 
-// Check if readable
-if (!is_readable($dir)) {
-    echo Alerts::danger('The access logs directory is not readable');
+// Check if the directory is readable
+if (!is_readable($filePath)) {
+    echo Alerts::danger('The access logs directory (' . $filePath . ') is not readable');
     return;
 }
-// Get all the files from the dir
-$files = scandir($dir);
+
+// Get all the files from the directory
+$files = scandir($filePath);
 
 // Remove the . and .. from the array
 $files = array_diff($files, ['.', '..']);
 
-// Find out if we run Windows or Linux
+// Filter out unwanted files (e.g., "other_vhosts_access.log")
+$files = array_filter($files, function ($file) {
+    // Ignore specific files like "other_vhosts_access.log"
+    return $file !== 'other_vhosts_access.log';
+});
+
+// Determine the operating system
 $os = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? 'windows' : 'linux';
 
-// If we run Windows, we look for .log files
+// Filter files based on OS and extension
 if ($os === 'windows') {
+    // On Windows, look for .log files
     $files = array_filter($files, function ($file) {
         return pathinfo($file, PATHINFO_EXTENSION) === 'log';
     });
 } else {
-    // If we run Linux, we look for .log files and .log.gz files
+    // On Linux, look for apache2 logs or gzipped files
     $files = array_filter($files, function ($file) {
-        return pathinfo($file, PATHINFO_EXTENSION) === 'log' || pathinfo($file, PATHINFO_EXTENSION) === 'gz';
+        return preg_match('/custom_access\.log(\.gz)?$/', $file);
     });
 }
 
-if (!$files || count($files) === 0) {
+// If no log files found, display a message
+if (empty($files)) {
     echo Alerts::danger('No access logs found');
     return;
 }
 
-// Check if each files is readable
+// Check if each file is readable
 foreach ($files as $file) {
-    if (!is_readable($dir . '/' . $file)) {
+    if (!is_readable($filePath . '/' . $file)) {
         echo Alerts::danger('The access log file ' . $file . ' is not readable');
         return;
     }
@@ -77,41 +87,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Response::output('No file set', 400);
     }
     // Check if the file exists
-    if (!file_exists($dir . '/' . $_POST['file'])) {
+    if (!file_exists($filePath . '/' . $_POST['file'])) {
         Response::output('The access log file does not exist', 404);
     }
     // Check if the file is writable
-    if (!is_writable($dir . '/' . $_POST['file'])) {
+    if (!is_writable($filePath . '/' . $_POST['file'])) {
         Response::output('The access log file is not writable', 403);
     }
     // Delete the file
-    if (unlink($dir . '/' . $_POST['file'])) {
+    if (unlink($filePath . '/' . $_POST['file'])) {
         // Show success message
         Response::output('The access log file ' . $_POST['file'] . ' was deleted', 200);
     } else {
         // Show error message
         Response::output('The access log file ' . $_POST['file'] . ' could not be deleted', 500);
     }
-    
 }
 
-$isAccessLogsDirWritable = is_writable($dir);
+$isAccessLogsDirWritable = is_writable($filePath);
 
 echo Html::h1('Access Logs', true);
-
 echo Html::p($_ENV['ACCESS_LOGS'], ['text-center']);
-
 echo Html::p('Log files in the directory:', ['text-center']);
 
 // Sort by latest
 arsort($files);
 
 // Sort the files by filetime
-$files = array_map(function ($file) use ($dir) {
+$files = array_map(function ($file) use ($filePath) {
     return [
         'file' => $file,
-        'time' => filemtime($dir . '/' . $file),
-        'size' => filesize($dir . '/' . $file)
+        'time' => filemtime($filePath . '/' . $file),
+        'size' => filesize($filePath . '/' . $file)
     ];
 }, $files);
 
@@ -165,19 +172,19 @@ if (!isset($_GET['file'])) {
 $file = $_GET['file'];
 
 // Check if the file exists
-if (!file_exists($dir . '/' . $file)) {
+if (!file_exists($filePath . '/' . $file)) {
     echo Alerts::danger('The access log file does not exist');
     return;
 }
 
 // Check if the file is readable
-if (!is_readable($dir . '/' . $file)) {
+if (!is_readable($filePath . '/' . $file)) {
     echo Alerts::danger('The access log file is not readable');
     return;
 }
 
 // Open the file
-$handle = fopen($dir . '/' . $file, 'r');
+$handle = fopen($filePath . '/' . $file, 'r');
 
 // Check if the file is opened
 if (!$handle) {
@@ -186,7 +193,7 @@ if (!$handle) {
 }
 
 // Read the file
-//$contents = fread($handle, filesize($dir . '/' . $file));
+//$contents = fread($handle, filesize($filePath . '/' . $file));
 
 // If Windows, we parse the IIS log
 if ($os === 'windows') {
@@ -224,4 +231,45 @@ if ($os === 'windows') {
     echo '</div>';
     // Now display the data grid
     echo DataGrid::fromData($file, $parsedLog['prasedData'], $theme);
+} else {
+    
+    $handle = gzopen($filePath . '/' . $file, 'r');
+
+    $parser = new AccessLogsParser($handle);
+    
+    $parsedLog = $parser->parse();
+
+    $log = $parsedLog['parsed_data'];
+
+    $columns = $parsedLog['header_columns'];
+
+    $counts = $parsedLog['counts'];
+
+    $chartsArray = [];
+    // Build the chart arrays
+    foreach ($counts as $title => $chartType) {
+        $chartsArray[] = [
+            'type' => 'piechart',
+            'data' => [
+                'parentDiv' => 'charts',
+                'title' => $title,
+                'width' => 250,
+                'height' => 250,
+                'labels' => array_keys($chartType),
+                'data' => array_values($chartType)
+            ]
+        ];
+    }
+
+
+    echo '<div id="charts" class="flex flex-row flex-wrap p-6 justify-center">';
+    // Create the hidden inputs so the JS can load the charts
+    foreach ($chartsArray as $array) {
+        echo '<input type="hidden" name="autoload" value="' . htmlspecialchars(json_encode($array)) . '" />';
+    }
+    echo '</div>';
+
+    //dd($chartsArray);
+    
+    echo DataGrid::fromData($file, $log, $theme);
 }

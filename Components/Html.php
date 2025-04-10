@@ -165,7 +165,7 @@ class Html
             'block',
             'w-full',
             'p-2.5',
-            'dark:bg-gray-700',
+            'dark:bg-gray-800',
             'dark:border-gray-600',
             'dark:placeholder-gray-400',
             'dark:text-white',

@@ -8,10 +8,11 @@ use App\Core\Session;
 
 if (isset($_POST['consent'])) {
     if ($_POST['consent'] === 'accept') {
+        $host = (str_contains($_SERVER['HTTP_HOST'], ':')) ? explode(':', $_SERVER['HTTP_HOST'])[0] : $_SERVER['HTTP_HOST'];
         $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
-        $secure = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? false : $httpsActive;
+        $secure = (str_contains($host, 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? false : $httpsActive;
         $sameSite = $secure ? 'None' : 'Lax';
-        Cookies::set('cookie-consent', 'accept', time() + 60 * 60 * 24 * 365, '/', $_SERVER['HTTP_HOST'], $secure, true, $sameSite); // 1 year
+        Cookies::set('cookie-consent', 'accept', time() + 60 * 60 * 24 * 365, '/', $host, $secure, true, $sameSite); // 1 year
         Response::output('success');
     } else {
         header('Location: https://www.google.com');
