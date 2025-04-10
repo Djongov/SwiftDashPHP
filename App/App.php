@@ -70,7 +70,7 @@ class App
                         $theme, // Theme
                         MAIN_MENU, // Menu
                         $loginInfo['usernameArray'], // Username array
-                        dirname($_SERVER['DOCUMENT_ROOT']) . '/Views/errors/error.php', // Controller
+                        ROOT . '/Views/errors/error.php', // Controller
                         $loginInfo['isAdmin'], // isAdmin
                         $routeInfo
                     );

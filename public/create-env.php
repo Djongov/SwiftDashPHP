@@ -2,7 +2,7 @@
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET'):
 
-    if (file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env')) {
+    if (file_exists(ROOT . DIRECTORY_SEPARATOR . '.env')) {
         die('No work to be done here');
     }
 ?>
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET'):
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
-    if (file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env')) {
+    if (file_exists(ROOT . DIRECTORY_SEPARATOR . '.env')) {
         die('No work to be done here');
     }
 
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $envContent .= 'ACCESS_LOGS="/var/log/apache2"' . PHP_EOL;
     }
 
-    $envFilePath = dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env';
+    $envFilePath = ROOT . DIRECTORY_SEPARATOR . '.env';
 
     $fileHandle = fopen($envFilePath, 'w');
 

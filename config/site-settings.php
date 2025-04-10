@@ -10,7 +10,7 @@ if (ini_get('display_errors') == 1) {
     define('ERROR_VERBOSE', false);
 }
 
-$version = trim(file_get_contents(dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . 'version.txt'));
+$version = trim(file_get_contents(ROOT . DIRECTORY_SEPARATOR . 'version.txt'));
 
 define('MULTILINGUAL', true);
 
@@ -51,7 +51,6 @@ define('GOOGLE_LOGO', '<svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg"
 // Default theme for unathenticated users and first-time logins, possible values: 'amber', 'green', 'stone', 'rose', 'lime', 'teal', 'sky', 'purple', 'red', 'fuchsia', 'indigo'
 
 // This is a default color scheme for small parts such as buttons and links
-define("COLOR_SCHEME", "amber");
 define("THEME_COLORS",
 [
     'sky',
@@ -63,6 +62,7 @@ define("THEME_COLORS",
     'violet',
     'purple',
     'fuchsia',
+    'green',
     'pink',
     'red',
     'rose',
@@ -75,41 +75,56 @@ define("THEME_COLORS",
     'stone',
 ]);
 
+define("COLOR_SCHEME", "amber");
+
+if (!in_array(COLOR_SCHEME, THEME_COLORS)) {
+    die('COLOR_SCHEME must be one of the following: ' . implode(', ', THEME_COLORS));
+}
+
+$defaultBodyColor = 'gray';
+
+if (!in_array($defaultBodyColor, THEME_COLORS)) {
+    die('defaultBodyColor must be one of the following: ' . implode(', ', THEME_COLORS));
+}
 // This is the text while in the light mode
 define("TEXT_COLOR_SCHEME", "text-gray-900"); // text-gray-900 is nice
 // This is the text while in the dark mode
-define("TEXT_DARK_COLOR_SCHEME", "dark:text-gray-100"); // dark:text-gray-100 is nice
-// This is the background color while in the light mode
-define("LIGHT_COLOR_SCHEME_CLASS", "bg-gray-100"); // bg-purple-300 is nice
-// This is the background color while in the dark mode
-define("DARK_COLOR_SCHEME_CLASS", "dark:bg-gray-900"); // dark:bg-purple-900 is nice
+define("TEXT_DARK_COLOR_SCHEME", "dark:text-gray-200"); // dark:text-gray-100 is nice
+// This is the background color of elements while in the light mode
+define("LIGHT_COLOR_SCHEME_CLASS", "bg-$defaultBodyColor-100"); // bg-purple-300 is nice
+// This is the background color of elements while in the dark mode
+define("DARK_COLOR_SCHEME_CLASS", "dark:bg-$defaultBodyColor-900"); // dark:bg-purple-900 is nice
 // This is the background color for the body while in the light mode
-define("BODY_COLOR_SCHEME_CLASS", "bg-gray-50"); // bg-purple-200 is nice
+define("BODY_COLOR_SCHEME_CLASS", "bg-$defaultBodyColor-200"); // bg-purple-200 is nice
 // This is the background color for the body while in the dark mode
-define("BODY_DARK_COLOR_SCHEME_CLASS", "dark:bg-gray-800"); // dark:bg-purple-800 is nice
+define("BODY_DARK_COLOR_SCHEME_CLASS", "dark:bg-$defaultBodyColor-800"); // dark:bg-purple-800 is nice
 
 // Data grid color schemes
+$defaultDataGridColor = 'gray';
 
+if (!in_array($defaultDataGridColor, THEME_COLORS)) {
+    die('defaultDataGridColor must be one of the following: ' . implode(', ', THEME_COLORS));
+}
 // This is the background color for the table body while in the light mode
-define("DATAGRID_TBODY_COLOR_SCHEME", "bg-gray-100");
+define("DATAGRID_TBODY_COLOR_SCHEME", "bg-$defaultDataGridColor-100");
 // This is the background color for the table body while in the dark mode
-define("DATAGRID_TBODY_DARK_COLOR_SCHEME", "dark:bg-gray-800");
+define("DATAGRID_TBODY_DARK_COLOR_SCHEME", "dark:bg-$defaultDataGridColor-700");
 // This is the background color for the table head while in the light mode
-define("DATAGRID_THEAD_COLOR_SCHEME", "bg-gray-300");
+define("DATAGRID_THEAD_COLOR_SCHEME", "bg-$defaultDataGridColor-300");
 // This is the background color for the table head while in the dark mode
-define("DATAGRID_THEAD_DARK_COLOR_SCHEME", "dark:bg-gray-700");
+define("DATAGRID_THEAD_DARK_COLOR_SCHEME", "dark:bg-$defaultDataGridColor-900");
 // This is the table text color while in the light mode
 define("DATAGRID_TEXT_COLOR_SCHEME", "text-gray-900");
 // This is the table text color while in the dark mode
 define("DATAGRID_TEXT_DARK_COLOR_SCHEME", "dark:text-gray-100");
 
 // Do a check here if .env file exists
-if (!file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env')) {
+if (!file_exists(ROOT . DIRECTORY_SEPARATOR . '.env')) {
     die('The .env file is missing. Please create one in the root of the project or use the <a href="/create-env">helper</a>');
 }
 
 // Load the environment variables from the .env file which resides in the root of the project
-$dotenv = \Dotenv\Dotenv::createImmutable(dirname($_SERVER['DOCUMENT_ROOT']));
+$dotenv = \Dotenv\Dotenv::createImmutable(ROOT);
 
 try {
     $dotenv->load();
@@ -173,9 +188,9 @@ if (DB_DRIVER !== 'sqlite') {
 
 
 // This is the DigiCertGlobalRootCA.crt.pem file that is used to verify the SSL connection to the DB. It's located in the .tools folder
-define("DB_CA_CERT", dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'DigiCertGlobalRootCA.crt.pem');
+define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'DigiCertGlobalRootCA.crt.pem');
 // This is used by the curl requests so you don't get SSL verification errors. It's located in the .tools folder
-define("CURL_CERT", dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
+define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
 
 // This needs to be set to what is set across the fetch requests in the javascript files. Default is the below
 define('SECRET_HEADER', 'secretheader');
@@ -265,16 +280,16 @@ if (LOCAL_USER_LOGIN) {
 // Whether to allow users to login with Azure AD accounts
 define('ENTRA_ID_LOGIN', filter_var($_ENV['ENTRA_ID_LOGIN_ENABLED'], FILTER_VALIDATE_BOOLEAN));
 if (ENTRA_ID_LOGIN) {
-    include_once dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'azure-ad-auth-config.php';
+    include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'azure-ad-auth-config.php';
 }
 define('MICROSOFT_LIVE_LOGIN', filter_var($_ENV['MSLIVE_LOGIN_ENABLED'], FILTER_VALIDATE_BOOLEAN));
 if (MICROSOFT_LIVE_LOGIN) {
-    include_once dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'microsoft-live-auth-config.php';
+    include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'microsoft-live-auth-config.php';
 }
 // Google login
 define('GOOGLE_LOGIN', filter_var($_ENV['GOOGLE_LOGIN_ENABLED'], FILTER_VALIDATE_BOOLEAN));
 if (GOOGLE_LOGIN) {
-    include_once dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'google-auth-config.php';
+    include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'google-auth-config.php';
 }
 
 // /* App checks */

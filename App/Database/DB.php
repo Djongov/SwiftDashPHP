@@ -37,7 +37,7 @@ class DB
     private function connect(array $config): void
     {
         if ($config['driver'] === 'sqlite') {
-            $dbFilePath = dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools/' . $config['dbname'] . '.db';
+            $dbFilePath = ROOT . '/.tools/' . $config['dbname'] . '.db';
             if (!file_exists($dbFilePath)) {
                 error_log("DB: SQLite database file does not exist: " . $config['dbname']);
                 throw new \PDOException("DB: SQLite database file does not exist: " . $config['dbname']);
@@ -88,7 +88,7 @@ class DB
         unset($config['driver'], $config['username'], $config['password']);
 
         if ($driver === 'sqlite') {
-            $dsn .= dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools/' . $config['dbname'] . '.db';
+            $dsn .= ROOT . '/.tools/' . $config['dbname'] . '.db';
         } else {
             foreach ($config as $key => $value) {
                 $dsn .= "$key=$value;";

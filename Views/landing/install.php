@@ -29,7 +29,7 @@ try {
             break;
 
         case 'sqlite':
-            $dsn = 'sqlite:' . dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools/' . DB_NAME . '.db';
+            $dsn = 'sqlite:' . ROOT . '/.tools/' . DB_NAME . '.db';
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
 
             // Verify SQLite schema

@@ -9,7 +9,7 @@ return function (RouteCollector $router) {
     $viewsFolder = ROOT . '/Views';
     $controllersFolder = ROOT . '/Controllers';
     // include the menu data
-    require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/menus/menus.php';
+    require_once ROOT . '/resources/menus/menus.php';
     $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
 
     $genericMetaDataArray = [

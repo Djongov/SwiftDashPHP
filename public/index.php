@@ -4,7 +4,7 @@
 define("START_TIME", microtime(true));
 
 // Path to the composer autoload file
-$path = dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+$path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 if (file_exists($path)) {
     require_once $path;

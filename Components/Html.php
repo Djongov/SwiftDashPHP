@@ -157,7 +157,7 @@ class Html
             BODY_COLOR_SCHEME_CLASS,
             'border',
             'border-gray-300',
-            'text-gray-900',
+            TEXT_COLOR_SCHEME,
             'text-sm',
             'rounded-lg',
             'focus:ring-' . $theme . '-500',
@@ -165,10 +165,10 @@ class Html
             'block',
             'w-full',
             'p-2.5',
-            'dark:bg-gray-800',
+            BODY_DARK_COLOR_SCHEME_CLASS,
             'dark:border-gray-600',
             'dark:placeholder-gray-400',
-            'dark:text-white',
+            TEXT_DARK_COLOR_SCHEME,
             'dark:focus:ring-' . $theme . '-500',
             'dark:focus:border-' . $theme . '-500',
             'outline-none',
@@ -279,7 +279,7 @@ class Html
             '<div class="my-4">%s%s%s</div>',
             $label_name ? self::label($id, $label_name, $required) : '',
             $textareaHtml,
-            $description ? sprintf('<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">%s</p>', $description) : ''
+            $description ? sprintf('<p class="mt-2 text-sm ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">%s</p>', $description) : ''
         );
     }
 
@@ -303,11 +303,25 @@ class Html
     {
         // Core input classes
         $baseClasses = [
-            'w-full', 'p-2', 'text-sm', BODY_COLOR_SCHEME_CLASS, 'appearance-none', 'border-2',
-            'border-gray-100', 'rounded-lg', 'text-gray-700', 'leading-tight', 'focus:outline-none',
-            "focus:" . BODY_COLOR_SCHEME_CLASS, "focus:border-$theme-500",
-            'dark:bg-gray-900', 'dark:border-gray-600', 'dark:placeholder-gray-400', 'dark:text-white',
-            "dark:focus:ring-$theme-500", "dark:focus:border-$theme-500"
+            'w-full',
+            'p-2',
+            'text-sm',
+            BODY_COLOR_SCHEME_CLASS,
+            BODY_DARK_COLOR_SCHEME_CLASS,
+            'appearance-none',
+            'border-2',
+            'border-gray-100',
+            'rounded-lg',
+            LIGHT_COLOR_SCHEME_CLASS,
+            'leading-tight',
+            'focus:outline-none',
+            "focus:" . BODY_COLOR_SCHEME_CLASS,
+            "focus:border-$theme-500",
+            'dark:border-gray-600',
+            'dark:placeholder-gray-400',
+            TEXT_DARK_COLOR_SCHEME,
+            "dark:focus:ring-$theme-500",
+            "dark:focus:border-$theme-500"
         ];
 
         // Combine with extra classes
@@ -538,7 +552,33 @@ class Html
     }
     public static function searchInput($theme): string
     {
-        return '<input type="search" class="filterSearch my-2 py-2 px-4 w-48 h-8 text-sm ' . BODY_COLOR_SCHEME_CLASS . ' outline-none appearance-none border border-gray-300 rounded-lg text-gray-700 leading-tight focus:outline-none focus:' . BODY_COLOR_SCHEME_CLASS . ' focus:border-' . $theme . '-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-' . $theme . '-500 dark:focus:border-' . $theme . '-500" placeholder="search..." />';
+        $classes = [
+            'filterSearch',
+            'my-2',
+            'py-2',
+            'px-4',
+            'w-48',
+            'h-8',
+            'text-sm',
+            BODY_COLOR_SCHEME_CLASS,
+            BODY_DARK_COLOR_SCHEME_CLASS,
+            'outline-none',
+            'appearance-none',
+            'border',
+            'border-gray-300',
+            'rounded-lg',
+            TEXT_COLOR_SCHEME,
+            TEXT_DARK_COLOR_SCHEME,
+            'leading-tight',
+            'focus:outline-none',
+            'focus:' . BODY_COLOR_SCHEME_CLASS,
+            'focus:border-' . $theme . '-500',
+            'dark:border-gray-600',
+            'dark:placeholder-gray-400',
+            'dark:focus:ring-' . $theme . '-500',
+            'dark:focus:border-' . $theme . '-500'
+        ];
+        return '<input type="search" class="' . implode(' ', $classes) . '" placeholder="search..." />';
     }
     public static function popOver($text, $id, $theme = 'gray'): string
     {

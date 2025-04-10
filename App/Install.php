@@ -58,7 +58,7 @@ class Install
                 }
             } elseif (DB_DRIVER === 'sqlite') {
                 // For sqlite we need to create the database file
-                $dbDir = dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools';
+                $dbDir = ROOT . '/.tools';
                 $dbFile = '/' . DB_NAME . '.db';
                 $dbFullPath = $dbDir . $dbFile;
 
@@ -83,7 +83,7 @@ class Install
                     $dsnWithDb .= sprintf(";sslmode=require;sslrootcert=%s", DB_CA_CERT);
                 }
             } elseif (DB_DRIVER === 'sqlite') {
-                $dsnWithDb = 'sqlite:' . dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools/' . DB_NAME . '.db';
+                $dsnWithDb = 'sqlite:' . ROOT . '/.tools/' . DB_NAME . '.db';
             }
 
             $conn = new PDO($dsnWithDb, DB_USER, DB_PASS, $options);
@@ -92,7 +92,7 @@ class Install
         }
 
         // Read and execute queries from the SQL file to create tables. We have a different migrate file for different database drivers
-        $migrateFile = dirname($_SERVER['DOCUMENT_ROOT']) . '/.tools/migrate_' . DB_DRIVER . '.sql';
+        $migrateFile = ROOT . '/.tools/migrate_' . DB_DRIVER . '.sql';
         $migrate = file_get_contents($migrateFile);
 
         try {

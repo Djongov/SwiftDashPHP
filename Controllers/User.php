@@ -271,7 +271,7 @@ class User
         }
 
         $currentPicture = $usernameConfirmed['picture'];
-        $profilePicturePath = dirname($_SERVER['DOCUMENT_ROOT']) . '/public' . $currentPicture;
+        $profilePicturePath = ROOT . '/public' . $currentPicture;
 
         if (file_exists($profilePicturePath)) {
             unlink($profilePicturePath);
