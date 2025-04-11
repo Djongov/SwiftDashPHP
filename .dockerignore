@@ -3,3 +3,9 @@
 .env
 composer.lock
 .tools/*.db
+.git
+.gitignore
+.gitattributes
+Dockerfile
+README.md
+LICENSE

@@ -1,15 +1,13 @@
 FROM php:8.4-apache
 
-ARG SSH_PASSWORD
-
 # Copy application and configuration files before executing RUN commands
 COPY . /var/www/html/
 COPY .tools/deployment/default.conf /etc/apache2/sites-available/000-default.conf
-COPY .tools/deployment/php.ini /usr/local/etc/php/php.ini
+COPY .tools/deployment/php.ini-development /usr/local/etc/php/php.ini
 COPY .tools/deployment/sshd_config /etc/ssh/sshd_config
 COPY .tools/deployment/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Install required packages, configure PHP and services
+# Install required packages and configure PHP
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        curl \
@@ -21,7 +19,6 @@ RUN apt-get update \
        sed \
        unzip \
        vim \
-    && echo "root:${SSH_PASSWORD}" | chpasswd \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) intl pdo_mysql mysqli \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
@@ -39,10 +36,14 @@ RUN apt-get update \
     && chmod +x /usr/local/bin/composer \
     && composer install --no-dev --optimize-autoloader --no-interaction \
     && a2enmod rewrite \
-    && a2enmod headers \
-    && mkdir /var/run/sshd \
-    && chmod 600 /etc/ssh/sshd_config \
-    && chmod +x /usr/local/bin/entrypoint.sh \
+    && a2enmod headers
+
+# SSH-specific setup (can be commented out if not needed)
+RUN mkdir /var/run/sshd \
+    && chmod 600 /etc/ssh/sshd_config
+
+# Final setup
+RUN chmod +x /usr/local/bin/entrypoint.sh \
     && rm -rf /var/lib/apt/lists/* \
     \
     # Enable additional access log for logrotate
@@ -51,7 +52,9 @@ RUN apt-get update \
     && chmod 644 /var/log/apache2/custom_access.log \
     && chown www-data:www-data /var/log/apache2/custom_access.log \
     && echo "/var/log/apache2/custom_access.log {\n    daily\n    rotate 7\n    compress\n    missingok\n    notifempty\n    create 0640 www-data adm\n}" | tee /etc/logrotate.d/apache2-custom > /dev/null \
-    && service apache2 restart
+    && service apache2 restart \
+    && rm -rf /var/www/html/.tools/deployment \
+    && rm -rf /var/www/html/.dockerignore
 
 EXPOSE 2222 80
 

@@ -1,6 +1,11 @@
 #!/bin/sh
 echo "Starting entrypoint script..."
 
+# Set root password if SSH_PASSWORD is provided
+if [[ -n "$SSH_PASSWORD" ]]; then
+  echo "root:$SSH_PASSWORD" | chpasswd
+fi
+
 # Generate host keys if not present
 ssh-keygen -A
 
