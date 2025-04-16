@@ -247,6 +247,10 @@ const handleFormFetch = (form, currentEvent, resultType) => {
                 console.log(response);
                 return;
             }
+            if (response.redirect) {
+                window.location.href = response.redirect;
+                return; // Exit the function after redirecting
+            }
             // If the response is of type text()
             if (typeof response === 'string') {
                 if (resultType === 'html') {
