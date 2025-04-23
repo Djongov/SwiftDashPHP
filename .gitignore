@@ -15,3 +15,4 @@ composer.lock
 !/public/assets/images/profile/dummy.jpg
 
 .tools/*.db
+sync.ffs_db

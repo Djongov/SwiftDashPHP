@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php 
+
+declare(strict_types=1);
 
 define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']));
 
