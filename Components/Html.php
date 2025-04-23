@@ -163,7 +163,7 @@ class Html
             'focus:ring-' . $theme . '-500',
             'focus:border-' . $theme . '-500',
             'block',
-            'w-full',
+            $width,
             'p-2.5',
             BODY_DARK_COLOR_SCHEME_CLASS,
             'dark:border-gray-600',
