@@ -72,17 +72,14 @@ class Page
         $keywords = (isset($yamlData['keywords'])) ? explode(',', $yamlData['keywords']) : GENERIC_KEYWORDS;
         $thumbimage = $yamlData['thumbimage'] ?? OG_LOGO;
         $menu = $yamlData['menu'] ?? MAIN_MENU; // This has no real effect as of now but allows for passing a MENU
-        $genericMetaDataArray = [
-            'metadata' => [
-                // Title will be the uppercased file name
-                'title' => $title,
-                'description' => $description,
-                'keywords' => $keywords,
-                'thumbimage' => $thumbimage,
-                'menu' => $menu,
-            ]
+        return [
+            // Title will be the uppercased file name
+            'title' => $title,
+            'description' => $description,
+            'keywords' => $keywords,
+            'thumbimage' => $thumbimage,
+            'menu' => $menu
         ];
-        return $genericMetaDataArray;
     }
     public static function readMetaDataFromMd($file, $folder): array
     {

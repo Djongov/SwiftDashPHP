@@ -23,6 +23,7 @@ class App
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
 
         // Now that we've loaded the env, let's get the site settings
+        require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
 
         /*
@@ -90,8 +91,8 @@ class App
                 $controllerInfo = $routeInfo[1];
                 $controllerName = $controllerInfo[0]; // Path to controller file
 
-                // Extract route metadata parameters if any
-                $params = $controllerInfo[1]['metadata'] ?? [];
+                // Extract route parameters if any
+                $params = $controllerInfo[1] ?? [];
 
                 if (!file_exists($controllerName)) {
                     throw new \Exception("Controller file ($controllerName) not found");

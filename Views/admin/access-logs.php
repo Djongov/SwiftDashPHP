@@ -95,12 +95,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Response::output('The access log file is not writable', 403);
     }
     // Delete the file
-    if (unlink($filePath . '/' . $_POST['file'])) {
-        // Show success message
-        Response::output('The access log file ' . $_POST['file'] . ' was deleted', 200);
+    $file = basename($_POST['file']);
+    $fullPath = $filePath . '/' . $file;
+    
+    $errorMessage = null;
+    
+    // Custom error handler to capture warning
+    set_error_handler(function($errno, $errstr) use (&$errorMessage) {
+        $errorMessage = $errstr;
+        return true; // prevent default warning output
+    });
+    
+    $success = unlink($fullPath);
+    
+    // Restore default error handler
+    restore_error_handler();
+    
+    if ($success) {
+        Response::output("The access log file $file was deleted", 200);
     } else {
-        // Show error message
-        Response::output('The access log file ' . $_POST['file'] . ' could not be deleted', 500);
+        Response::output("The access log file $file could not be deleted: $errorMessage", 500);
     }
 }
 
@@ -123,9 +137,9 @@ $files = array_map(function ($file) use ($filePath) {
 }, $files);
 
 // Display the files
-echo '<div class="flex flex-row flex-wrap my-4">';
+echo '<div class="flex md:flex-row flex-col items-center justify-center m-4">';
 foreach ($files as $file) {
-    echo '<div class="max-w-lg mx-auto p-2 my-2 flex flex-col justify-center items-center border border-gray-900 dark:border-gray-400 rounded-lg">';
+    echo '<div class="bg-gray-100 dark:bg-gray-900 max-w-lg mx-4 p-2 my-2 flex flex-col justify-center items-center border border-gray-900 dark:border-gray-400 rounded-lg">';
         echo Html::a($file['file'], '?file=' . $file['file'], $theme, '_self', ['ml-4']);
         echo Html::p(date('Y-m-d H:i:s', $file['time']), ['text-center']);
         // Calculate if it is bytes, KB or MB

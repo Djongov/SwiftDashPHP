@@ -30,6 +30,12 @@ SwiftDashPHP comes with a built-in authentication system that is easy to use and
 
 ---
 
+## PHPCs Tests
+
+```bash
+./vendor/bin/phpcs --standard=PSR12 --exclude=vendor .
+```
+
 ## Support for MySQL/MariaDB/SQlite/Postgres
 
 SwiftDashPHP supports MySQL, MariaDB, SQLite, and Postgres. You can easily switch between them by changing the `.env` file. The database connection is handled by PDO, with very little magic in between, taking advantage of the agnostic nature of PDO. There is no ORM, so you write your own queries.

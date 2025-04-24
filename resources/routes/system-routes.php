@@ -1,0 +1,97 @@
+<?php
+
+declare(strict_types=1);
+
+use FastRoute\RouteCollector;
+use App\Markdown\Page;
+
+function systemRoutes(RouteCollector $router, string $viewsFolder, string $controllersFolder, array $metadataArray) {
+
+    /* Views */
+
+    // Login page
+    $router->addRoute('GET', '/login', [$viewsFolder . '/landing/login.php', $metadataArray['main']]);
+    // Install apge
+    $router->addRoute('GET', '/install', [$viewsFolder . '/landing/install.php', $metadataArray['main']]);
+    // Register page
+    $router->addRoute('GET', '/register', [$viewsFolder . '/landing/register.php', $metadataArray['main']]);
+    // User settings page
+    $router->addRoute('GET', '/user-settings', [$viewsFolder . '/landing/user-settings.php', $metadataArray['main']]);
+    // Terms of service
+    $router->addRoute('GET', '/terms-of-service', [$viewsFolder . '/landing/terms-of-service.php', $metadataArray['main']]);
+    // Privacy policy
+    $router->addRoute('GET', '/privacy-policy', [$viewsFolder . '/landing/privacy-policy.php', $metadataArray['main']]);
+
+    // Example
+    $router->addRoute('GET', '/charts', [$viewsFolder . '/example/charts.php', $metadataArray['main']]);
+    $router->addRoute('GET', '/forms', [$viewsFolder . '/example/forms.php', $metadataArray['main']]);
+    $router->addRoute('GET', '/datagrid', [$viewsFolder . '/example/datagrid.php', $metadataArray['main']]);
+    $router->addRoute('GET', '/dummy', [$viewsFolder . '/example/dummy.php', $metadataArray['main']]);
+
+    // Auth
+    $router->addRoute('POST', '/auth/local', [$viewsFolder . '/auth/local.php']);
+    $router->addRoute('GET', '/auth/google', [$viewsFolder . '/auth/google.php']);
+    $router->addRoute('POST', '/auth/azure-ad', [$viewsFolder . '/auth/azure-ad.php']);
+    $router->addRoute(['POST', 'GET'], '/auth/azure-ad-access-token', [$viewsFolder . '/auth/azure-ad-access-token.php']);
+    $router->addRoute('GET', '/logout', [$viewsFolder . '/auth/logout.php']);
+
+    // Azure and MS Live auth
+    $router->addRoute('GET', '/auth/azure/request-access-token', [$viewsFolder . '/auth/azure/request-access-token.php']);
+    $router->addRoute('POST', '/auth/azure/azure-ad-code-exchange', [$viewsFolder . '/auth/azure/azure-ad-code-exchange.php']);
+    $router->addRoute('POST', '/auth/azure/mslive-code-exchange', [$viewsFolder . '/auth/azure/mslive-code-exchange.php']);
+
+    // CSP report endpoiont
+    $router->addRoute('POST', '/api/csp-report', [$viewsFolder . '/api/csp-report.php']);
+    // Admin
+    $router->addRoute('GET', '/adminx', [$viewsFolder . '/admin/index.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/server', [$viewsFolder . '/admin/server.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/users', [$viewsFolder . '/admin/users.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/api-access-log', [$viewsFolder . '/admin/api-access-log.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/cache', [$viewsFolder . '/admin/cache.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/system-logs', [$viewsFolder . '/admin/system-logs.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/csp-reports', [$viewsFolder . '/admin/csp/csp-reports.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/csp-approved-domains', [$viewsFolder . '/admin/csp/csp-approved-domains.php', $metadataArray['admin']]);
+    $router->addRoute(['GET', 'POST'], '/adminx/access-logs', [$viewsFolder . '/admin/access-logs.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/firewall', [$viewsFolder . '/admin/firewall.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/queries', [$viewsFolder . '/admin/queries.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/mailer', [$viewsFolder . '/admin/mailer.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64.php', $metadataArray['admin']]);
+
+    // Admin API
+    $router->addRoute('POST', '/api/admin/csp/add', [$viewsFolder . '/api/admin/csp/add.php']);
+    $router->addRoute('POST', '/api/admin/queries', [$viewsFolder . '/api/admin/queries.php']);
+
+    // Tools API
+    $router->addRoute('POST', '/api/tools/get-error-file', [$viewsFolder . '/api/tools/get-error-file.php']);
+    $router->addRoute('POST', '/api/tools/clear-error-file', [$viewsFolder . '/api/tools/clear-error-file.php']);
+    $router->addRoute('POST', '/api/tools/export-csv', [$viewsFolder . '/api/tools/export-csv.php']);
+    $router->addRoute('POST', '/api/tools/export-tsv', [$viewsFolder . '/api/tools/export-tsv.php']);
+    $router->addRoute('POST', '/api/tools/base64', [$viewsFolder . '/api/tools/base64.php']);
+    $router->addRoute('POST', '/api/tools/php-info-parser', [$viewsFolder . '/api/tools/php-info-parser.php']);
+
+    /* API Routes */
+    $router->addRoute(['GET','PUT','DELETE','POST'], '/api/user[/{id:[^/]+}]', [$viewsFolder . '/api/user.php']);
+    $router->addRoute(['GET','PUT','DELETE','POST'], '/api/firewall[/{id:\d+}]', [$viewsFolder . '/api/firewall.php']);
+    $router->addRoute('POST', '/api/mail/send', [$viewsFolder . '/api/mail/send.php']);
+    $router->addRoute('POST', '/api/set-lang', [$viewsFolder . '/api/set-lang.php']);
+    $router->addRoute('POST', '/api/cookie-consent', [$viewsFolder . '/api/consent-cookie.php']);
+
+    /* DataGrid Api */
+    $router->addRoute('POST', '/api/datagrid/get-records', [$viewsFolder . '/api/datagrid/get-records.php']);
+    $router->addRoute('POST', '/api/datagrid/update-records', [$viewsFolder . '/api/datagrid/update-records.php']);
+    $router->addRoute('POST', '/api/datagrid/delete-records', [$viewsFolder . '/api/datagrid/delete-records.php']);
+
+    // Docs pages markdown auto routing for /docs
+    $docsFolder = '/docs';
+    $markDownFolder = $viewsFolder . $docsFolder;
+    $router->addRoute('GET', '/docs', [$markDownFolder . '/index.php', Page::getMetaDataFromMd('index', $markDownFolder)]);
+    // Search the /docs for files and build a route for each file
+    $docFiles = Page::getMdFilesInDir($viewsFolder . '/docs');
+    foreach ($docFiles as $file) {
+        $router->addRoute('GET', '/docs/' . $file, [$markDownFolder . '/index.php', Page::getMetaDataFromMd($file, $markDownFolder)]);
+    }
+
+    // API Example
+    $router->addRoute(['PUT', 'DELETE'], '/api/example/{id:\d+}', [$viewsFolder . '/api/example.php']);
+    $router->addRoute('POST', '/api/example', [$viewsFolder . '/api/example.php']);
+}
