@@ -12,7 +12,7 @@ return function (RouteCollector $router) {
     require_once ROOT . '/resources/routes/system-routes.php';
     require_once ROOT . '/resources/routes/project-routes.php';
 
-    
+
     $viewsFolder = ROOT . '/Views';
     $controllersFolder = ROOT . '/Controllers';
 

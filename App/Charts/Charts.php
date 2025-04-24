@@ -12,11 +12,13 @@ class Charts
     // Radial Gauge good for measuring percentages or values out of max values
     public function radialGauge(string $label, int $data, array $range = [0, 100], string|int $width = 250, string|int $height = 250, string $format = 'svg', bool $shortUrl = false): string
     {
-        $chart = new QuickChart([
+        $chart = new QuickChart(
+            [
             'width' => $width,
             'height' => $height,
             'format' => $format,
-        ]);
+            ]
+        );
         // Let's calculate how much of the range we are at, percentage wise
         $percentage = floor(($data / $range[1]) * 100);
         // Let's set the background color based on the percentage
@@ -100,17 +102,19 @@ class Charts
         $jsonConfig = str_replace('"backgroundColor":null', '"backgroundColor":' . $background, $jsonConfig);
 
         $chart->setConfig($jsonConfig);
-        
+
         return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $label . '" alt="' . $label . '" width="' . $width . '" height="' . $height . '"  /></figure>' : '<figure class="m-1"><img src="' . $chart->getUrl() . '" title="' . $label . '" alt="' . $label . '" width="' . $width . '" height="' . $height . '" /></figure>';
     }
     // Donut or Pie chart in one
     public function doughnutOrPieChart(string $type, string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
     {
-        $chart = new QuickChart([
+        $chart = new QuickChart(
+            [
             'width' => $width,
             'height' => $height,
             'format' => $format,
-        ]);
+            ]
+        );
 
         // Convert labels array to JSON-safe format
         $labels_json = json_encode($labels, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -210,11 +214,13 @@ class Charts
     }
     public function lineChart(string $title, array $data, string|int $width, string|int $height, string $format, bool $shortUrl = false): string
     {
-        $chart = new QuickChart([
+        $chart = new QuickChart(
+            [
             'width' => $width,
             'height' => $height,
             'format' => $format,
-        ]);
+            ]
+        );
 
         // Background color array
         $backgroundColorArray = [
@@ -306,16 +312,18 @@ class Charts
         // Set the configuration for the chart
         $chart->setConfig($jsonConfig);
 
-        
+
         return ($shortUrl) ?  '<figure class="m-1"><img src="' . $chart->getShortUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>' : '<figure class="m-1"><img height="' . $height . '" width="' . $width . '" src="' . $chart->getUrl() . '" title="' . $title . '" alt="' . $title . '" /></figure>';
     }
     public function barChart(string $title, array $labels, array $data, string|int $width = 300, string|int $height = 300, string $format = 'svg', bool $shortUrl = false): string
     {
-        $chart = new QuickChart([
+        $chart = new QuickChart(
+            [
             'width' => $width,
             'height' => $height,
             'format' => $format,
-        ]);
+            ]
+        );
 
         $chartConfig = [
             'type' => 'bar',

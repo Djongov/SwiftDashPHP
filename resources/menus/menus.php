@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-define("ADMIN_MENU", [
+define(
+    "ADMIN_MENU", [
     'Admin Home' => [
         'link' => '/adminx',
     ],
@@ -59,11 +60,13 @@ define("ADMIN_MENU", [
             ]
         ]
     ],
-]);
+    ]
+);
 
 /* Menu Settings */
 
-define("MAIN_MENU", [
+define(
+    "MAIN_MENU", [
     translate('docs_menu_name') => [
         'icon' => [
             'type' => 'svg',
@@ -83,11 +86,13 @@ define("MAIN_MENU", [
     '404' => [
         'link' => '/blablabla'
     ]
-]);
+    ]
+);
 
 /* Username drop down menu */
 
-define("USERNAME_DROPDOWN_MENU", [
+define(
+    "USERNAME_DROPDOWN_MENU", [
     'User Settings' => [
         'path' => '/user-settings',
         'admin' => false
@@ -100,4 +105,5 @@ define("USERNAME_DROPDOWN_MENU", [
         'path' => '/logout',
         'admin' => false,
     ]
-]);
+    ]
+);

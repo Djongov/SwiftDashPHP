@@ -89,17 +89,17 @@ echo '<div class="my-12 flex flex-wrap flex-row justify-center items-center">';
 
         echo $chart->lineChart('Line chart', $lineChartData, 400, 200, 'svg');
 
-    echo '</div>';
-echo '</div>';
+        echo '</div>';
+        echo '</div>';
 
-echo Html::h2('Interactive charts (Chart.js)');
+        echo Html::h2('Interactive charts (Chart.js)');
 
-echo Html::p('We can spawn interactive charts using Chart.js. This is a JavaScript library that allows us to create charts and graphs. We are passing the data to the JavaScript by using hidden inputs with the name "autoload".');
+        echo Html::p('We can spawn interactive charts using Chart.js. This is a JavaScript library that allows us to create charts and graphs. We are passing the data to the JavaScript by using hidden inputs with the name "autoload".');
 
-echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row justify-center items-center">';
+        echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row justify-center items-center">';
     // initiate an array that will pass the following data into hidden inputs so Javascript can have access to this data on page load and draw the charts
-    $chartsArray = [
-    [
+        $chartsArray = [
+        [
         'type' => 'piechart',
         'data' => [
             'parentDiv' => 'doughnut-limits-holder',
@@ -109,8 +109,8 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             'labels' => array_keys($chartData),
             'data' => array_values($chartData)
         ]
-    ],
-    [
+        ],
+        [
         'type' => 'donutchart',
         'data' => [
             'parentDiv' => 'doughnut-limits-holder',
@@ -120,8 +120,8 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             'labels' => array_keys($chartData),
             'data' => array_values($chartData)
         ]
-    ],
-    [
+        ],
+        [
         'type' => 'barchart',
         'data' => [
             'parentDiv' => 'doughnut-limits-holder',
@@ -131,8 +131,8 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             'labels' => array_keys($chartData),
             'data' => array_values($chartData)
         ]
-    ],
-    [
+        ],
+        [
         'type' => 'gaugechart',
         'data' => [
             'parentDiv' => 'doughnut-limits-holder',
@@ -141,8 +141,8 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
             'height' => 250,
             'data' => [$randomNumber, $max]
         ]
-    ],
-    [
+        ],
+        [
         'type' => 'linechart',
         'data' => [
             'parentDiv' => 'doughnut-limits-holder',
@@ -161,10 +161,10 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap flex-row just
                 ]
             ]
         ]
-    ]
-    ];
+        ]
+        ];
     // Now go through them and create an input hidden for each
-    foreach ($chartsArray as $array) {
-        echo '<input type="hidden" name="autoload" value="' . htmlspecialchars(json_encode($array)) . '" />';
-    }
-echo '</div>';
+        foreach ($chartsArray as $array) {
+            echo '<input type="hidden" name="autoload" value="' . htmlspecialchars(json_encode($array)) . '" />';
+        }
+        echo '</div>';

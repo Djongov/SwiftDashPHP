@@ -5,7 +5,8 @@ declare(strict_types=1);
 use FastRoute\RouteCollector;
 use App\Markdown\Page;
 
-function systemRoutes(RouteCollector $router, string $viewsFolder, string $controllersFolder, array $metadataArray) {
+function systemRoutes(RouteCollector $router, string $viewsFolder, string $controllersFolder, array $metadataArray)
+{
 
     /* Views */
 

@@ -30,10 +30,22 @@ SwiftDashPHP comes with a built-in authentication system that is easy to use and
 
 ---
 
-## PHPCs Tests
+## PHP CodeSniffer checks
+
+Checks
 
 ```bash
-./vendor/bin/phpcs --standard=PSR12 --exclude=vendor .
+./vendor/bin/phpcs --standard=phpcs.xml --ignore=vendor/* --extensions=php .
+```
+
+Fixes
+
+```bash
+./vendor/bin/phpcbf --standard=phpcs.xml --ignore=vendor/* --extensions=php .
+```
+
+```bash
+php -d memory_limit=512M ./vendor/bin/phpcbf --standard=phpcs.xml --ignore=vendor/* --extensions=php .
 ```
 
 ## Support for MySQL/MariaDB/SQlite/Postgres

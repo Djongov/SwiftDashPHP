@@ -16,11 +16,13 @@ $checks->apiAdminChecks();
 $recipients = explode(';', $_POST['recipients']);
 
 // Now we must prepare the recipients array
-$recipients = array_map(function ($recipient) {
+$recipients = array_map(
+    function ($recipient) {
     return [
         'email' => $recipient,
     ];
-}, $recipients);
+    }, $recipients
+);
 
 // Now let's send the email
 echo Send::send($recipients, $_POST['subject'], $_POST['body']);

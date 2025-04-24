@@ -34,7 +34,8 @@ echo '<div class="ml-2">';
     echo Forms::render($formOptions, $theme);
 echo '</div>';
 
-echo Html::code('
+echo Html::code(
+    '
 $formOptions = [
     "inputs" => [
         "hidden" => [
@@ -51,7 +52,8 @@ $formOptions = [
         "size" => "large",
     ]
 ];
-');
+'
+);
 
 echo Html::h2('Complex form example');
 
@@ -286,7 +288,8 @@ echo Components\Html::divBox(Forms::render($formOptions));
 
 echo Html::p('And here is the code for this form:');
 
-echo Html::code('
+echo Html::code(
+    '
 $formOptions = [
     // If you need input fields, open an \'inputs\' key
     \'inputs\' => [
@@ -510,4 +513,5 @@ $formOptions = [
 ];
 
 echo Components\Html::divBox(Components\Forms::render($formOptions));
-');
+'
+);

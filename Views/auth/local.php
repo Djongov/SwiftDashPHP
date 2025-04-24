@@ -47,7 +47,8 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
 
     $tokenExpiration = ($_POST['remember'] === "1") ? 3600 * 24 * 3 : 3600; // 3 day or 1 hour
 
-    $idToken = JWT::generateToken([
+    $idToken = JWT::generateToken(
+        [
         'iss' => $_SERVER['HTTP_HOST'],
         'username' => $userArray['username'],
         'name' => $userArray['name'],
@@ -55,7 +56,8 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
             $userArray['role'],
         ],
         'last_ip' => currentIP()
-    ], $tokenExpiration);
+        ], $tokenExpiration
+    );
 
     //$expiry_addition = ($_POST['remember'] === "1") ? 86400 * 24 * 12 : 86400;
     AuthToken::set($idToken);

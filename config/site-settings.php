@@ -16,9 +16,11 @@ define("SHOW_LOADING_SCREEN", true);
 define('SYSTEM_USER_AGENT', SITE_TITLE . '/' . $version . ' (+https://' . $_SERVER['HTTP_HOST'] . ')');
 
 // Key words for SEO
-define("GENERIC_KEYWORDS", [
+define(
+    "GENERIC_KEYWORDS", [
     SITE_TITLE,
-]);
+    ]
+);
 // Site description for SEO
 define("GENERIC_DESCRIPTION", translate('site_title'));
 
@@ -40,8 +42,9 @@ define('GOOGLE_LOGO', '<svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg"
 // Default theme for unathenticated users and first-time logins, possible values: 'amber', 'green', 'stone', 'rose', 'lime', 'teal', 'sky', 'purple', 'red', 'fuchsia', 'indigo'
 
 // This is a default color scheme for small parts such as buttons and links
-define("THEME_COLORS",
-[
+define(
+    "THEME_COLORS",
+    [
     'sky',
     'cyan',
     'emerald',
@@ -62,7 +65,8 @@ define("THEME_COLORS",
     'gray',
     'slate',
     'stone',
-]);
+    ]
+);
 
 define("COLOR_SCHEME", "amber");
 

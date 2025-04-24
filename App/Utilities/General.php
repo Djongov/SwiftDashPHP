@@ -103,9 +103,11 @@ class General
     // Convert assoc array to indexed array
     public static function assocToIndexed(array $array): array
     {
-        return array_map(function ($key, $value) {
+        return array_map(
+            function ($key, $value) {
             return [$key, $value];
-        }, array_keys($array), $array);
+            }, array_keys($array), $array
+        );
     }
     // Random RGBA
     public static function randomRGBA($opacity = 1): string
@@ -175,9 +177,11 @@ class General
     }
     public static function decodeUnicodeString($str): string
     {
-        return preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+        return preg_replace_callback(
+            '/\\\\u([0-9a-fA-F]{4})/', function ($match) {
             return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-        }, $str);
+            }, $str
+        );
     }
     public static function countryCodeToLocale($countryCode): string
     {

@@ -28,13 +28,17 @@ $query = "SELECT id, username, theme FROM users";
 
 echo Html::p('This example will render data from a custom query - ' . Html::code($query));
 
-echo Html::divBox(DataGrid::fromQuery('users', $query, 'Custom query', $theme, true, false, [
-    'filters' => true,
-    'ordering' => true,
-    'order' => [0, 'desc'],
-    'paging' => true,
-    'lengthMenu' => [[10, 50, 100], [10, 50, 100]],
-]));
+echo Html::divBox(
+    DataGrid::fromQuery(
+        'users', $query, 'Custom query', $theme, true, false, [
+        'filters' => true,
+        'ordering' => true,
+        'order' => [0, 'desc'],
+        'paging' => true,
+        'lengthMenu' => [[10, 50, 100], [10, 50, 100]],
+        ]
+    )
+);
 
 echo Html::horizontalLine();
 
@@ -59,7 +63,8 @@ $users = [
     ],
 ];
 
-echo DataGrid::fromData('From PHP Array', $users, $theme, [
+echo DataGrid::fromData(
+    'From PHP Array', $users, $theme, [
     'filters' => true,
     'ordering' => true,
     'order' => [0, 'asc'],
@@ -71,7 +76,8 @@ echo DataGrid::fromData('From PHP Array', $users, $theme, [
         'csv' => true,
         'tsv' => true
     ]
-]);
+    ]
+);
 
 echo Html::horizontalLine();
 

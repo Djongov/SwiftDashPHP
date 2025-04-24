@@ -19,14 +19,16 @@ class Session
             // Set session name
             session_name($sesstionName);
             // Set session cookie parameters
-            session_set_cookie_params([
+            session_set_cookie_params(
+                [
                 'lifetime' => 86400,  // 1 day
                 'path' => '/',  // Available throughout the site
                 'domain' => $domain,  // Ensure correct domain
                 'secure' => $secure,  // Only secure on HTTPS
                 'httponly' => true,  // Prevent JavaScript access
                 'samesite' => ($secure) ? 'None' : 'Lax' // Set to None because of trip to MS Azure AD authentication endpoint and back but None cannot be used with secure false.
-            ]);
+                ]
+            );
             session_start();
         //}
     }
@@ -39,8 +41,14 @@ class Session
         // Delete the session cookie
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000,
-                $params['path'], $params['domain'], $params['secure'], $params['httponly']
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
             );
         }
     }

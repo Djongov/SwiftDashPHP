@@ -102,9 +102,11 @@ class AzureAD
 
         $request = new HttpClient($url);
 
-        $result = $request->call('GET', $url, null, null, false, [
+        $result = $request->call(
+            'GET', $url, null, null, false, [
             'Accept' => 'application/json'
-        ]);
+            ]
+        );
 
         $kid_array = [];
 

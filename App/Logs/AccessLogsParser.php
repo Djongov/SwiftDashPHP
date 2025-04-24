@@ -38,7 +38,7 @@ class AccessLogsParser
      *               - 'header_columns': the column headers.
      *               - 'parsed_data': the log data with headers as keys.
      *
-     * @throws Exception 
+     * @throws Exception
      */
     public function parse(): array
     {
@@ -79,10 +79,10 @@ class AccessLogsParser
         foreach ($requiredCountsFields as $field) {
             // Count values for each field
             $countsArray[$field] = array_count_values(array_column($dataLines, $field));
-            
+
             // Slice to top 5 items (highest counts first)
             $countsArray[$field] = array_slice($countsArray[$field], 0, 5, true);
-            
+
             // Sort by count (highest first)
             arsort($countsArray[$field]);
         }

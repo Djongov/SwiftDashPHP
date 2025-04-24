@@ -15,14 +15,16 @@ class HttpClient
 
     public function __construct($url)
     {
-        $this->client = new Client([
+        $this->client = new Client(
+            [
             'base_uri' => $url,
             'timeout'  => 600,
             'http_errors' => false,
             'verify' => CURL_CERT,
             'debug' => false,
             'allow_redirects' => false
-        ]);
+            ]
+        );
     }
 
     public function call($method, $path, $data = [], ?string $bearer_token = null, $sendJson = false, $headers = [], $expectJson = true): mixed

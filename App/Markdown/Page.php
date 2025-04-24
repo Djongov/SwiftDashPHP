@@ -58,9 +58,11 @@ class Page
     {
         $files = scandir($dir);
         $files = array_diff($files, ['.', '..', 'index.php']);
-        $files = array_map(function ($file) {
+        $files = array_map(
+            function ($file) {
             return str_replace('.md', '', $file);
-        }, $files);
+            }, $files
+        );
         return $files;
     }
     public static function getMetaDataFromMd($file, $folder): array

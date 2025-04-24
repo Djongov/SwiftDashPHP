@@ -110,59 +110,59 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
                 ],
             ];
             echo '<div class="absolute bottom-0 right-0 p-1 text-xs font-bold">' . Forms::render($deleteProfilePictureForm) . '</div>';
-        echo '</div>';
-        echo '<table class="w-auto">';
-        foreach ($usernameArray as $name => $setting) {
-            echo '<tr>';
-            if ($name === 'id' || $name === 'password' || $name === 'picture' || $name === 'enabled') {
-                continue;
-            }
-            // Check if date and format it
-            if ($setting !== null && is_string($setting) && General::isValidDatetime($setting)) {
-                echo ' <td class="w-full"><strong>' . $name . '</strong> : ' . $fmt->format(strtotime($setting)) . '  </td>';
-                continue;
-            }
-            // Theme changer
-            if ($name === 'theme') {
-                echo '<td class="w-full">
+            echo '</div>';
+            echo '<table class="w-auto">';
+            foreach ($usernameArray as $name => $setting) {
+                echo '<tr>';
+                if ($name === 'id' || $name === 'password' || $name === 'picture' || $name === 'enabled') {
+                    continue;
+                }
+                // Check if date and format it
+                if ($setting !== null && is_string($setting) && General::isValidDatetime($setting)) {
+                    echo ' <td class="w-full"><strong>' . $name . '</strong> : ' . $fmt->format(strtotime($setting)) . '  </td>';
+                    continue;
+                }
+                // Theme changer
+                if ($name === 'theme') {
+                    echo '<td class="w-full">
                 <div class="flex my-2 flex-row"><strong>' . $name . '</strong> : ';
                     echo '<form class="select-submitter" data-reload="true" method="PUT" action="/api/user/' . $usernameArray['id'] . '">';
                         echo '<select name="theme" class="' . Html::selectInputClasses($theme) . '">';
-                foreach (THEME_COLORS as $color) {
-                    echo '<option value="' . $color . '" ' . (($setting === $color) ? 'selected' : '') . '>' . $color . '</option>';
-                }
+                    foreach (THEME_COLORS as $color) {
+                        echo '<option value="' . $color . '" ' . (($setting === $color) ? 'selected' : '') . '>' . $color . '</option>';
+                    }
                         echo '</select>';
                         echo '<input type="hidden" name="username" value="' . $usernameArray['username'] . '">';
                         echo App\Security\CSRF::createTag();
                     echo '</form>';
-                echo '</div>
+                    echo '</div>
             </td>';
-                continue;
+                    continue;
+                }
+                // Boolean
+                if (is_bool($setting)) {
+                    echo ' <td class="w-full"><strong>' . $name . '</strong> : ' . (($setting) ? 'true' : 'false') . '  </td>';
+                    continue;
+                // The rest
+                } else {
+                    echo ' <td class="w-full"><strong>' . $name . '</strong> : <span class="break-all">' . $setting . '</span>  </td>';
+                }
+                echo '</tr>';
             }
-            // Boolean
-            if (is_bool($setting)) {
-                echo ' <td class="w-full"><strong>' . $name . '</strong> : ' . (($setting) ? 'true' : 'false') . '  </td>';
-                continue;
-            // The rest
-            } else {
-                echo ' <td class="w-full"><strong>' . $name . '</strong> : <span class="break-all">' . $setting . '</span>  </td>';
-            }
-            echo '</tr>';
-        }
-        echo '</table>';
-        echo '</div>';
-        // Only show session info to admins
-        if ($isAdmin) {
-            echo '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">';
-            echo Html::h2('Session Info');
-            echo '<p><strong>Token expiry: </strong>' . $fmt->format(strtotime(date("Y-m-d H:i:s", (int)substr((string) JWT::parseTokenPayLoad(AuthToken::get())['exp'], 0, 10)))) . '</p>';
-            echo '<p><strong>Token: </strong></p><p class="break-all c0py">' . AuthToken::get() . '</p>';
-            $token = JWT::parseTokenPayLoad(AuthToken::get());
+            echo '</table>';
             echo '</div>';
-        }
+        // Only show session info to admins
+            if ($isAdmin) {
+                echo '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">';
+                echo Html::h2('Session Info');
+                echo '<p><strong>Token expiry: </strong>' . $fmt->format(strtotime(date("Y-m-d H:i:s", (int)substr((string) JWT::parseTokenPayLoad(AuthToken::get())['exp'], 0, 10)))) . '</p>';
+                echo '<p><strong>Token: </strong></p><p class="break-all c0py">' . AuthToken::get() . '</p>';
+                $token = JWT::parseTokenPayLoad(AuthToken::get());
+                echo '</div>';
+            }
         // If the user is missing an email, ask for it
-        if (empty($usernameArray['email']) || filter_var($usernameArray['email'], FILTER_VALIDATE_EMAIL) === false) {
-            $updateEmailHtml = '<div class="flex flex-row flex-wrap items-center mb-4">';
+            if (empty($usernameArray['email']) || filter_var($usernameArray['email'], FILTER_VALIDATE_EMAIL) === false) {
+                $updateEmailHtml = '<div class="flex flex-row flex-wrap items-center mb-4">';
                 // Email svg icon
                 $updateEmailHtml .= '
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-6 h-6 fill-amber-500">
@@ -170,10 +170,10 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
         </svg>';
                 $updateEmailHtml .= Html::h2('Missing Email');
-            $updateEmailHtml .= '</div>';
-            $updateEmailHtml .= Html::p('We noticed that we haven\'t got your email address from your token claims. We will try to email you on your username which is <strong>' . $usernameArray['username'] . '</strong> but in case you think you can\'t be receiving emails on your username address, here you can give an aleternative. Don\'t worry, we will only be sending important notifications. Signups for newsletters and others are separate');
-            // Update email form
-            $updateEmailFormOptions = [
+                $updateEmailHtml .= '</div>';
+                $updateEmailHtml .= Html::p('We noticed that we haven\'t got your email address from your token claims. We will try to email you on your username which is <strong>' . $usernameArray['username'] . '</strong> but in case you think you can\'t be receiving emails on your username address, here you can give an aleternative. Don\'t worry, we will only be sending important notifications. Signups for newsletters and others are separate');
+                // Update email form
+                $updateEmailFormOptions = [
                 'inputs' => [
                     'input' => [
                         [
@@ -200,15 +200,15 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
                 'submitButton' => [
                     'text' => 'Update'
                 ],
-            ];
-            $updateEmailHtml .= Forms::render($updateEmailFormOptions);
-            echo Html::divBox($updateEmailHtml);
-        }
+                ];
+                $updateEmailHtml .= Forms::render($updateEmailFormOptions);
+                echo Html::divBox($updateEmailHtml);
+            }
         // Change password for local users
-        if ($usernameArray['provider'] === 'local') {
-            $changePasswordForm = [
+            if ($usernameArray['provider'] === 'local') {
+                $changePasswordForm = [
                 'inputs' => [
-            'input' => [
+                'input' => [
                 [
                     'label' => 'New Password',
                     'type' => 'password',
@@ -227,13 +227,13 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
                     'disabled' => false,
                     'required' => true,
                 ]
-            ],
-            'hidden' => [
+                ],
+                'hidden' => [
                 [
                     'name' => 'username',
                     'value' => $usernameArray['username']
                 ]
-            ],
+                ],
                 ],
                 'theme' => $theme,
                 'method' => 'PUT',
@@ -242,15 +242,15 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
                 'submitButton' => [
                     'text' => 'Change Password'
                 ],
-            ];
+                ];
 
-            $changePassordHtml = Html::h2('Change Password');
-            $changePassordHtml .= Forms::render($changePasswordForm);
-            $changePassordHtml .= Html::small('Successfully changing the password will log you out of the app. You will need to login again with your new password.');
-            echo Html::divBox($changePassordHtml);
-        }
+                $changePassordHtml = Html::h2('Change Password');
+                $changePassordHtml .= Forms::render($changePasswordForm);
+                $changePassordHtml .= Html::small('Successfully changing the password will log you out of the app. You will need to login again with your new password.');
+                echo Html::divBox($changePassordHtml);
+            }
         // Delete/Forget user
-        $deleteUserFormOptions = [
+            $deleteUserFormOptions = [
             'inputs' => [
                 'hidden' => [
                     [
@@ -272,12 +272,12 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
             'submitButton' => [
             'text' => 'Delete User'
             ],
-        ];
+            ];
 
-        $deleteUserHtml = Html::h2('Forget About me');
-        $deleteUserHtml .= Html::p('This will delete your account in our database along with any data we have about your account.');
-        $deleteUserHtml .= Forms::render($deleteUserFormOptions);
+            $deleteUserHtml = Html::h2('Forget About me');
+            $deleteUserHtml .= Html::p('This will delete your account in our database along with any data we have about your account.');
+            $deleteUserHtml .= Forms::render($deleteUserFormOptions);
 
-        echo Html::divBox($deleteUserHtml);
+            echo Html::divBox($deleteUserHtml);
 
-        echo '</div>';
+            echo '</div>';

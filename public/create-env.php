@@ -1,11 +1,12 @@
-<?php declare(strict_types=1);
+<?php
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET'):
+declare(strict_types=1);
 
+if ($_SERVER['REQUEST_METHOD'] === 'GET') :
     if (file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env')) {
         die('No work to be done here');
     }
-?>
+    ?>
 
 <h2>This is a form to help you create a .env file automatically</h2>
 <form id="env">
@@ -64,20 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET'):
     <button type="submit">Submit</button>
 </form>
 
-<script src="/assets/js/create-env.js?<?=time()?>"></script>
+<script src="/assets/js/create-env.js?<?php echo time()?>"></script>
 
 <?php endif;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-
     if (file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . DIRECTORY_SEPARATOR . '.env')) {
         die('No work to be done here');
     }
 
     // Create the .env file
     $envContentArray = $_POST;
-    
+
     if (isset($_POST['LOCAL_LOGIN_ENABLED']) && $_POST["LOCAL_LOGIN_ENABLED"] === 'on') {
         if (!extension_loaded('openssl')) {
             die('Enable openssl extension');
@@ -89,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "private_key_bits" => 2048,
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
         ];
-        
+
         // Create the keypair
         $res = openssl_pkey_new($config);
 
@@ -103,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Get public key
         $pubKey = openssl_pkey_get_details($res);
         $pubKey = $pubKey["key"];
-        
+
         // Base64 encode private and public keys
         $base64PrivateKey = base64_encode($privKey);
         $base64PublicKey = base64_encode($pubKey);
@@ -139,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $envContentArray['SENDGRID_ENABLED'] = 'false';
     }
-    
+
     // Let's unset the ones that we don't want to be in the .env file
     unset($envContentArray['SENDGRID']);
 
@@ -174,5 +173,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(404);
         echo "Unable to create the .env file.";
     }
-
 }

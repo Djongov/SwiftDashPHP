@@ -19,7 +19,8 @@ class DB
         ?int $port = DB_PORT,
         string $driver = DB_DRIVER,
         ?bool $ssl = DB_SSL
-    ) {
+    )
+    {
         $config = [
             'driver' => $driver,
             'host' => $host,

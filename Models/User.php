@@ -83,7 +83,7 @@ class User extends BasicModel
     {
         unset($data['csrf_token']);
         unset($data['confirm_password']);
-        
+
         $tableColumns = $this->getColumns($this->table);
 
         // Now let's check if the structure of the data matches the table
@@ -97,7 +97,7 @@ class User extends BasicModel
         if ($this->exists($data['username'])) {
             throw (new UserExceptions())->userAlreadyExists();
         }
-        
+
         $db = new DB();
 
         // Prepare the password
@@ -126,10 +126,10 @@ class User extends BasicModel
             SystemLog::write('User not created with ' . json_encode($data), 'User API');
             throw (new UserExceptions())->userNotCreated();
         }
-    
+
         $userId = (int) $pdo->lastInsertId();
         SystemLog::write('User created with ID ' . $userId . ' and data ' . json_encode($data), 'User API');
-    
+
         return $userId;
     }
     // User updater

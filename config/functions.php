@@ -1,9 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 function dd()
 {
-    array_map(function ($x) {
+    array_map(
+        function ($x) {
         var_dump($x);
-    }, func_get_args());
+        }, func_get_args()
+    );
     die;
 }
 
@@ -35,15 +40,16 @@ function currentUrl()
 {
     return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 }
-function getApiKeyFromHeaders() {
+function getApiKeyFromHeaders()
+{
     $headers = getallheaders();
-    
+
     // Convert the headers array keys to lowercase for case-insensitive search
     $headers = array_change_key_case($headers, CASE_LOWER);
-    
+
     // Check for the API key in lowercase
     $apiKeyHeader = strtolower(API_KEY_NAME);
-    
+
     if (isset($headers[$apiKeyHeader])) {
         return $headers[$apiKeyHeader];
     } else {

@@ -249,12 +249,14 @@ class Html
         int $cols,
         array $extraClasses = [],
         array $dataAttributes = []
-    ): string {
+    ): string
+    {
         // Generate unique ID if not provided
         $id ??= uniqid();
 
         // Prepare attributes
-        $attributes = self::buildAttributes([
+        $attributes = self::buildAttributes(
+            [
             'id' => $id,
             'name' => $name,
             'placeholder' => $placeholder ?: null,
@@ -265,7 +267,8 @@ class Html
             'disabled' => $disabled ? 'disabled' : null,
             'required' => $required ? 'required' : null,
             'readonly' => $readonly ? 'readonly' : null,
-        ], $dataAttributes);
+            ], $dataAttributes
+        );
 
         // Build textarea HTML
         $textareaHtml = sprintf(
@@ -292,11 +295,13 @@ class Html
         );
 
         // Build a string of attributes
-        return implode(' ', array_map(
-            fn($key, $value) => is_numeric($key) ? $value : "$key=\"$value\"",
-            array_keys($mergedAttributes),
-            $mergedAttributes
-        ));
+        return implode(
+            ' ', array_map(
+                fn($key, $value) => is_numeric($key) ? $value : "$key=\"$value\"",
+                array_keys($mergedAttributes),
+                $mergedAttributes
+            )
+        );
     }
 
     private static function buildInputClasses(string $theme, array $extraClasses): string
@@ -339,7 +344,8 @@ class Html
         bool $readOnly,
         string $theme,
         array $extraClasses = []
-    ): string {
+    ): string
+    {
         // Generate a unique ID if not provided
         $id = $id ?: uniqid($name);
 

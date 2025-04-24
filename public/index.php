@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Define the start time of the request, it can be used to calculate the time it took to process the request later
 define("START_TIME", microtime(true));

@@ -129,7 +129,8 @@ class DataGrid
     }
     public static function simpleTable(array $data, string $theme): string
     {
-        return self::createTable('', null, $data, $theme, false, false, [
+        return self::createTable(
+            '', null, $data, $theme, false, false, [
             'searching' => false,
             'filters' => false,
             'ordering' => false,
@@ -141,7 +142,8 @@ class DataGrid
                 'csv' => true,
                 'tsv' => false
             ]
-        ]);
+            ]
+        );
     }
     public static function fromDBTable(string $dbTable, ?string $title, string $theme, bool $edit = true, bool $delete = true, $orderBy = 'id', $sortBy = 'desc', ?array $tableOptions = null): string
     {

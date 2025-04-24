@@ -1,7 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 if (ENTRA_ID_LOGIN) {
-
     if (!isset($_ENV['ENTRA_ID_CLIENT_ID']) || !isset($_ENV['ENTRA_ID_TENANT_ID'])) {
         die('ENTRA_ID_CLIENT_ID, ENTRA_ID_TENANT_ID, must be set in the .env file if ENTRA_ID_LOGIN is set to true');
     }
@@ -45,6 +46,6 @@ if (ENTRA_ID_LOGIN) {
     //define('ENTRA_ID_ACCESS_TOKEN_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure/receive-access-token');
 
     /* Logout */
-    
+
     define('ENTRA_ID_LOGOUT_BUTTON_URL', 'https://login.microsoftonline.com/' . ENTRA_ID_TENANT_ID . '/oauth2/v2.0/logout?post_logout_redirect_uri=' . $protocol . '://' . $_SERVER['HTTP_HOST']);
 }

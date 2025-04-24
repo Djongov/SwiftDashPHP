@@ -35,9 +35,11 @@ if (!$cspArray) {
 
 function filterValidValues($array)
 {
-    return array_filter($array, function ($value) {
+    return array_filter(
+        $array, function ($value) {
         return $value !== null && (is_string($value) || is_int($value));
-    });
+        }
+    );
 }
 
 // We will need an array with the values of domain
@@ -116,29 +118,33 @@ echo '<div id="csp-charts" class="flex flex-row flex-wrap p-6 justify-center">';
     $indexedArray = array_count_values($blockedUri);
 
     echo '<div class="mx-4 max-w-full overflow-auto flex justify-center">';
-    echo DataGrid::fromData('blocked_uri', $indexedArray, $theme, [
+    echo DataGrid::fromData(
+        'blocked_uri', $indexedArray, $theme, [
         //'sorting' => true,
         'filters' => true,
         'ordering' => true,
         'order' => [1, 'desc'],
         'paging' => true,
         'lengthMenu' => [[10, 50, 100, -1], [10, 50, 100, 'All']],
-    ]);
+        ]
+    );
     echo '</div>';
 
     $cspReportsQuery = 'SELECT id,date_created,domain,url,referrer,violated_directive,effective_directive,disposition,blocked_uri,line_number,column_number,source_file,script_sample FROM csp_reports';
 
-    echo DataGrid::fromQuery('csp_reports', $cspReportsQuery, 'CSP Reports', $theme, true, true, [
-    'filters' => true,
-    'ordering' => true,
-    'order' => [0, 'asc'],
-    'paging' => true,
-    'lengthMenu' => [[10, 50, 100, -1], [10, 50, 100, 'All']],
-    'searching' => true,
-    'info' => true,
-    'export' => [
+    echo DataGrid::fromQuery(
+        'csp_reports', $cspReportsQuery, 'CSP Reports', $theme, true, true, [
+        'filters' => true,
+        'ordering' => true,
+        'order' => [0, 'asc'],
+        'paging' => true,
+        'lengthMenu' => [[10, 50, 100, -1], [10, 50, 100, 'All']],
+        'searching' => true,
+        'info' => true,
+        'export' => [
         'csv' => true
-    ]
-    ]);
+        ]
+        ]
+    );
 
     $db->__destruct();

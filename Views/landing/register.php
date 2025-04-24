@@ -83,5 +83,5 @@ echo '<div class="flex items-center justify-center mx-4">
         echo Html::h2('Register', true);
         echo Html::small('Register a new local user account.');
         echo Forms::render($registrationForm);
-    echo '</div>';
-echo '</div>';
+        echo '</div>';
+        echo '</div>';

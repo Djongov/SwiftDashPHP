@@ -71,7 +71,7 @@ if ($userModel->exists($idTokenArray['preferred_username'])) {
     }
     try {
         $user->create($idTokenArray, $provider);
-        SystemLog::write('User created with email: ' . $idTokenArray['preferred_username'] . ' and provider '. $provider, 'User Creation');
+        SystemLog::write('User created with email: ' . $idTokenArray['preferred_username'] . ' and provider ' . $provider, 'User Creation');
     } catch (Exception $e) {
         SystemLog::write('Could not create user with email: ' . $idTokenArray['preferred_username'] . '. Error: ' . $e->getMessage(), 'User Creation Error');
         Response::output('Could not create user', 500);
@@ -82,4 +82,3 @@ $destinationUrl = $_POST['state'] ?? null;
 // Valid destination, proceed to redirect to the destination
 header("Location: " . filter_var($destinationUrl, FILTER_SANITIZE_URL));
 exit();
-

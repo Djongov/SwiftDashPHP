@@ -27,14 +27,16 @@ class Cookies
         }
 
         $domainCookie = str_replace($colonPosition, '', $domainCookie);
-        setcookie(AUTH_COOKIE_NAME, $token, [
+        setcookie(
+            AUTH_COOKIE_NAME, $token, [
             'expires' => JWT::parseTokenPayLoad($token)['exp'] + $expiry,
             'path' => '/',
             'domain' => $domainCookie, // strip : from HOST in cases where localhost:8080 is used
             'secure' => $secure, // This needs to be true for most scenarios, we leave the option to be false for local environments
             'httponly' =>  true, // Prevent JavaScript from accessing the cookie
             'samesite' => 'Lax' // This unlike the session cookie can be Lax
-        ]);
+            ]
+        );
     }
     public static function get(string $name): ?string
     {

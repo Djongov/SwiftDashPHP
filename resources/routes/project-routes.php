@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use FastRoute\RouteCollector;
 
-function projectRoutes(RouteCollector $router, string $viewsFolder, string $controllersFolder, array $metadataArray) {
+function projectRoutes(RouteCollector $router, string $viewsFolder, string $controllersFolder, array $metadataArray)
+{
 
     /* Views */
     $router->addRoute('GET', '/', [$viewsFolder . '/landing/main.php', $metadataArray['main']]);

@@ -45,10 +45,12 @@ $files = scandir($filePath);
 $files = array_diff($files, ['.', '..']);
 
 // Filter out unwanted files (e.g., "other_vhosts_access.log")
-$files = array_filter($files, function ($file) {
+$files = array_filter(
+    $files, function ($file) {
     // Ignore specific files like "other_vhosts_access.log"
     return $file !== 'other_vhosts_access.log';
-});
+    }
+);
 
 // Determine the operating system
 $os = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? 'windows' : 'linux';
@@ -56,14 +58,18 @@ $os = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? 'windows' : 'linux';
 // Filter files based on OS and extension
 if ($os === 'windows') {
     // On Windows, look for .log files
-    $files = array_filter($files, function ($file) {
+    $files = array_filter(
+        $files, function ($file) {
         return pathinfo($file, PATHINFO_EXTENSION) === 'log';
-    });
+        }
+    );
 } else {
     // On Linux, look for apache2 logs or gzipped files
-    $files = array_filter($files, function ($file) {
+    $files = array_filter(
+        $files, function ($file) {
         return preg_match('/custom_access\.log(\.gz)?$/', $file);
-    });
+        }
+    );
 }
 
 // If no log files found, display a message
@@ -97,20 +103,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Delete the file
     $file = basename($_POST['file']);
     $fullPath = $filePath . '/' . $file;
-    
+
     $errorMessage = null;
-    
+
     // Custom error handler to capture warning
-    set_error_handler(function($errno, $errstr) use (&$errorMessage) {
+    set_error_handler(
+        function ($errno, $errstr) use (&$errorMessage) {
         $errorMessage = $errstr;
         return true; // prevent default warning output
-    });
-    
+        }
+    );
+
     $success = unlink($fullPath);
-    
+
     // Restore default error handler
     restore_error_handler();
-    
+
     if ($success) {
         Response::output("The access log file $file was deleted", 200);
     } else {
@@ -128,13 +136,15 @@ echo Html::p('Log files in the directory:', ['text-center']);
 arsort($files);
 
 // Sort the files by filetime
-$files = array_map(function ($file) use ($filePath) {
+$files = array_map(
+    function ($file) use ($filePath) {
     return [
         'file' => $file,
         'time' => filemtime($filePath . '/' . $file),
         'size' => filesize($filePath . '/' . $file)
     ];
-}, $files);
+    }, $files
+);
 
 // Display the files
 echo '<div class="flex md:flex-row flex-col items-center justify-center m-4">';
@@ -232,11 +242,13 @@ if ($os === 'windows') {
         ];
     }
     // In IIS there is a column Date and column Time, we can merge them
-    $parsedLog['prasedData'] = array_map(function ($row) {
+    $parsedLog['prasedData'] = array_map(
+        function ($row) {
         $row['date'] = $row['date'] . ' ' . $row['time'];
         unset($row['time']);
         return $row;
-    }, $parsedLog['prasedData']);
+        }, $parsedLog['prasedData']
+    );
     echo '<div id="charts" class="flex flex-row flex-wrap p-6 justify-center">';
     // Create the hidden inputs so the JS can load the charts
     foreach ($chartsArray as $array) {
@@ -246,11 +258,10 @@ if ($os === 'windows') {
     // Now display the data grid
     echo DataGrid::fromData($file, $parsedLog['prasedData'], $theme);
 } else {
-    
     $handle = gzopen($filePath . '/' . $file, 'r');
 
     $parser = new AccessLogsParser($handle);
-    
+
     $parsedLog = $parser->parse();
 
     $log = $parsedLog['parsed_data'];
@@ -284,6 +295,6 @@ if ($os === 'windows') {
     echo '</div>';
 
     //dd($chartsArray);
-    
+
     echo DataGrid::fromData($file, $log, $theme);
 }
