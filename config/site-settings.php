@@ -5,6 +5,19 @@ declare(strict_types=1);
 // Site title, Goes on footer and main menu header
 define("SITE_TITLE", translate('site_title'));
 
+define('LOGIN_EXEMPTIONS', [
+    '/',
+    '/docs',
+    '/docs/*',
+    '/register',
+    '/terms-of-service',
+    '/privacy-policy',
+    '/charts',
+    '/forms',
+    '/datagrid',
+    '/blablabla', // to showcase the 404 page,
+]);
+
 /*
 
 Branding & SEO Settings

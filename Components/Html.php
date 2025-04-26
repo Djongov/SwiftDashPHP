@@ -435,7 +435,7 @@ class Html
     }
     public static function horizontalLine(): string
     {
-        return '<hr class="my-4 border-gray-300 sm:mx-auto dark:border-gray-700">';
+        return '<hr class="my-2 border-gray-300 dark:border-gray-700">';
     }
     public static function selectInputClasses($theme): string
     {
@@ -479,17 +479,18 @@ class Html
         $html .= '</div>';
         return $html;
     }
-    public static function bigButtonLink($link, $text, $theme): string
+    public static function bigButtonLink($link, $text, $theme, $extraClasses = []): string
     {
-        return '<a class="my-2 inline-flex items-center justify-center px-7 py-3 h-14 w-full md:w-auto mb-2 md:mb-0 md:mr-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
+        return '<a class="inline-flex items-center justify-center px-7 py-3 h-14 w-full md:w-auto mb-2 md:mb-0 md:mr-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm ' . implode(' ', $extraClasses) . '" href="' . $link . '">' . $text . '</a>';
     }
-    public static function mediumButtonLink($link, $text, $theme): string
+    public static function mediumButtonLink($link, $text, $theme, $extraClasses = []): string
     {
-        return '<a class="inline-flex items-center justify-center ml-2 my-2 px-2 py-2 h-10 w-32 md:w-44 mb-2 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
+        return '<a class="inline-flex items-center justify-center ml-2 px-2 py-2 h-10 w-32 md:w-44 mb-2 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm ' . implode(' ', $extraClasses) . '" href="' . $link . '">' . $text . '</a>';
     }
-    public static function smallButtonLink($link, $text, $theme): string
+    public static function smallButtonLink($link, $text, $theme, $extraClasses = []): string
     {
-        return '<a class="px-2 py-1 text-md my-2 inline-flex items-center justify-center text-md leading-7 text-gray-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="' . $link . '">' . $text . '</a>';
+
+        return '<a class="px-2 py-1 text-md inline-flex items-center justify-center text-md leading-7 text-gray-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm ' . implode(' ', $extraClasses) . '" href="' . $link . '">' . $text . '</a>';
     }
     public static function infoBadge($text, $id, $theme): string
     {

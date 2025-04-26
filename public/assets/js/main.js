@@ -1018,3 +1018,35 @@ function attachTooltip(targetElement, tooltipContent) {
         attachTooltip(element, element.getAttribute('data-tooltip'));
     });
 }
+
+// Search functionality for products
+
+// Get the search input element
+const liveSearchInputs = Array.from(document.getElementsByClassName('live-search-input'));
+
+if (liveSearchInputs.length > 0) {
+    // Add event listener to search input
+    liveSearchInputs.forEach(search => {
+        search.addEventListener('input', ({ target }) => {
+            // Get the search value and convert it to lowercase
+            const searchValue = target.value.toLowerCase();
+            // Get all product names
+            const searchForTextInClass = search.dataset.searchfortextinclass;
+            const productNames = document.querySelectorAll(searchForTextInClass);
+            
+            // Loop through each product name and check if it includes the search value
+            productNames.forEach((product) => {
+                // Get the parent element of the product name
+                const parentElement = search.dataset.parentElement;
+                let productCard = product.parentElement;
+                while (productCard && !productCard.classList.contains(parentElement.replace('.', ''))) {
+                    productCard = productCard.parentElement;
+                }
+                // Check if the product name includes the search value
+                const isMatch = product.textContent.toLowerCase().includes(searchValue);
+                // Toggle the hidden class based on the search value
+                productCard.classList.toggle('hidden', !isMatch);
+            });
+        });
+    })
+}

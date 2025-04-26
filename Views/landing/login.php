@@ -129,7 +129,7 @@ if (LOCAL_USER_LOGIN) {
     if (MANUAL_REGISTRATION) {
         echo Html::small(translate('if_you_dont_have_account') . ', ' . translate('please') . ' <a class="underline" href="/register">' . translate('sign_up') . '</a>');
     } else {
-        echo Html::small(translate('if_you_dont_have_account') . ', ' . translate('please') . translate('contact_admin'));
+        echo Html::small(translate('if_you_dont_have_account') . ', ' . translate('contact_admin'));
     }
 }
         // If no login methods are enabled, show an alert

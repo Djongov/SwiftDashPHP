@@ -16,29 +16,7 @@ class RequireLogin
 {
     public static function check(bool $apiRoute): array
     {
-        $loginExempt = [
-            '/',
-            '/docs',
-            '/docs/*',
-            '/api/csp-report',
-            '/api/set-lang',
-            '/api/cookie-consent',
-            '/register',
-            '/auth/azure-ad',
-            '/auth/google',
-            '/auth/local',
-            '/auth/azure/azure-ad-code-exchange',
-            '/auth/azure/mslive-code-exchange',
-            '/api/user',
-            '/install',
-            '/charts',
-            '/forms',
-            '/datagrid',
-            '/blablabla', // to showcase the 404 page,
-            '/logout',
-            '/terms-of-service',
-            '/privacy-policy',
-        ];
+        $loginExemptions = array_unique(array_merge(LOGIN_EXEMPTIONS, SYSTEM_LOGIN_EXEMPTIONS));
 
         $loggedIn = false;
 
@@ -123,7 +101,7 @@ class RequireLogin
                 Do not redirect to /login if uri is in the list or exempt urls
                 !str_contains($_SERVER['REQUEST_URI'], '/login') is to prevent infinite redirects
             */
-            if (!General::matchRequestURI($loginExempt) && !str_contains($_SERVER['REQUEST_URI'], '/login') && !str_contains($_SERVER['REQUEST_URI'], '/auth/azure-ad') && !str_contains($_SERVER['REQUEST_URI'], '/auth/google') && !str_contains($_SERVER['REQUEST_URI'], '/auth/local')) {
+            if (!General::matchRequestURI($loginExemptions) && !str_contains($_SERVER['REQUEST_URI'], '/login') && !str_contains($_SERVER['REQUEST_URI'], '/auth/azure-ad') && !str_contains($_SERVER['REQUEST_URI'], '/auth/google') && !str_contains($_SERVER['REQUEST_URI'], '/auth/local')) {
                 if ($apiRoute) {
                     Response::output('missing token', 401);
                 } else {

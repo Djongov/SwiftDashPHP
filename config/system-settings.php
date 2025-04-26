@@ -12,6 +12,20 @@ if (ini_get('display_errors') == 1) {
     define('ERROR_VERBOSE', false);
 }
 
+define('SYSTEM_LOGIN_EXEMPTIONS', [
+    '/api/csp-report',
+    '/api/set-lang',
+    '/api/cookie-consent',
+    '/auth/azure-ad',
+    '/auth/google',
+    '/auth/local',
+    '/auth/azure/azure-ad-code-exchange',
+    '/auth/azure/mslive-code-exchange',
+    '/api/user',
+    '/install',
+    '/logout',
+]);
+
 $version = trim(file_get_contents(ROOT . DIRECTORY_SEPARATOR . 'version.txt'));
 
 define('MULTILINGUAL', true);

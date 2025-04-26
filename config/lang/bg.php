@@ -18,5 +18,5 @@ return [
     'remember_me' => 'Запомни ме',
     'forgot_password' => 'Забравена парола?',
     'if_you_dont_have_account' => 'Ако нямате акаунт',
-
+    'contact_admin' => 'свържете се с администратора',
 ];
