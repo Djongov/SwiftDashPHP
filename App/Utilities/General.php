@@ -20,22 +20,20 @@ class General
         return $_SERVER['HTTP_USER_AGENT'] ?? null;
     }
     // This method catches if current uri is in the array of uris including wildcards
-    public static function matchRequestURI($uris)
+    public static function matchRequestURI(array $patterns): bool
     {
-        // Get the current request URI
-        $currentURI = $_SERVER['REQUEST_URI'];
+        $currentURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // remove query string
 
-        // Loop through the array of URIs
-        foreach ($uris as $uri) {
-            // If the URI in the array ends with a wildcard character (*), use strncmp to check if the current URI matches the beginning part of the URI in the array
-            if (substr($uri, -1) === '*' && strncmp($currentURI, rtrim($uri, '*'), strlen(rtrim($uri, '*'))) === 0) {
-                return true; // Match found
-            } elseif ($currentURI === $uri) {
-                return true; // Exact match found
+        foreach ($patterns as $pattern) {
+            // Convert wildcard patterns to regex
+            $regex = '#^' . str_replace(['*', '/'], ['[^/]+', '\/'], $pattern) . '$#';
+
+            if (preg_match($regex, $currentURI)) {
+                return true;
             }
         }
 
-        return false; // No match found
+        return false;
     }
     public static function isAssocArray(array $array): bool
     {
