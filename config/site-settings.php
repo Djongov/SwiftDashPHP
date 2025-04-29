@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+
+define("FROM", 'admin@gamerz-bg.com');
+define("FROM_NAME", 'No Reply');
+
+define('MULTILINGUAL', true);
+
 // Site title, Goes on footer and main menu header
 define("SITE_TITLE", translate('site_title'));
 
@@ -26,7 +32,7 @@ Branding & SEO Settings
 // Whether to show the loading screen on page load
 define("SHOW_LOADING_SCREEN", true);
 
-define('SYSTEM_USER_AGENT', SITE_TITLE . '/' . $version . ' (+https://' . $_SERVER['HTTP_HOST'] . ')');
+define('SYSTEM_USER_AGENT', SITE_TITLE . '/' . VERSION . ' (+https://' . $_SERVER['HTTP_HOST'] . ')');
 
 // Key words for SEO
 define(

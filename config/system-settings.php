@@ -2,6 +2,21 @@
 
 declare(strict_types=1);
 
+// PHP ini settings checks
+$phpIniSettings = [
+    'memory_limit' => '512M',
+    'post_max_size' => '12M',
+    'upload_max_filesize' => '12M',
+    'max_execution_time' => 300,
+    'max_input_time' => 300,
+];
+
+foreach ($phpIniSettings as $setting => $value) {
+    if (ini_get($setting) < $value) {
+        die($setting . ' should be at least ' . $value);
+    }
+}
+
 define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']));
 
 if (ini_get('display_errors') == 1) {
@@ -26,9 +41,7 @@ define('SYSTEM_LOGIN_EXEMPTIONS', [
     '/logout',
 ]);
 
-$version = trim(file_get_contents(ROOT . DIRECTORY_SEPARATOR . 'version.txt'));
-
-define('MULTILINGUAL', true);
+define('VERSION', trim(file_get_contents(ROOT . DIRECTORY_SEPARATOR . 'version.txt')));
 
 // Do a check here if .env file exists
 if (!file_exists(ROOT . DIRECTORY_SEPARATOR . '.env')) {
@@ -126,9 +139,6 @@ if (SENDGRID) {
     define("SENDGRID_API_KEY", $_ENV['SENDGRID_API_KEY']);
     #define("SENDGRID_TEMPLATE_ID", 'd-381e01fdce2b44c48791d7a12683a9c3');
 }
-
-define("FROM", 'admin@gamerz-bg.com');
-define("FROM_NAME", 'No Reply');
 
 /*
 
