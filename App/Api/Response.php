@@ -45,7 +45,7 @@ class Response
                 'requestId' => $requestId,
                 'data' => $data
             ],
-            JSON_PRETTY_PRINT
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }
     public static function responseXml(mixed $data, int $statusCode): string

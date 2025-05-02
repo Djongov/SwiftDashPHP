@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-
 define("FROM", 'admin@gamerz-bg.com');
 define("FROM_NAME", 'No Reply');
 
 define('MULTILINGUAL', true);
+define('DEFAULT_LANG', 'bg');
 
 // Site title, Goes on footer and main menu header
 define("SITE_TITLE", translate('site_title'));

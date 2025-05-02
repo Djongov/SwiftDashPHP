@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'home' => 'Начало',
     'site_title' => 'SwiftDashPHP',
     'docs_menu_name' => 'Документация',
     'please' => 'моля',
@@ -19,4 +20,5 @@ return [
     'forgot_password' => 'Забравена парола?',
     'if_you_dont_have_account' => 'Ако нямате акаунт',
     'contact_admin' => 'свържете се с администратора',
+    'no_logins_available' => 'Няма налични методи за вход. Проверете конфигурацията',
 ];

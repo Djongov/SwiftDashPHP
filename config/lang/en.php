@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'home' => 'Home',
     'site_title' => 'SwiftDashPHP',
     'docs_menu_name' => 'Docs',
     'please' => 'please',

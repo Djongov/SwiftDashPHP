@@ -19,7 +19,7 @@ return function (RouteCollector $router) {
     $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
 
     $genericMetaDataArray = [
-        'title' => (!empty($title)) ? $title : 'Home',
+        'title' => (!empty($title)) ? $title : translate('home'),
         'description' => GENERIC_DESCRIPTION,
         'keywords' => GENERIC_KEYWORDS,
         'thumbimage' => OG_LOGO,
@@ -27,7 +27,7 @@ return function (RouteCollector $router) {
     ];
 
     $genericMetaAdminDataArray = [
-        'title' => (!empty($title)) ? $title : 'Home',
+        'title' => (!empty($title)) ? $title : translate('home'),
         'description' => GENERIC_DESCRIPTION,
         'keywords' => GENERIC_KEYWORDS,
         'thumbimage' => OG_LOGO,

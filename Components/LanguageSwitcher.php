@@ -33,7 +33,7 @@ class LanguageSwitcher
             }
             // Loop through languages and set the selected one
             foreach ($languages as $code => $language) {
-                $selected = ($_SESSION['lang'] ?? 'en') === $code ? 'selected' : '';
+                $selected = ($_SESSION['lang'] ?? DEFAULT_LANG) === $code ? 'selected' : '';
                 $html .= '<option value="' . $code . '" ' . $selected . '>' . getLanguageFlag($code) . ' ' . $language . '</option>';
             }
 

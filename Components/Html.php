@@ -485,7 +485,7 @@ class Html
     }
     public static function mediumButtonLink($link, $text, $theme, $extraClasses = []): string
     {
-        return '<a class="inline-flex items-center justify-center ml-2 px-2 py-2 h-10 w-32 md:w-44 mb-2 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm ' . implode(' ', $extraClasses) . '" href="' . $link . '">' . $text . '</a>';
+        return '<a class="text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 focus:ring-1 focus:ring-' . $theme . '-300 font-medium rounded-lg text-sm px-4 py-2 me-2 mb-2 dark:bg-' . $theme . '-600 dark:hover:bg-' . $theme . '-700 focus:outline-none dark:focus:ring-' . $theme . '-800 ' . implode(' ', $extraClasses) . '" href="' . $link . '">' . $text . '</a>';
     }
     public static function smallButtonLink($link, $text, $theme, $extraClasses = []): string
     {

@@ -26,6 +26,11 @@ class App
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
 
+        // Set the default language in session
+        if (MULTILINGUAL && !isset($_SESSION['lang'])) {
+            $_SESSION['lang'] = DEFAULT_LANG;
+        }
+
         /*
             Now Routing
         */

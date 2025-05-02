@@ -11,7 +11,31 @@ function dd()
     );
     die;
 }
+function searchArrayForKey($array, $key) {
+    // Iterate through each element in the array
+    foreach ($array as $k => $v) {
+        // If the current key matches the one we're looking for
+        if ($k === $key) {
+            // If the value is an array, return it (you can modify this based on your data)
+            if (is_array($v)) {
+                return $v; // Returning the array
+            } else {
+                return $v; // Return the value if it's not an array
+            }
+        }
 
+        // If the value is an array, recursively search through it
+        if (is_array($v)) {
+            $result = searchArrayForKey($v, $key);
+            if ($result !== null) {
+                return $result;
+            }
+        }
+    }
+
+    // If the key was not found, return null
+    return null;
+}
 function currentIP(): string
 {
     if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
@@ -56,23 +80,23 @@ function getApiKeyFromHeaders()
         return null; // or handle missing API key appropriately
     }
 }
-
 function translate(string $key, array $replace = []): string
 {
     static $translations = [];
 
-    $lang = $_SESSION['lang'] ?? 'en'; // Default to English
+    $lang = $_SESSION['lang'] ?? DEFAULT_LANG; // Default to DEFAULT_LANG
 
     // Get project root (parent of public/)
     $projectRoot = ROOT;
     $file = "{$projectRoot}/config/lang/{$lang}.php";
+    $projectFile = "{$projectRoot}/config/lang/{$lang}-project.php";
 
     if (!isset($translations[$lang])) {
-        if (file_exists($file)) {
-            $translations[$lang] = include $file;
-        } else {
-            $translations[$lang] = []; // Prevent errors
-        }
+        $core = file_exists($file) ? include $file : [];
+        $project = file_exists($projectFile) ? include $projectFile : [];
+
+        // Merge, giving priority to project-specific translations
+        $translations[$lang] = array_merge($core, $project);
     }
 
     $text = $translations[$lang][$key] ?? $key;
