@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 define("FROM", 'admin@gamerz-bg.com');
 define("FROM_NAME", 'No Reply');
+define("ADMINISTRATOR_EMAIL", "");
 
 define('MULTILINGUAL', true);
 define('DEFAULT_LANG', 'bg');

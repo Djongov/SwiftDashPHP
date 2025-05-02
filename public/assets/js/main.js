@@ -188,43 +188,53 @@ scrollToTopButton.addEventListener("click", backToTop);
 
 /* Autload stuff */
 
-const autoLoadParams = document.querySelectorAll('input[type="hidden"][name="autoload"]');
+const initializeAutoLoadedComponents = () => {
+    const autoLoadParams = document.querySelectorAll('input[type="hidden"][name="autoload"]');
 
-if (autoLoadParams.length > 0) {
+    if (autoLoadParams.length === 0) return;
+
     autoLoadParams.forEach(input => {
         const value = JSON.parse(input.value);
         const type = value.type;
         const data = value.data;
-        if (type === 'gaugechart') {
-            createGaugeChart(data.title, data.parentDiv, data.width, data.height, data.data[0], data.data[1]);
-        }
-        if (type === 'donutchart') {
-            createDonutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
-        }
-        if (type === 'piechart') {
-            createPieChart(data.title, data.parentDiv, data.title, data.height, data.width, data.labels, data.data);
-        }
-        if (type === 'linechart') {
-            createLineChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.datasets);
-        }
-        if (type === 'barchart') {
-            createBarChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
-        }
-        if (type === 'table') {
-            // Create a table element
-            const table = createSkeletonTable();
-            // Add to parentDiv
-            document.getElementById(value.parentDiv).appendChild(table);
-            // Create the DataGrid table object
-            const dataGridTable = drawDataGridFromData(data, table.id, value.tableOptions || {});
 
-            // Activate filters if tableOptions is null or filters is true
-            if (value.tableOptions === null || value.tableOptions?.filters) {
-                buildDataGridFilters(dataGridTable, table.id);
-            }
+        switch (type) {
+            case 'gaugechart':
+                createGaugeChart(data.title, data.parentDiv, data.width, data.height, data.data[0], data.data[1]);
+                break;
+
+            case 'donutchart':
+                createDonutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
+                break;
+
+            case 'piechart':
+                createPieChart(data.title, data.parentDiv, data.title, data.height, data.width, data.labels, data.data);
+                break;
+
+            case 'linechart':
+                createLineChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.datasets);
+                break;
+
+            case 'barchart':
+                createBarChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
+                break;
+
+            case 'table':
+                const table = createSkeletonTable();
+                document.getElementById(value.parentDiv).appendChild(table);
+                const dataGridTable = drawDataGridFromData(data, table.id, value.tableOptions || {});
+                if (value.tableOptions === null || value.tableOptions?.filters) {
+                    buildDataGridFilters(dataGridTable, table.id);
+                }
+                break;
+
+            default:
+                console.warn(`Unknown autoload type: ${type}`);
         }
-    })
-}
+    });
+};
+
+initializeAutoLoadedComponents();
 
 // Handle the submitting of the IP address form if there is a get request with query paramter "ip". If it does, find a form with .generic-form class and simulate a click on the form submitter
 const urlParams = new URLSearchParams(window.location.search);

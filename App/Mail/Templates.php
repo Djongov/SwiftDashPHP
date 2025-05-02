@@ -22,6 +22,6 @@ class Templates
                 'email' => ADMINISTRATOR_EMAIL
             ]
         ], $subject, $html);
-        SystemLog::write('Mail', 'informAdministrator has sent email to ' . ADMINISTRATOR_EMAIL . ' with subject: ' . $subject . ' and result is ' . json_encode($send), 'info');
+        SystemLog::write('Mail', 'informAdministrator has sent email to ' . ADMINISTRATOR_EMAIL . ' with subject: ' . $subject . ' and result is ' . json_encode($send), 'informAdministrator');
     }
 }
