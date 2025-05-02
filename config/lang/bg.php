@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'home' => 'Начало',
-    'site_title' => 'SwiftDashPHP',
     'docs_menu_name' => 'Документация',
     'please' => 'моля',
     // Login related
