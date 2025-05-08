@@ -14,4 +14,4 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-echo DataGrid::fromDBTable('system_log', 'System Logs', $theme);
+echo DataGrid::fromDBTable('system_log', 'System Logs', $theme, true, true, 'id', 'asc');
