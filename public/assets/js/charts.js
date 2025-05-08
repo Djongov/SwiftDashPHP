@@ -35,17 +35,13 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
     containerDiv.appendChild(canvas);
 
     // Find out the theme - dark or light
-    let theme = getCurrentTheme();
-
-    const titleColor = (theme === 'dark') ? 'white' : 'black';
-
-    const labelColor = (theme === 'dark') ? 'white' : 'black';
+    const textColor = getCurrentChartColors().textColor;
 
     let backgroundColorArray = [];
 
     let colorScheme = [];
     labels.forEach(label => {
-        var item = colorScheme[Math.floor(Math.random() * colorScheme.length)];
+        let item = colorScheme[Math.floor(Math.random() * colorScheme.length)];
         // For Malicious confidences let's draw red orange green for the good and bad malicious confidences
         if (name === 'maliciousConfidences') {
             let color = '';
@@ -65,18 +61,7 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
             backgroundColorArray.push(color);
             // For the rest - push from the random array of colors
         } else {
-            backgroundColorArray = [
-                'rgba(54, 162, 235, 1)', // blue
-                'rgba(75, 192, 192, 1)', // green
-                'rgba(255, 99, 132, 1)', // red
-                'rgba(255, 159, 64, 1)', // orange
-                'rgba(153, 102, 255, 1)', // purple
-                'rgba(255, 206, 86, 1)', // yellow
-                'rgba(255, 0, 0, 1)', // bright red
-                'rgba(0, 255, 255, 1)', // cyan
-                'rgba(255, 0, 255, 1)', // magenta
-                'rgba(128, 128, 128, 1)' // grey
-            ];
+            backgroundColorArray = colors
 
         }
         colorScheme = colorScheme.filter(element => element !== item);
@@ -94,7 +79,7 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
                     data: data,
                     //color: 'red',
                     borderWidth: 0,
-                    borderColor: 'rgba(255,255,255, 0.95)',
+                    borderColor: textColor,
                     weight: 600,
                 }
             ]
@@ -105,31 +90,31 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
             },
             responsive: false, // ✅ Disable responsiveness for fixed size
             maintainAspectRatio: false, // ✅ Allow custom height
-            /*
-            legendCallback: function(chart) {
-                var text = [];
-                text.push('<ul class="0-legend">');
-                var ds = chart.data.datasets[0];
-                var sum = ds.data.reduce(function add(a, b) { return a + b; }, 0);
-                for (var i=0; i<ds.data.length; i++) {
-                    text.push('<li>');
-                    var perc = Math.round(100*ds.data[i]/sum,0);
-                    text.push('<span style="background-color:' + ds.backgroundColor[i] + '">' + '</span>' + chart.data.labels[i] + ' ('+ds.data[i]+') ('+perc+'%)');
-                    text.push('</li>');
-                }
-                text.push('</ul>');
-                return text.join("");
-            },
-            */
+            
+            // legendCallback: function(chart) {
+            //     var text = [];
+            //     text.push('<ul class="0-legend">');
+            //     var ds = chart.data.datasets[0];
+            //     var sum = ds.data.reduce(function add(a, b) { return a + b; }, 0);
+            //     for (var i=0; i<ds.data.length; i++) {
+            //         text.push('<li>');
+            //         var perc = Math.round(100*ds.data[i]/sum,0);
+            //         text.push('<span style="background-color:' + ds.backgroundColor[i] + '">' + '</span>' + chart.data.labels[i] + ' ('+ds.data[i]+') ('+perc+'%)');
+            //         text.push('</li>');
+            //     }
+            //     text.push('</ul>');
+            //     return text.join("");
+            // },
+            
             plugins: {
                 legend: {
                     display: true,
                     position: 'top',
                     labels: {
                         padding: 20,
-                        color: labelColor,
+                        color: textColor,
                         fontSize: 12,
-                        borderWidth: 1,
+                        borderWidth: 0,
                         /*
                         generateLabels: function(chart) {
                         var data = chart.data;
@@ -162,7 +147,7 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
                         top: 15,
                         bottom: 10
                     },
-                    color: titleColor,
+                    color: textColor,
                     align: 'center',
                     fullSize: true,
                     font: {
@@ -174,14 +159,17 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
                 // When you hover on a datalabel, show count and stuff
                 datalabels: {
                     display: true,
-                    align: 'middle',
-                    color: '#fff',
-                    backgroundColor: '#000',
-                    borderRadius: 3,
+                    anchor: "center",
+                    align: "center",
+                    color: "#000",
+                    backgroundColor: "#fff",
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    borderRadius: 6,
                     font: {
-                        size: 11,
-                        lineHeight: 1
-                    },
+                        weight: 'normal',
+                        size: 12,
+                    }
                 }
             },
         }
@@ -212,11 +200,8 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
 
     let lineDataSets = [];
 
-    let theme = getCurrentTheme();
-
-    const textColor = (theme === 'dark') ? 'white' : 'black';
-    const gridColor = (theme === 'dark') ? 'rgba(128, 128, 128, 0.65)' : 'rgba(128, 128, 128, 0.4)';
-
+    const textColor = getCurrentChartColors().textColor;
+    const gridColor = getCurrentChartColors().gridColor;
     
     data.forEach((array, index) => {
         let calculatedTarget = Object.entries(array)[0][1];
@@ -316,9 +301,7 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
 
     containerDiv.appendChild(canvas);
 
-    let theme = getCurrentTheme();
-
-    const titleColor = (theme === 'dark') ? 'white' : 'black';
+    const textColor = getCurrentChartColors().textColor;
 
     // Define the gauge chart data
     const remainder = max - min;
@@ -412,7 +395,7 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
                     display: true,
                     text: `${title}`,
                     font: { size: 16, weight: 'bold' },
-                    color: titleColor,
+                    color: textColor,
                 }
             }
         }
@@ -442,28 +425,12 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
 
     containerDiv.appendChild(canvas);
 
-    // Find out the theme - dark or light
-    let theme = getCurrentTheme();
-
-    const titleColor = (theme === 'dark') ? "#E5E7EB" : "#111827";
-
-    const labelColor = (theme === 'dark') ? "#E5E7EB" : "#111827";
+    const textColor = getCurrentChartColors().textColor;
 
     let backgroundColorArray = [];
     let colorScheme = [];
     labels.forEach(label => {
-        backgroundColorArray = [
-            'rgba(54, 162, 235, 1)', // blue
-            'rgba(75, 192, 192, 1)', // green
-            'rgba(255, 99, 132, 1)', // red
-            'rgba(255, 159, 64, 1)', // orange
-            'rgba(153, 102, 255, 1)', // purple
-            'rgba(255, 206, 86, 1)', // yellow
-            'rgba(255, 0, 0, 1)', // bright red
-            'rgba(0, 255, 255, 1)', // cyan
-            'rgba(255, 0, 255, 1)', // magenta
-            'rgba(128, 128, 128, 1)' // grey
-        ];
+        backgroundColorArray = colors;
         //console.log('Assigning color ' + item + ' to chart ' + name);
         colorScheme = colorScheme.filter(element => element !== item);
     })
@@ -531,7 +498,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                     position: 'top',
                     labels: {
                         padding: 20,
-                        color: labelColor,
+                        color: textColor,
                         fontSize: 12,
                         borderWidth: 1,
                     }
@@ -544,7 +511,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                         top: 15,
                         bottom: 10
                     },
-                    color: titleColor,
+                    color: textColor,
                     align: 'center',
                     fullSize: true,
                     font: {
@@ -556,14 +523,17 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                 // When you hover on a datalabel, show count and stuff
                 datalabels: {
                     display: true,
-                    align: 'middle',
-                    color: 'white',
-                    backgroundColor: '#000',
-                    borderRadius: 3,
+                    anchor: "center",
+                    align: "center",
+                    color: "#000",
+                    backgroundColor: "#fff",
+                    borderColor: "#fff",
+                    borderWidth: 1,
+                    borderRadius: 6,
                     font: {
-                        size: 11,
-                        lineHeight: 1
-                    },
+                        weight: 'normal',
+                        size: 12,
+                    }
                 },
                 doughnutlabel: {
                     labels: [
@@ -575,7 +545,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                                 weight: 'bold'
                             },
                             backgroundColor: 'green',
-                            color: labelColor
+                            color: textColor
                         }
                     ]
                 }
@@ -606,8 +576,8 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
     containerDiv.appendChild(canvas);
 
     // Get the current theme
-    let theme = getCurrentTheme();
-    const textColor = (theme === 'dark') ? "#E5E7EB" : "#111827";
+    const textColor = getCurrentChartColors().textColor;
+    const gridColor = getCurrentChartColors().gridColor;
 
     let ctx = canvas.getContext('2d');
     let myChart = new Chart(ctx, {
@@ -643,15 +613,16 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
                     fontSize: 20
                 },
                 datalabels: {
+                    display: true,
                     anchor: "center",
                     align: "center",
-                    color: "white",
-                    backgroundColor: "black",
-                    borderColor: "black",
+                    color: "#000",
+                    backgroundColor: "#fff",
+                    borderColor: "#fff",
                     borderWidth: 1,
                     borderRadius: 6,
                     font: {
-                        weight: 'bold',
+                        weight: 'normal',
                         size: 12,
                     }
                 }
@@ -661,19 +632,31 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
                     beginAtZero: true,
                     ticks: {
                         color: textColor,
+                        backgroundColor: gridColor,
                         font: {
                             size: 12,
                         }
                     },
+                    grid: {
+                        color: gridColor,
+                        borderColor: textColor,
+                        borderWidth: 1
+                    }
                 },
                 x: {
                     beginAtZero: true,
                     ticks: {
                         color: textColor,
+                        backgroundColor: gridColor,
                         font: {
                             size: 12,
                         }
                     },
+                    grid: {
+                        color: gridColor,
+                        borderColor: textColor,
+                        borderWidth: 1
+                    }
                 }
             }
         },

@@ -3,38 +3,80 @@ const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
 const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-const preferedSystemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+const isSystemThemeDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-const getCurrentTheme = () => localStorage.getItem('color-theme') || localStorage.setItem('color-theme', preferedSystemTheme);
+const preferedSystemTheme = isSystemThemeDark ? "dark" : "light";
+
+const getCurrentTheme = () => {
+    const storedTheme = localStorage.getItem('color-theme');
+    if (storedTheme) return storedTheme;
+    localStorage.setItem('color-theme', preferedSystemTheme);
+    return preferedSystemTheme;
+};
+
+const getCurrentChartColors = () => {
+    let textLightColor = "#E5E7EB";
+    let textDarkColor = "#111827";
+    let gridLightColor = "rgba(64, 62, 60, 1)";
+    let gridDarkColor = "rgba(168, 162, 155, 1)";
+
+    if (getCurrentTheme() !== 'dark' && preferedSystemTheme !== 'dark' || getCurrentTheme() === 'dark' && preferedSystemTheme === 'dark') {
+        textLightColor = "#111827";
+        textDarkColor = "#E5E7EB";
+        gridLightColor = "rgba(168, 162, 155, 1)";
+        gridDarkColor = "rgba(64, 62, 60, 1)";
+    }
+
+    let textColor = getCurrentTheme() === 'dark' ? textDarkColor : textLightColor;
+
+    let gridColor = getCurrentTheme() === 'dark' ? gridDarkColor : gridLightColor;
+
+    return {
+        textColor: textColor,
+        gridColor: gridColor,
+    };
+}
 
 const updateChartThemes = () => {
-    const isDark = document.documentElement.classList.contains('dark');
-
     Chart.helpers.each(Chart.instances, function (chart) {
         if (chart) {
             const options = chart.options;
 
             // Update legend text color
             if (options.plugins?.legend?.labels) {
-                options.plugins.legend.labels.color = isDark ? "#E5E7EB" : "#111827";
+                options.plugins.legend.labels.color = getCurrentChartColors().textColor;
             }
 
             // Update title text color
             if (options.plugins?.title) {
-                options.plugins.title.color = isDark ? "#E5E7EB" : "#111827";
+                options.plugins.title.color = getCurrentChartColors().textColor;
             }
 
             // Update axes colors (only if scales exist)
             if (options.scales) {
                 if (options.scales.x) {
-                    options.scales.x.ticks.color = isDark ? "#E5E7EB" : "#111827";
+                    options.scales.x.ticks.color = getCurrentChartColors().textColor;
                 }
                 if (options.scales.y) {
-                    options.scales.y.ticks.color = isDark ? "#E5E7EB" : "#111827";
+                    options.scales.y.ticks.color = getCurrentChartColors().textColor;
+                }
+            }
+            // Update grid line colors
+            if (options.scales) {
+                if (options.scales.x) {
+                    options.scales.x.grid.color = getCurrentChartColors().gridColor;
+                }
+                if (options.scales.y) {
+                    options.scales.y.grid.color = getCurrentChartColors().gridColor;
                 }
             }
 
-            chart.update();
+            try {
+                chart.update();
+                console.log(`Chart with ID ${chart.id} updated successfully.`);
+            } catch (error) {
+                console.error(`Error updating chart with ID ${chart.id}: ${error}`);
+            }
         }
     });
 };
@@ -43,11 +85,11 @@ const setButtonStateFromLocalStorage = () => {
     if (getCurrentTheme() === 'dark') {
         themeToggleDarkIcon.classList.add('hidden');
         themeToggleLightIcon.classList.remove('hidden');
-        document.documentElement.classList.add('dark');
+        //document.documentElement.classList.add('dark');
     } else {
         themeToggleDarkIcon.classList.remove('hidden');
         themeToggleLightIcon.classList.add('hidden');
-        document.documentElement.classList.remove('dark');
+        //document.documentElement.classList.remove('dark');
     }
 };
 
@@ -64,6 +106,24 @@ if (themeToggleBtn) {
         updateChartThemes();
     });
 }
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    const newTheme = event.matches ? 'dark' : 'light';
+
+    // Update localStorage
+    localStorage.setItem('color-theme', newTheme);
+
+    // Update the <html> class
+    if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    setButtonStateFromLocalStorage();
+    updateChartThemes();
+});
+
 
 // Event listener for storage change in other tabs/windows
 window.addEventListener('storage', (event) => {
