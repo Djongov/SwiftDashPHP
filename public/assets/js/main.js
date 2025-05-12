@@ -3,33 +3,42 @@ const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
 const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-const isSystemThemeDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-const preferedSystemTheme = isSystemThemeDark ? "dark" : "light";
+const isSystemDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 const getCurrentTheme = () => {
     const storedTheme = localStorage.getItem('color-theme');
     if (storedTheme) return storedTheme;
-    localStorage.setItem('color-theme', preferedSystemTheme);
-    return preferedSystemTheme;
+    localStorage.setItem('color-theme', isSystemDark() ? 'dark' : 'light');
+    return isSystemDark() ? 'dark' : 'light';
 };
 
 const getCurrentChartColors = () => {
-    let textLightColor = "#E5E7EB";
-    let textDarkColor = "#111827";
-    let gridLightColor = "rgba(64, 62, 60, 1)";
-    let gridDarkColor = "rgba(168, 162, 155, 1)";
 
-    if (getCurrentTheme() !== 'dark' && preferedSystemTheme !== 'dark' || getCurrentTheme() === 'dark' && preferedSystemTheme === 'dark') {
-        textLightColor = "#111827";
-        textDarkColor = "#E5E7EB";
-        gridLightColor = "rgba(168, 162, 155, 1)";
-        gridDarkColor = "rgba(64, 62, 60, 1)";
+    const systemTheme = isSystemDark() ? 'dark' : 'light';
+    const userTheme = getCurrentTheme();
+
+    let textColor = "#111827";
+    let gridColor = "rgba(168, 162, 155, 1)";
+
+    if (systemTheme === 'dark' && userTheme === 'dark') {
+        textColor = "#111827";
+        gridColor = "rgba(168, 162, 155, 1)";
     }
 
-    let textColor = getCurrentTheme() === 'dark' ? textDarkColor : textLightColor;
+    if (systemTheme === 'dark' && userTheme === 'light') {
+        textColor = "#E5E7EB";
+        gridColor = "rgba(64, 62, 60, 1)";
+    }
 
-    let gridColor = getCurrentTheme() === 'dark' ? gridDarkColor : gridLightColor;
+    if (systemTheme === 'light' && userTheme === 'dark') {
+        textColor = "#E5E7EB";
+        gridColor = "rgba(64, 62, 60, 1)";
+    }
+
+    if (systemTheme === 'light' && userTheme === 'light') {
+        textColor = "#111827";
+        gridColor = "rgba(168, 162, 155, 1)";
+    }
 
     return {
         textColor: textColor,
@@ -80,6 +89,7 @@ const updateChartThemes = () => {
         }
     });
 };
+
 // Function to set button state based on localStorage
 const setButtonStateFromLocalStorage = () => {
     if (getCurrentTheme() === 'dark') {
