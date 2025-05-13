@@ -204,7 +204,11 @@ if (tables.length > 0) {
                     updateSelectedResults(tableId, allTableCheckedCheckboxes);
                     updateFilteredResults(tableId, countVisibleRows(tableId));
                     if (massDeleteModalTriggerer && massDeleteModalText) {
-                        massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
+                        if (lang === 'en') {
+                            massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
+                        } else if (lang === 'bg') {
+                            massDeleteModalText.innerText = 'Искате ли да изтриете ' + allTableCheckedCheckboxes + ' записа?';
+                        }
                         massDeleteModalTriggerer.disabled = allTableCheckedCheckboxes <= 0;
                     }
                 }, false);
@@ -361,7 +365,11 @@ if (tables.length > 0) {
             const allTableCheckedCheckboxes = countAllCheckedCheckboxes(tableId);
             updateSelectedResults(tableId, allTableCheckedCheckboxes);
             if (massDeleteModalTriggerer && massDeleteModalText) {
-                massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
+                if (lang === 'en') {
+                    massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
+                } else if (lang === 'bg') {
+                    massDeleteModalText.innerText = 'Искате ли да изтриете ' + allTableCheckedCheckboxes + ' записа?';
+                }
                 massDeleteModalTriggerer.disabled = (allTableCheckedCheckboxes > 0) ? false : true;
             }
         });

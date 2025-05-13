@@ -12,7 +12,7 @@ if (!LOCAL_USER_LOGIN) {
 }
 
 if (!MANUAL_REGISTRATION) {
-    echo Alerts::danger('Server does not permit manual registration');
+    echo Alerts::danger(translate('manual_registration_disabled'));
     return;
 }
 
@@ -24,48 +24,48 @@ echo '<div class="flex items-center justify-center mx-4">
                 'input' => [
                     // Email
                     [
-                        'label' => 'Username',
+                        'label' => translate('username'),
                         'type' => 'text',
                         'placeholder' => 'John84',
                         'name' => 'username',
                         'required' => true,
-                        'description' => 'Provide a username',
+                        'description' => translate('usrname_description'),
                         'id' => uniqid(),
                     ],
                     [
-                        'label' => 'Email',
+                        'label' => translate('email'),
                         'type' => 'email',
                         'placeholder' => 'John.Doe@example.com',
                         'name' => 'email',
                         'required' => true,
-                        'description' => 'Provide a valid email',
+                        'description' => translate('email_description'),
                         'id' => uniqid(),
                     ],
                     // Password
                     [
-                        'label' => 'Password',
+                        'label' => translate('password'),
                         'type' => 'password',
                         'name' => 'password',
                         'required' => true,
-                        'description' => 'Provide a password',
+                        'description' => translate('password_description'),
                         'id' => uniqid(),
                     ],
                     // Password
                     [
-                        'label' => 'Confirm Password',
+                        'label' => translate('conrifm_password'),
                         'type' => 'password',
                         'name' => 'confirm_password',
                         'required' => true,
-                        'description' => 'Confirm your password',
+                        'description' => translate('confirm_password_description'),
                         'id' => uniqid(),
                     ],
                     // Name
                     [
-                        'label' => 'Name',
+                        'label' => translate('name'),
                         'type' => 'text',
                         'name' => 'name',
                         'required' => true,
-                        'description' => 'Provide your name',
+                        'description' => translate('name_description'),
                         'id' => uniqid(),
                     ],
                 ]

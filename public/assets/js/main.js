@@ -153,6 +153,10 @@ updateChartThemes();
 const themeInput = document.querySelector('input[type="hidden"][name="theme"]');
 const theme = themeInput ? themeInput.value : 'sky';
 
+// let's do the same for the langauge
+const langInput = document.querySelector('input[type="hidden"][name="lang"]');
+const lang = langInput ? langInput.value : 'en';
+
 /* Back Button */
 const backButtons = document.querySelectorAll('.back-button');
 
@@ -259,12 +263,19 @@ scrollToTopButton.addEventListener("click", backToTop);
 /* Autload stuff */
 
 const initializeAutoLoadedComponents = () => {
-    const autoLoadParams = document.querySelectorAll('input[type="hidden"][name="autoload"]');
+    const autoLoadParams = document.querySelectorAll('input[type="hidden"][name="autoload"]:not([data-initialized])');
 
     if (autoLoadParams.length === 0) return;
 
     autoLoadParams.forEach(input => {
-        const value = JSON.parse(input.value);
+        let value;
+        try {
+            value = JSON.parse(input.value);
+        } catch (e) {
+            console.error('Invalid JSON in autoload input:', input.value);
+            return;
+        }
+
         const type = value.type;
         const data = value.data;
 
@@ -301,6 +312,9 @@ const initializeAutoLoadedComponents = () => {
             default:
                 console.warn(`Unknown autoload type: ${type}`);
         }
+
+        // Mark this input as initialized
+        input.setAttribute('data-initialized', 'true');
     });
 };
 

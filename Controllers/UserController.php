@@ -135,11 +135,11 @@ class UserController
         $dbUserDataFromToken = $tokenData['preferred_username'] ?? $tokenData['username'] ?? $tokenData['email'];
 
         if ($dbUserData['username'] !== $dbUserDataFromToken) {
-            Response::output('You cannot edit another user data', 401);
+            Response::output(translate('user_api_response_cannot_edit_other_user_data'), 401);
         }
 
         if (isset($data['password']) && isset($data['confirm_password']) && $data['password'] !== $data['confirm_password']) {
-            Response::output('Passwords do not match', 400);
+            Response::output(translate('user_api_response_passwords_do_not_match'), 400);
         }
 
         if (isset($data['password'])) {
@@ -147,7 +147,7 @@ class UserController
         }
 
         if (isset($data['role']) && !in_array('administrator', $tokenData['roles'])) {
-            Response::output('Only administrators can change roles', 401);
+            Response::output(translate('user_api_response_only_admins_change_roles'), 401);
         }
 
         unset($data['confirm_password'], $data['csrf_token'], $data['username']);
@@ -164,9 +164,9 @@ class UserController
         try {
             $rowCount = $user->update($data, $userId);
             if ($rowCount === 0) {
-                Response::output('user not updated', 400);
+                Response::output(translate('user_api_response_user_not_updated'), 400);
             }
-            Response::output('user updated', 200);
+            Response::output(translate('user_api_response_user_updated'), 200);
         } catch (\Throwable $e) {
             Response::output('Invalid field: ' . $e->getMessage(), 400);
         }
@@ -175,12 +175,12 @@ class UserController
     public function deleteUser(array $routeInfo, array $loginInfo): void
     {
         if (!isset($_GET['csrf_token'])) {
-            Response::output('Missing CSRF Token', 401);
+            Response::output(translate('api_response_missing_csrf_token'), 401);
             exit();
         }
 
         if (!isset($routeInfo[2]['id'])) {
-            Response::output('Missing user id', 400);
+            Response::output(translate('api_response_missing_user_id'), 400);
             exit();
         }
 
@@ -197,7 +197,7 @@ class UserController
         $dbUserDataFromToken = $tokenData['preferred_username'] ?? $tokenData['username'] ?? $tokenData['email'];
 
         if ($dbUserData['username'] !== $dbUserDataFromToken) {
-            Response::output('You cannot delete another user', 401);
+            Response::output(translate('user_api_response_user_cannot_delete_another_user'), 401);
         }
 
         $user->delete($userId);
