@@ -127,9 +127,9 @@ if (LOCAL_USER_LOGIN) {
 if (LOCAL_USER_LOGIN) {
     // But if only show the link if manual registration is enabled
     if (MANUAL_REGISTRATION) {
-        echo Html::small(translate('if_you_dont_have_account_contact_admin') . ', ' . translate('please') . ' <a class="underline" href="/register">' . translate('sign_up') . '</a>');
+        echo Html::small(translate('if_you_dont_have_account') . ' - <a class="underline" href="/register">' . translate('sign_up') . '</a>');
     } else {
-        echo Html::small(translate('manual_registration_disabled'));
+        echo Html::small(translate('if_you_dont_have_account_contact_admin'));
     }
 }
         // If no login methods are enabled, show an alert
