@@ -52,6 +52,9 @@ class Page
             'https://cdn.tailwindcss.com?plugins=typography' => [
                 'cache' => true
             ],
+            '/assets/js/lang.js' => [
+                'defer' => 'true'
+            ],
             '/assets/js/main.js' => [
                 'defer' => 'true'
             ],

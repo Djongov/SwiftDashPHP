@@ -57,8 +57,7 @@ return [
     'change_password_form_small_text' => 'Successfully changing the password will log you out of the app. You will need to login again with your new password.',
     'forget_about_me' => 'Forget about me',
     'forget_about_me_description' => 'This will delete your account in our database along with any data we have about your account.',
-    'forget_about_me_modal_text' => 'Are you sure you want to delete your user?
-    This will delete your username from our database. This will also remove you from organization where you are a member. This will NOT remove any logs that have your name in it. Your user will be re-created if you login again to the app.',
+    'forget_about_me_modal_text' => 'Are you sure you want to delete your user? This will delete your username from our database. Your user will be re-created if you login again to the app.',
     'delete_user_button_text' => 'Delete User',
     // DataGrid
     'delete_selected_button_text' => 'Delete Selected',

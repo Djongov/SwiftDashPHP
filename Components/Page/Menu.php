@@ -98,7 +98,7 @@ class Menu
             $html .= self::dropDownUserMenu($usernameArray['name'], $theme, $isAdmin, $usernameArray['picture'] ?? null);
             // Otherwise, show the login button
         } else {
-            $html .= '<a class="inline-flex items-center justify-center px-2 py-2 h-10 w-18 md:w-18 my-2 ml-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="/login">Login</a>';
+            $html .= '<a class="inline-flex items-center justify-center px-2 py-2 h-10 w-18 md:w-18 my-2 ml-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="/login">' . translate('login_button_text') . '</a>';
             $html .= '</div>';
         }
         // Close the nav

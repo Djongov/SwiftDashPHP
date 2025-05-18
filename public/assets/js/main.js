@@ -90,6 +90,17 @@ const updateChartThemes = () => {
     });
 };
 
+const translate = (key, replacements = {}) => {
+    const dictionary = translations[lang] || {};
+    let text = dictionary[key] || translations.en?.[key] || key;
+
+    for (const [placeholder, value] of Object.entries(replacements)) {
+        text = text.replaceAll(`{${placeholder}}`, value);
+    }
+
+    return text;
+};
+
 // Function to set button state based on localStorage
 const setButtonStateFromLocalStorage = () => {
     if (getCurrentTheme() === 'dark') {
@@ -934,7 +945,7 @@ const createModal = (id, title, submitButtonName, parentDiv, action) => {
             <!-- Modal footer -->
             <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
                 <button id="${id}-edit" type="submit" class="text-white bg-${theme}-700 hover:bg-${theme}-800 focus:ring-4 focus:outline-none focus:ring-${theme}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-${theme}-600 dark:hover:bg-${theme}-700 dark:focus:ring-${theme}-800">${submitButtonName}</button>
-                <button id="${id}-close-button" type="button" class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-${theme}-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Cancel</button>
+                <button id="${id}-close-button" type="button" class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-${theme}-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">${translate('cancel')}</button>
             </div>
         </div>
     </form>
@@ -999,7 +1010,7 @@ if (cookieConsentLink) {
     cookieConsentLink.addEventListener('click', async (event) => {
         event.preventDefault();
         const modalId = 'cookie-consent-modal';
-        const modal = createModal(modalId, 'Cookie Consent', 'Accept', document.body, '/api/cookie-consent');
+        const modal = createModal(modalId, translate('cookieConsentHeading'), translate('accept'), document.body, '/api/cookie-consent');
         document.body.insertBefore(modal, document.body.firstChild);
         initializeModal(modal, modalId);
         // Add a loader until we populate the data
@@ -1019,12 +1030,12 @@ if (cookieConsentLink) {
             const cookieData = await handleCookieFetchData(modalForm);
             modalBody.innerHTML = cookieData.data;
             if (cookieData.data === 'no consent') {
-                modalBody.innerHTML = `You have not consented to cookies use yet. Please click the Accept button on the cookie banner to consent.`;
+                modalBody.innerHTML = translate('cookieConsentNotAcceptedYet');
             }
             if (cookieData.data === 'accept') {
-                modalBody.innerHTML = `You have already consented to cookies use.`;
+                modalBody.innerHTML = translate('cookieConsentAgree');
                 // Let's offer the user to revoke the consent
-                document.getElementById(`${modalId}-edit`).innerText = 'Revoke';
+                document.getElementById(`${modalId}-edit`).innerText = translate('cookieConsentRevokeButtonText');
                 //Switch the theme with red
                 document.getElementById(`${modalId}-edit`).classList.remove(`bg-${theme}-700`, `hover:bg-${theme}-800`, `focus:ring-${theme}-300`, `dark:bg-${theme}-600`, `dark:hover:bg-${theme}-700`, `dark:focus:ring-${theme}-800`);
                 document.getElementById(`${modalId}-edit`).classList.add('bg-red-700', 'hover:bg-red-800', 'focus:ring-red-300', 'dark:bg-red-600', 'dark:hover:bg-red-700', 'dark:focus:ring-red-800');
@@ -1041,7 +1052,7 @@ if (cookieConsentLink) {
                     // Send the request to revoke the consent
                     handleCookieFetchData(modalForm).then(data => {
                         if (data.data === 'consent deleted') {
-                            modalBody.innerHTML = `You have successfully revoked the consent to use cookies.`;
+                            modalBody.innerHTML = translate('cookieConsentRevokeSuccess');
                             // reload
                             location.reload();
                         }

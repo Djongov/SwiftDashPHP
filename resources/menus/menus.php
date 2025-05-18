@@ -93,17 +93,17 @@ define(
 
 define(
     "USERNAME_DROPDOWN_MENU", [
-    'User Settings' => [
-        'path' => '/user-settings',
-        'admin' => false
-    ],
-    'Admin' => [
-        'path' => '/adminx',
-        'admin' => true,
-    ],
-    'Logout' => [
-        'path' => '/logout',
-        'admin' => false,
-    ]
+        translate('menu_user_settings') => [
+            'path' => '/user-settings',
+            'admin' => false
+        ],
+        translate('menu_admin') => [
+            'path' => '/adminx',
+            'admin' => true,
+        ],
+        translate('menu_logout') => [
+            'path' => '/logout',
+            'admin' => false,
+        ]
     ]
 );
