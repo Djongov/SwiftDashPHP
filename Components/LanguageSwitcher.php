@@ -21,16 +21,6 @@ class LanguageSwitcher
                 'en' => 'English',
                 'bg' => 'Български', // Bulgarian
             ];
-
-            function getLanguageFlag($code)
-            {
-                $flags = [
-                    'en' => '🇬🇧',  // UK flag directly as an emoji
-                    'bg' => '🇧🇬',  // Bulgaria flag directly as an emoji (corrected)
-                ];
-
-                return $flags[$code] ?? '';  // Returns the flag for the language code, or an empty string if not found
-            }
             // Loop through languages and set the selected one
             foreach ($languages as $code => $language) {
                 $selected = ($_SESSION['lang'] ?? DEFAULT_LANG) === $code ? 'selected' : '';

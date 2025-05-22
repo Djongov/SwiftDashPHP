@@ -21,10 +21,14 @@ class Alerts
     {
         return self::template('green', $message);
     }
+    public static function warning($message): string
+    {
+        return self::template('yellow', $message);
+    }
     public static function template($color, $message): string
     {
         return '
-        <div class="whitespace-pre-wrap break-all w-max-full mx-4 flex items-center p-4 my-4 text-sm text-' . $color . '-800 border border-' . $color . '-300 rounded-lg bg-' . $color . '-50 ' . DARK_COLOR_SCHEME_CLASS . ' dark:text-' . $color . '-400 dark:border-' . $color . '-800" role="alert">
+        <div class="w-max-full mx-4 flex items-center p-4 my-4 text-sm text-' . $color . '-800 border border-' . $color . '-300 rounded-lg bg-' . $color . '-50 ' . DARK_COLOR_SCHEME_CLASS . ' dark:text-' . $color . '-400 dark:border-' . $color . '-800" role="alert">
             ' . self::$svgInfo . '
             <span class="sr-only">Info</span>
         <div>' . $message . '</div>

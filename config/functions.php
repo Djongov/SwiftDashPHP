@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+function getLanguageFlag($code)
+{
+    $flags = [
+        'en' => '🇬🇧',  // UK flag directly as an emoji
+        'bg' => '🇧🇬',  // Bulgaria flag directly as an emoji (corrected)
+    ];
+
+    return $flags[$code] ?? '';  // Returns the flag for the language code, or an empty string if not found
+}
 function dd()
 {
     array_map(

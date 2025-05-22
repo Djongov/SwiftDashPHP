@@ -1,140 +1,104 @@
-/* Dark/Light Theme Changes */
-const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-const themeToggleBtn = document.getElementById('theme-toggle');
-
+// Get current theme from localStorage or system preference
 const isSystemDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 const getCurrentTheme = () => {
     const storedTheme = localStorage.getItem('color-theme');
     if (storedTheme) return storedTheme;
-    localStorage.setItem('color-theme', isSystemDark() ? 'dark' : 'light');
-    return isSystemDark() ? 'dark' : 'light';
-};
-
-const getCurrentChartColors = () => {
 
     const systemTheme = isSystemDark() ? 'dark' : 'light';
-    const userTheme = getCurrentTheme();
+    localStorage.setItem('color-theme', systemTheme);
+    return systemTheme;
+};
 
-    let textColor = "#111827";
-    let gridColor = "rgba(168, 162, 155, 1)";
+// Update all theme toggle buttons based on current theme
+const setButtonStateFromLocalStorage = () => {
+    const currentTheme = getCurrentTheme();
 
-    if (systemTheme === 'dark' && userTheme === 'dark') {
-        textColor = "#111827";
-        gridColor = "rgba(168, 162, 155, 1)";
-    }
+    document.querySelectorAll('.theme-toggle').forEach(btn => {
+        const darkIcon = btn.querySelector('.theme-toggle-dark-icon');
+        const lightIcon = btn.querySelector('.theme-toggle-light-icon');
 
-    if (systemTheme === 'dark' && userTheme === 'light') {
-        textColor = "#E5E7EB";
-        gridColor = "rgba(64, 62, 60, 1)";
-    }
+        if (!darkIcon || !lightIcon) return;
 
-    if (systemTheme === 'light' && userTheme === 'dark') {
-        textColor = "#E5E7EB";
-        gridColor = "rgba(64, 62, 60, 1)";
-    }
-
-    if (systemTheme === 'light' && userTheme === 'light') {
-        textColor = "#111827";
-        gridColor = "rgba(168, 162, 155, 1)";
-    }
-
-    return {
-        textColor: textColor,
-        gridColor: gridColor,
-    };
-}
-
-const updateChartThemes = () => {
-    Chart.helpers.each(Chart.instances, function (chart) {
-        if (chart) {
-            const options = chart.options;
-
-            // Update legend text color
-            if (options.plugins?.legend?.labels) {
-                options.plugins.legend.labels.color = getCurrentChartColors().textColor;
-            }
-
-            // Update title text color
-            if (options.plugins?.title) {
-                options.plugins.title.color = getCurrentChartColors().textColor;
-            }
-
-            // Update axes colors (only if scales exist)
-            if (options.scales) {
-                if (options.scales.x) {
-                    options.scales.x.ticks.color = getCurrentChartColors().textColor;
-                }
-                if (options.scales.y) {
-                    options.scales.y.ticks.color = getCurrentChartColors().textColor;
-                }
-            }
-            // Update grid line colors
-            if (options.scales) {
-                if (options.scales.x) {
-                    options.scales.x.grid.color = getCurrentChartColors().gridColor;
-                }
-                if (options.scales.y) {
-                    options.scales.y.grid.color = getCurrentChartColors().gridColor;
-                }
-            }
-
-            try {
-                chart.update();
-                console.log(`Chart with ID ${chart.id} updated successfully.`);
-            } catch (error) {
-                console.error(`Error updating chart with ID ${chart.id}: ${error}`);
-            }
+        if (currentTheme === 'dark') {
+            darkIcon.classList.add('hidden');
+            lightIcon.classList.remove('hidden');
+        } else {
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
         }
     });
 };
 
-const translate = (key, replacements = {}) => {
-    const dictionary = translations[lang] || {};
-    let text = dictionary[key] || translations.en?.[key] || key;
-
-    for (const [placeholder, value] of Object.entries(replacements)) {
-        text = text.replaceAll(`{${placeholder}}`, value);
-    }
-
-    return text;
-};
-
-// Function to set button state based on localStorage
-const setButtonStateFromLocalStorage = () => {
-    if (getCurrentTheme() === 'dark') {
-        themeToggleDarkIcon.classList.add('hidden');
-        themeToggleLightIcon.classList.remove('hidden');
-        //document.documentElement.classList.add('dark');
-    } else {
-        themeToggleDarkIcon.classList.remove('hidden');
-        themeToggleLightIcon.classList.add('hidden');
-        //document.documentElement.classList.remove('dark');
-    }
-};
-
-// Event listener for theme toggle button
-if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-        // Toggle theme class
+// Add click listener to all toggle buttons
+document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
         document.documentElement.classList.toggle('dark');
         const newTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
         localStorage.setItem('color-theme', newTheme);
 
-        // Update button state and charts
         setButtonStateFromLocalStorage();
-        updateChartThemes();
+        updateChartThemes?.(); // Safe call in case function exists
     });
-}
+});
 
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-    const newTheme = event.matches ? 'dark' : 'light';
+// Update chart colors
+const getCurrentChartColors = () => {
+    const systemTheme = isSystemDark() ? 'dark' : 'light';
+    const userTheme = getCurrentTheme();
 
-    // Update localStorage
+    if ((systemTheme === 'light' && userTheme === 'light') ||
+        (systemTheme === 'dark' && userTheme === 'dark')) {
+        return {
+            textColor: "#111827",
+            gridColor: "rgba(168, 162, 155, 1)",
+        };
+    } else {
+        return {
+            textColor: "oklch(70.7% 0.022 261.325)",
+            gridColor: "rgba(64, 62, 60, 1)",
+        };
+    }
+};
+
+const updateChartThemes = () => {
+    Chart.helpers.each(Chart.instances, function (chart) {
+        if (!chart) return;
+
+        const { textColor, gridColor } = getCurrentChartColors();
+        const options = chart.options;
+
+        if (options.plugins?.legend?.labels) {
+            options.plugins.legend.labels.color = textColor;
+        }
+
+        if (options.plugins?.title) {
+            options.plugins.title.color = textColor;
+        }
+
+        if (options.scales?.x) {
+            options.scales.x.ticks.color = textColor;
+            options.scales.x.grid.color = gridColor;
+        }
+
+        if (options.scales?.y) {
+            options.scales.y.ticks.color = textColor;
+            options.scales.y.grid.color = gridColor;
+        }
+
+        try {
+            chart.update();
+        } catch (error) {
+            console.error(`Chart update failed: ${error}`);
+        }
+    });
+};
+
+// Watch for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const newTheme = e.matches ? 'dark' : 'light';
     localStorage.setItem('color-theme', newTheme);
 
-    // Update the <html> class
     if (newTheme === 'dark') {
         document.documentElement.classList.add('dark');
     } else {
@@ -145,8 +109,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', eve
     updateChartThemes();
 });
 
-
-// Event listener for storage change in other tabs/windows
+// Sync across tabs/windows
 window.addEventListener('storage', (event) => {
     if (event.key === 'color-theme') {
         setButtonStateFromLocalStorage();
@@ -154,7 +117,7 @@ window.addEventListener('storage', (event) => {
     }
 });
 
-// Initially set button state and update chart themes when the page loads
+// Initial setup
 setButtonStateFromLocalStorage();
 updateChartThemes();
 
@@ -167,6 +130,13 @@ const theme = themeInput ? themeInput.value : 'sky';
 // let's do the same for the langauge
 const langInput = document.querySelector('input[type="hidden"][name="lang"]');
 const lang = langInput ? langInput.value : 'en';
+
+// This function will use translations object to translate the text
+const translate = (key) => {
+
+    const langTranslations = translations[lang] || translations.en;
+    return langTranslations[key] || key;
+}
 
 /* Back Button */
 const backButtons = document.querySelectorAll('.back-button');

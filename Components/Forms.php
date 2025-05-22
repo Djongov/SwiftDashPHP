@@ -123,7 +123,7 @@ class Forms
                         //$html .= Html::label($id . '-' . $idConcurrence, $label);
                         $html .= Html::checkbox($id . '-' . $idConcurrence, $name, $checkbox['value'], $checkbox['label'], $checkbox['description'], false, $checkbox['checked'], $disabled, $readonly, $theme, $extraClasses, $dataAttributes);
                     }
-                        $html .= '<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">' . $inputOptionsArray['description'] . '</p>';
+                        $html .= '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . $inputOptionsArray['description'] . '</p>';
                         $html .= '</div>';
                 }
                 if ($inputType === 'toggle') {
@@ -157,7 +157,7 @@ class Forms
                         }
                     }
                                 $html .= '</select>';
-                                $html .= (isset($inputOptionsArray['description'])) ? '<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">' . $inputOptionsArray['description'] . '</p>' : null;
+                                $html .= (isset($inputOptionsArray['description'])) ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . $inputOptionsArray['description'] . '</p>' : null;
                                 $html .= '</div>';
                                 $html .= '</div>';
                                 $html .= '</div>';
@@ -236,6 +236,10 @@ class Forms
     {
         // Now let's create an array that will hold the form data-attributes
         $formAttributesArray = [];
+
+        if (isset($options['headers'])) {
+            $formAttributesArray['data-headers'] = htmlspecialchars(json_encode($options['headers']));
+        }
 
         // confirmText is optional, if it's not passed, we will use the default text
         if (isset($options['confirmText'])) {

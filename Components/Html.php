@@ -209,7 +209,7 @@ class Html
                 $html .= '<div class="my-4">';
                     $html .= ($label_name !== '') ? self::label($id, $label_name, $requiredOriginal) : '';
                     $html .= '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $dataAttributesString . ' autocomplete="on" />';
-                    $html .= ($description !== '') ? '<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">' . $description . '</p>' : '';
+                    $html .= ($description !== '') ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . $description . '</p>' : '';
                 $html .= '</div>';
                 return $html;
             } else {
@@ -225,7 +225,7 @@ class Html
                 $html .= self::label($id, $label_name, $requiredOriginal);
             }
                 $html .= $inputHtml;
-                $html .= ($description !== '') ? '<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">' . $description . '</p>' : '';
+                $html .= ($description !== '') ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . $description . '</p>' : '';
             $html .= '</div>';
         } else {
             $html .= $inputHtml;
@@ -282,7 +282,7 @@ class Html
             '<div class="my-4">%s%s%s</div>',
             $label_name ? self::label($id, $label_name, $required) : '',
             $textareaHtml,
-            $description ? sprintf('<p class="mt-2 text-sm ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">%s</p>', $description) : ''
+            $description ? sprintf('<p class="mt-2 text-xs ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">%s</p>', $description) : ''
         );
     }
 
@@ -353,9 +353,9 @@ class Html
         $descriptionHtml = '';
         if (!empty($description)) {
             $descriptionHtml = <<<HTML
-    <i data-popover-target="{$id}-info" class="cursor-pointer ml-1 rounded-full border border-gray-300">
+    <i data-popover-target="{$id}-info" class="cursor-pointer ml-1 rounded-full border border-gray-300 p-1">
         i
-        <div data-popover id="{$id}-info" role="tooltip" class="absolute z-10 invisible inline-block w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 {BODY_DARK_COLOR_SCHEME_CLASS}">
+        <div data-popover id="{$id}-info" role="tooltip" class="absolute z-10 invisible inline-block w-64 text-sm font-light text-gray-900 dark:text-gray-400 transition-opacity duration-300 bg-gray-50 dark:bg-gray-900 border border-gray-200 rounded-lg shadow-sm opacity-0 dark:border-gray-600">
             <div class="px-3 py-2">
                 <p>{$description}</p>
             </div>
@@ -600,7 +600,7 @@ class Html
     }
     public static function backButton(string $theme): string
     {
-        return '<button class="back-button mx-auto py-3 px-5 leading-5 text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium text-center focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm">Go Back</button>';
+        return '<button class="back-button my-2 mx-auto py-3 px-5 leading-5 text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium text-center focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm">' . translate('go_back_button_text') . '</button>';
     }
     public static function blockquote($text, $theme): string
     {

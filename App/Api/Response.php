@@ -45,7 +45,7 @@ class Response
                 'requestId' => $requestId,
                 'data' => $data
             ],
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
         );
     }
     public static function responseXml(mixed $data, int $statusCode): string
@@ -113,7 +113,7 @@ class Response
         $responseMethod = $contentType === 'application/xml' ? 'responseXml' : 'responseJson';
 
         // Call the response method dynamically
-        echo self::$responseMethod($data, $statusCode);
+        echo self::{$responseMethod}($data, $statusCode);
         exit();
     }
 }

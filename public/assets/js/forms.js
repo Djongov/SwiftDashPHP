@@ -192,6 +192,18 @@ const handleFormFetch = (form, currentEvent, resultType) => {
         },
         redirect: 'manual'
     };
+    
+    // Let's see if data-headers attribute is set on the form
+    const customHeaders = form.getAttribute('data-headers');
+
+    if (customHeaders) {
+        // Parse the custom headers
+        const headers = JSON.parse(customHeaders);
+        // Add them to the fetch options
+        for (const [key, value] of Object.entries(headers)) {
+            fetchOptions.headers[key] = value;
+        }
+    }
 
     // Adjusting based on method:
     if (formMethod === 'POST') {
@@ -215,6 +227,10 @@ const handleFormFetch = (form, currentEvent, resultType) => {
     } else {
         // For other methods (like PATCH), use FormData (including file uploads)
         fetchOptions.body = formData;
+    }
+    // If the form method is GET, and formData is empty, we need to remove the body
+    if (formMethod === 'GET' && fetchOptions.body.size <= 1) {
+        delete fetchOptions.body;
     }
 
     // Fetch function
@@ -308,7 +324,7 @@ const handleFormFetch = (form, currentEvent, resultType) => {
             // handle error from the front end api processing endpoint
             if (response.error) {
                 newResultDiv.classList.add('text-red-500', 'font-semibold', 'ml-0');
-                newResultDiv.innerHTML = `<p class="text-red-500 font-semibold ml-0">${JSON.stringify(response.error)}</p>`;
+                newResultDiv.innerHTML = `<p class="text-red-500 font-semibold ml-0">${response.error}</p>`;
                 return;
             }
             // handle error from the remote api processing endpoint
@@ -316,7 +332,7 @@ const handleFormFetch = (form, currentEvent, resultType) => {
                 // if response is [object Object] it means it's an error
                 console.log(response.data);
                 newResultDiv.classList.add('text-red-500', 'font-semibold', 'ml-0');
-                newResultDiv.innerHTML = `<p class="text-red-500 font-semibold ml-0">${JSON.stringify(response.data)}</p>`;
+                newResultDiv.innerHTML = `<p class="text-red-500 font-semibold ml-0">${response.data}</p>`;
             } else {
                 // Now successful respones from the API
                 // If data-reload is on the form, instruct to reload the page
@@ -342,7 +358,7 @@ const handleFormFetch = (form, currentEvent, resultType) => {
                         if (typeof response.data === 'object') {
                             newResultDiv.innerHTML = `<pre class="text-sm font-mono text-gray-800 dark:text-gray-400 whitespace-pre-wrap">${result}</pre>`;
                         } else {
-                            newResultDiv.innerHTML = `<p class="font-semibold text-green-500 -ml-4">${result}</p>`;
+                            newResultDiv.innerHTML = `<p class="font-semibold text-green-500 ml-2">${result}</p>`;
                         }
                         return;
                     }

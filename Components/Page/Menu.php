@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Components\Page;
@@ -86,27 +85,41 @@ class Menu
             $uniqueIdCounter++;
         }
         $html .= '</ul>';
+        $html .= self::switcherLanguageLogin($theme, $isAdmin, $usernameArray, true);
         $html .= '</div>';
-        $html .= '<div class="flex items-center ml-4">';
-        // Theme switcher
-        $html .= ThemeSwitcher::render();
-        if (MULTILINGUAL) {
-            $html .= LanguageSwitcher::render($theme);
-        }
-        // Drop down menu for user if logged in
-        if (isset($usernameArray['username']) && $usernameArray['username'] !== null) {
-            $html .= self::dropDownUserMenu($usernameArray['name'], $theme, $isAdmin, $usernameArray['picture'] ?? null);
-            // Otherwise, show the login button
-        } else {
-            $html .= '<a class="inline-flex items-center justify-center px-2 py-2 h-10 w-18 md:w-18 my-2 ml-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="/login">' . translate('login_button_text') . '</a>';
-            $html .= '</div>';
-        }
-        // Close the nav
+        $html .= self::switcherLanguageLogin($theme, $isAdmin, $usernameArray, false);
         $html .= '</nav>';
         return $html;
     }
-    public static function dropDownUserMenu(string $name, string $theme, bool $isAdmin, ?string $picture): string
+    public static function switcherLanguageLogin(string $theme, bool $isAdmin, null|array $usernameArray, bool $visibleOnMobile): string
     {
+        // Set container visibility based on screen size
+        $containerClasses = $visibleOnMobile
+        ? 'flex items-center justify-center gap-2 md:hidden'        // mobile: center horizontally + vertically
+        : 'hidden md:flex md:order-2 items-center justify-center gap-2'; // desktop: same
+
+        $html = '<div class="' . $containerClasses . '">';
+
+        $html .= ThemeSwitcher::render();
+
+        if (MULTILINGUAL) {
+            $html .= LanguageSwitcher::render($theme);
+        }
+
+        if (isset($usernameArray['username']) && $usernameArray['username'] !== null) {
+            $html .= self::dropDownUserMenu($usernameArray['name'], $theme, $isAdmin, $usernameArray['picture']);
+        } else {
+            $html .= '<a class="inline-flex items-center justify-center px-2 py-2 h-10 w-18 md:w-18 my-2 ml-4 text-lg leading-7 text-' . $theme . '-50 bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm" href="/login">'
+                . translate('login_button_text')
+                . '</a>';
+        }
+
+        $html .= '</div>';
+        return $html;
+    }
+    public static function dropDownUserMenu(string $name, string $theme, bool $isAdmin, null|string $picture): string
+    {
+        $dropDownBarId = uniqid();
         $html = '<div class="flex md:order-2">';
             $html .= '<div class="flex items-center justify-between ml-2">';
                 $html .= '<div class="flex items-center">';
@@ -119,7 +132,7 @@ class Menu
                                     </svg>';
         }
                     // Button to open the dropdown
-                    $html .= '<button id="' . uniqid() . '" data-dropdown-toggle="userAvatarDropDownNavBar" class="ml-1 text-sm flex justify-between items-center p-1 w-full font-medium hover:bg-' . $theme . '-500 rounded hover:text-gray-100 truncate max-w-sm cursor-pointer">
+                    $html .= '<button id="' . uniqid() . '" data-dropdown-toggle="' . $dropDownBarId . '" class="ml-1 text-sm flex justify-between items-center p-1 w-full font-medium hover:bg-' . $theme . '-500 rounded hover:text-gray-100 truncate max-w-sm cursor-pointer">
                             ' . $name;
                         // The dropdown arrow
                         $html .= '<svg class="ml-1 w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +142,7 @@ class Menu
                 $html .= '</div>';
             $html .= '</div>';
             // Dropdown menu itself
-            $html .= '<div id="userAvatarDropDownNavBar" class="z-10 w-44 font-normal ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 block hidden" data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="bottom" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(381px, 66px, 0px);">';
+            $html .= '<div id="' . $dropDownBarId . '" class="z-10 w-44 font-normal ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 block hidden" data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="bottom" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(381px, 66px, 0px);">';
             // Open the <ul>
                 $html .= '<ul class="py-1 text-sm ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '" aria-labelledby="dropdownLargeButton">';
                 // Display the admin menus to admin users
