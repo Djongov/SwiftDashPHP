@@ -499,8 +499,8 @@ const loaderString = (text = null) => {
     }
     return `
     <div role="status" class="flex flex-col items-center justify-center">
-        <span class="${srOnlyClass}text-black dark:text-white">Loading data...</span>
-        <svg class="${marginTop}animate-spin h-5 w-5 text-black dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+        <span class="${srOnlyClass}text-white">Loading data...</span>
+        <svg class="${marginTop}animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                     stroke-width="4"></circle>
@@ -1124,4 +1124,49 @@ if (liveSearchInputs.length > 0) {
             });
         });
     })
+}
+
+const shareButton = document.getElementById('share-button');
+
+if (shareButton) {
+    const fallbackToClipboard = async (url) => {
+        try {
+            await navigator.clipboard.writeText(url);
+
+            const successMessage = document.createElement('span');
+            successMessage.innerText = 'Link copied to clipboard! ✅';
+            successMessage.classList.add('text-green-500', 'ml-2');
+            shareButton.parentElement.appendChild(successMessage);
+
+            setTimeout(() => {
+                successMessage.remove();
+            }, 1000);
+        } catch (err) {
+            // this triggers if someone closes the share dialog so let's do nothing
+        }
+    };
+
+    shareButton.addEventListener('click', async () => {
+        const shareData = {
+            title: document.title || 'Price Watcher',
+            text: translate('checkoutThisPrice') || 'Checkout this price!',
+            url: window.location.href
+        };
+
+        if (!navigator.share || !navigator.canShare) {
+            console.warn('Web Share API is not supported in this browser.');
+            await fallbackToClipboard(shareData.url);
+        } else if (navigator.canShare(shareData)) {
+            try {
+                await navigator.share(shareData);
+                console.log('Share was successful.');
+            } catch (error) {
+                console.error('Error sharing:', error);
+                await fallbackToClipboard(shareData.url);
+            }
+        } else {
+            console.warn('Sharing is not supported with the provided data.');
+            await fallbackToClipboard(shareData.url);
+        }
+    });
 }

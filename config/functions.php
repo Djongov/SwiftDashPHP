@@ -89,11 +89,14 @@ function getApiKeyFromHeaders()
         return null; // or handle missing API key appropriately
     }
 }
-function translate(string $key, array $replace = []): string
+function translate(string $key, array $replace = [], $lang = DEFAULT_LANG): string
 {
     static $translations = [];
 
-    $lang = $_SESSION['lang'] ?? DEFAULT_LANG; // Default to DEFAULT_LANG
+    // If language in Session is set, use it
+    if (isset($_SESSION['lang']) && $_SESSION['lang'] !== DEFAULT_LANG) {
+        $lang = $_SESSION['lang'];
+    }
 
     // Get project root (parent of public/)
     $projectRoot = ROOT;

@@ -20,7 +20,7 @@ if (!$isAdmin) {
 
 // Get the file path from the environment variable
 if (!isset($_ENV['ACCESS_LOGS'])) {
-    echo Alerts::danger('No access logs directory (' . $_ENV['ACCESS_LOGS'] . ') set in .env file');
+    echo Alerts::danger('No access logs directory set in .env file (ACCESS_LOGS)');
     return;
 }
 

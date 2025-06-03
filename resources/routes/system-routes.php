@@ -33,10 +33,6 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     // Admin
     $router->addRoute('GET', '/adminx', [$viewsFolder . '/admin/index.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/server', [$viewsFolder . '/admin/server.php', $metadataArray['admin']]);
-    $router->addRoute('GET', '/adminx/users', [$viewsFolder . '/admin/users.php', $metadataArray['admin']]);
-    $router->addRoute('GET', '/adminx/api-access-log', [$viewsFolder . '/admin/api-access-log.php', $metadataArray['admin']]);
-    $router->addRoute('GET', '/adminx/cache', [$viewsFolder . '/admin/cache.php', $metadataArray['admin']]);
-    $router->addRoute('GET', '/adminx/system-logs', [$viewsFolder . '/admin/system-logs.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/csp-reports', [$viewsFolder . '/admin/csp/csp-reports.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/csp-approved-domains', [$viewsFolder . '/admin/csp/csp-approved-domains.php', $metadataArray['admin']]);
     $router->addRoute(['GET', 'POST'], '/adminx/access-logs', [$viewsFolder . '/admin/access-logs.php', $metadataArray['admin']]);
@@ -44,6 +40,7 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('GET', '/adminx/queries', [$viewsFolder . '/admin/queries.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/mailer', [$viewsFolder . '/admin/mailer.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/db-table', [$viewsFolder . '/admin/db-table.php', $metadataArray['admin']]);
 
     // Admin API
     $router->addRoute('POST', '/api/admin/csp/add', [$viewsFolder . '/api/admin/csp/add.php']);

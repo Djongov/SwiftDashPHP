@@ -519,7 +519,7 @@ const initiateGenericForms = () => {
                     event.preventDefault();
                 }
                 // Disable the submitter as someone can click multiple times sending multiple requests
-                event.submitter.disabled = true;
+                //event.submitter.disabled = true;
                 // Check the result type (text or html) if declared in the form
                 let resultType = form.getAttribute('data-result');
                 // Remember the initial button text

@@ -75,9 +75,10 @@ if (str_starts_with($query, 'SELECT')) {
         echo '</div>';
     }
 } else {
-    if (empty($data)) {
-        echo Alerts::danger('No rows changed');
+    $affectedRows = $stmt->rowCount();
+    if ($affectedRows === 0) {
+        echo Alerts::warning('Query executed successfully, but no rows were affected');
     } else {
-        echo Alerts::success('Query executed successfully. ' . $stmt->rowCount() . ' rows affected');
+        echo Alerts::success('Query executed successfully. ' . $affectedRows . ' rows affected');
     }
 }

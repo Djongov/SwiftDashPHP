@@ -616,4 +616,8 @@ class Html
         $html .= '</ul>';
         return $html;
     }
+    public static function shareButton(string $theme) : string
+    {
+        return '<button id="share-button" class="share-button my-2 mx-auto py-3 px-5 leading-5 text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium text-center focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm">' . translate('share_button_text') . '</button>';
+    }
 }

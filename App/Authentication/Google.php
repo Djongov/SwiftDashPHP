@@ -102,7 +102,17 @@ class Google
             // Verify the token
             $client = new Client(['client_id' => GOOGLE_CLIENT_ID]);
             $client->setHttpClient(new \GuzzleHttp\Client(['verify' => CURL_CERT, 'timeout' => 60, 'http_errors' => false]));
-            $payload = $client->verifyIdToken($idToken);
+            try {
+                // Verify the ID token
+                $payload = $client->verifyIdToken($idToken);
+            } catch (\Exception $e) {
+                SystemLog::write('Error verifying token for new token: ' . $e->getMessage() . '. Token: ' . $idToken, 'Google Auth');
+                if (ERROR_VERBOSE) {
+                    Response::output('Error verifying token new token: ' . $e->getMessage() . '. Token: ' . $idToken, 500);
+                } else {
+                    Response::output('Error verifying token', 500);
+                }
+            }
             // If token is not valid, return false
             if (!$payload) {
                 JWT::handleValidationFailure();
@@ -123,7 +133,16 @@ class Google
                 // Replace the token with the current one but verify it first
                 $client = new Client(['client_id' => GOOGLE_CLIENT_ID]);
                 $client->setHttpClient(new \GuzzleHttp\Client(['verify' => CURL_CERT, 'timeout' => 60, 'http_errors' => false]));
-                $payload = $client->verifyIdToken($idToken);
+                try {
+                    $payload = $client->verifyIdToken($idToken);
+                } catch (\Exception $e) {
+                    SystemLog::write('Error verifying token for existing: ' . $e->getMessage() . '. Token: ' . $idToken, 'Google Auth');
+                    if (ERROR_VERBOSE) {
+                        Response::output('Error verifying token for existing: ' . $e->getMessage() . '. Token: ' . $idToken, 500);
+                    } else {
+                        Response::output('Error verifying token', 500);
+                    }
+                }
                 IdTokenCache::update($idToken, JWT::parseTokenPayLoad($idToken)['email']);
                 SystemLog::write('Token updated because there was a different between token expiration (' . $tokenExpiration . ') and cached token expiration (' . $cachedTokenExpiration . ')', 'Google Auth');
                 //echo 'Token updated';
