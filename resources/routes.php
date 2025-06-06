@@ -18,6 +18,11 @@ return function (RouteCollector $router) {
 
     $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
 
+    // remove query string from title
+    if (strpos($title, '?') !== false) {
+        $title = substr($title, 0, strpos($title, '?'));
+    }
+
     $genericMetaDataArray = [
         'title' => (!empty($title)) ? $title : translate('home'),
         'description' => GENERIC_DESCRIPTION,
