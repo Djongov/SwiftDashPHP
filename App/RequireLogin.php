@@ -32,7 +32,7 @@ class RequireLogin
             $tokenPayload = JWT::parseTokenPayLoad(AuthToken::get());
 
             // If the issuer is $_SERVER['HTTP_HOST'], we are dealing with a local login
-            if ($tokenPayload['iss'] === $_SERVER['HTTP_HOST']) {
+            if ($tokenPayload['iss'] === JWT_ISSUER) {
                 // Check if valid
                 if (JWT::checkToken(AuthToken::get())) {
                     $provider = 'local';

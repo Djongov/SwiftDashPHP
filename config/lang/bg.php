@@ -4,6 +4,8 @@ return [
     'site_title' => 'SwiftDashPHP',
     'docs_menu_name' => 'Документация',
     'please' => 'моля',
+    'go_back_button_text' => 'Назад',
+    'share_button_text' => 'Сподели',
     // Login related
     'login' => 'Вход',
     'sign_up' => 'регистрация',
@@ -23,6 +25,7 @@ return [
     'if_you_dont_have_account' => 'Ако нямате акаунт',
     'contact_admin' => 'Моля, свържете се с вашия администратор',
     'no_logins_available' => 'Няма налични методи за вход. Проверете конфигурацията',
+    'if_you_dont_have_account_contact_admin' => 'Ако нямате акаунт, моля, свържете се с вашия администратор',
     // Register page
     'register' => 'Регистрация',
     'manual_registration_disabled' => 'Ръчната регистрация е деактивирана. Моля, свържете се с вашия администратор.',
@@ -74,7 +77,7 @@ return [
 
     'api_response_missing_csrf_token' => 'Липсва CSRF токен',
     'api_response_missing_user_id' => 'Липсва потребителски ID',
-
+    'api_response_not_logged_in' => 'Не сте влезли',
     // Cookie consent
     'cookie_consent_welcome_text' => 'Използваме бисквитки, за да подобрим вашето изживяване. С продължаването на използването на сайта, вие се съгласявате с използването на бисквитки.',
     'session_cookie' => '<b>сесийна бисквитка</b> – Тази бисквитка е необходима за правилното функциониране на уебсайта. Използва се за поддържане на сесията и запомняне на езиковите настройки.',

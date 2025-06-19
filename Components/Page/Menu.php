@@ -106,7 +106,6 @@ class Menu
         if (MULTILINGUAL) {
             $html .= LanguageSwitcher::render($theme);
         }
-
         if (isset($usernameArray['username']) && $usernameArray['username'] !== null) {
             $html .= self::dropDownUserMenu($usernameArray['name'], $theme, $isAdmin, $usernameArray['picture']);
         } else {

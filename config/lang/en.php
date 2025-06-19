@@ -4,6 +4,8 @@ return [
     'site_title' => 'SwiftDashPHP',
     'docs_menu_name' => 'Docs',
     'please' => 'please',
+    'go_back_button_text' => 'Go back',
+    'share_button_text' => 'Share',
     // Login related
     'login' => 'Login',
     'sign_up' => 'sign up',
@@ -23,6 +25,7 @@ return [
     'if_you_dont_have_account' => 'If you do not have an account',
     'contact_admin' => 'Please contact your administrator',
     'no_logins_available' => 'No login methods are available. Check the configuration',
+    'if_you_dont_have_account_contact_admin' => 'If you do not have an account, please contact your administrator',
     // Register page
     'register' => 'Register',
     'manual_registration_disabled' => 'Manual registration is disabled. Please contact your administrator.',
@@ -57,7 +60,8 @@ return [
     'change_password_form_small_text' => 'Successfully changing the password will log you out of the app. You will need to login again with your new password.',
     'forget_about_me' => 'Forget about me',
     'forget_about_me_description' => 'This will delete your account in our database along with any data we have about your account.',
-    'forget_about_me_modal_text' => 'Are you sure you want to delete your user? This will delete your username from our database. Your user will be re-created if you login again to the app.',
+    'forget_about_me_modal_text' => 'Are you sure you want to delete your user?
+    This will delete your username from our database. This will also remove you from organization where you are a member. This will NOT remove any logs that have your name in it. Your user will be re-created if you login again to the app.',
     'delete_user_button_text' => 'Delete User',
     // DataGrid
     'delete_selected_button_text' => 'Delete Selected',
@@ -71,5 +75,13 @@ return [
     'user_api_response_user_updated' => 'User updated',
     'user_api_response_user_cannot_delete_another_user' => 'You cannot delete another user',
     'api_response_missing_csrf_token' => 'Missing CSRF Token',
-    'api_response_missing_user_id' => 'Missing User id'
+    'api_response_missing_user_id' => 'Missing User id',
+    'api_response_not_logged_in' => 'Not logged in',
+    // Cookie consent
+    'cookie_consent_welcome_text' => 'We use cookies to enhance your experience. By continuing to use our site, you agree to our use of cookies.',
+    'session_cookie' => '<b>session cookie</b> - This cookie is essential for the website to function properly. They are used to maintain the session and remember language settings.',
+    'consent_cookie' => '<b>consent cookie</b> - This cookie is used to remember the user\'s choice about cookies on the website. Where users have previously indicated a preference, that user\'s preference will be stored in this cookie.',
+    'cookie_consent_accept_button' => 'Accept',
+    'cookie_consent_decline_button' => 'Leave',
+    'cookie_consent_learn_more_button' => 'Learn more',
 ];
