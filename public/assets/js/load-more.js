@@ -16,7 +16,12 @@ document.addEventListener('DOMContentLoaded', function () {
 function loadMoreProducts() {
     const storeName = getStoreNameFromUrl();
 
-    fetch(`/api/products/load-products?store=${storeName}&page=${currentPage + 1}&limit=${limitPerPage}`)
+    // Let's check if sort_by and sort_order are present in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sortBy = urlParams.get('sort_by') || 'created_at';
+    const sortOrder = urlParams.get('sort_order') || 'desc';
+
+    fetch(`/api/products/load-products?store=${storeName}&page=${currentPage + 1}&limit=${limitPerPage}&sort_by=${sortBy}&sort_order=${sortOrder}`)
         .then(response => response.text())
         .then(html => {
             loadMoreButton.innerText = translate('loadMore'); // Reset button text

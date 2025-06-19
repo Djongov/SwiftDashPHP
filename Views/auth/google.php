@@ -77,6 +77,20 @@ if ($userModel->exists($idTokenArray['email'])) {
     $user->create($idTokenArray, 'google', false);
 }
 
+// Issue a local JWT token if not using remote ID token
+if (!USE_REMOTE_ID_TOKEN) {
+    $idToken = JWT::generateToken([
+        'provider' => 'google',
+        'username' => $idTokenArray['email'],
+        'name' => $idTokenArray['name'],
+        'email' => $idTokenArray['email'],
+        'roles' => [
+            $userDetailsArray['role']
+        ],
+        'last_ip' => currentIP()
+    ], JWT_TOKEN_EXPIRY);
+}
+
 AuthToken::set($idToken);
 
 if (str_contains($state, 'login') || str_contains($state, 'logout')) {

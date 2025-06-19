@@ -7,7 +7,7 @@ define("FROM_NAME", 'No Reply');
 define("ADMINISTRATOR_EMAIL", "");
 
 define('MULTILINGUAL', true);
-define('DEFAULT_LANG', 'bg');
+define('DEFAULT_LANG', 'en');
 
 // Site title, Goes on footer and main menu header
 define("SITE_TITLE", translate('site_title'));

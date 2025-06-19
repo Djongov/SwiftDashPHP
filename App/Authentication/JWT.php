@@ -8,6 +8,7 @@ use App\Utilities\General;
 use App\Api\Response;
 use App\Core\Session;
 use App\Authentication\AuthToken;
+use Models\Core\DBCache;
 
 class JWT
 {
@@ -15,10 +16,12 @@ class JWT
     public static function generateToken(array $claims, $expiration = JWT_TOKEN_EXPIRY): string
     {
         // First let's make sure that the claims structure is correct
+        if (isset($claims['iss'])) {
+            throw new \Exception('iss claim is not allowed in the JWT claims. It is set automatically by the system.');
+        }
 
         // Required claims
         $requiredClaims = [
-            'iss',
             'username',
             'name',
             'roles',
@@ -35,6 +38,8 @@ class JWT
         if (!is_array($claims['roles'])) {
             throw new \Exception('Roles claim needs to be an array');
         }
+
+        $claims['iss'] = JWT_ISSUER; // Set the issuer claim
 
         $claims['exp'] = time() + $expiration;
 
@@ -214,8 +219,10 @@ class JWT
     public static function handleValidationFailure(): bool
     {
         if (self::isTokenSet()) {
-            AuthToken::unset();
+            // Destroy the session and delete the token from cache
             Session::reset();
+            //DBCache::delete('id_token', self::extractUserName(AuthToken::get()));
+            AuthToken::unset();
             return false;
         } else {
             return false;

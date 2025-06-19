@@ -47,7 +47,9 @@ function showGroupedProductsModal() {
                         ${translate('groupNameAddProductButton')}
                     </button>
                     <!-- Placeholder for added products -->
-                    <ul id="grouped-products-list" class="space-y-2"></ul>
+                    <div class="max-h-72 overflow-auto">
+                        <ul id="grouped-products-list" class="space-y-2"></ul>
+                    </div>
                 </div>
 
                 <!-- Modal footer -->
@@ -320,22 +322,23 @@ function showEditGroupedProductsModal(groupData) {
                             </svg>
                             ${translate('groupNameAddProductButton')}
                         </button>
-
-                        <ul id="grouped-products-list" class="space-y-2">
-                            ${Object.values(groupData.products).map(product => `
-                                <li class="bg-gray-100 dark:bg-gray-800 p-2 rounded space-y-2">
-                                    <div class="flex items-center space-x-2">
-                                        <input type="hidden" name="product_ids[]" value="${product.id}" />
-                                        <img src="${product.image}" alt="${product.title}" class="w-12 h-12 object-cover rounded border border-gray-300 dark:border-gray-600" />
-                                        <span class="text-gray-900 dark:text-white text-sm">${product.title}</span>
-                                        <span class="text-gray-600 dark:text-gray-400 text-md">(${product.store})</span>
-                                        <span class="text-red-600 font-bold">${product.price}</span>
-                                        <span class="text-md font-bold text-red-600">${product.price_eur}</span>
-                                        <button type="button" class="remove-product text-red-600 hover:text-red-800 text-sm">${translate('remove')}</button>
-                                    </div>
-                                </li>
-                            `).join('')}
-                        </ul>
+                        <div class="max-h-72 overflow-auto">
+                            <ul id="grouped-products-list" class="space-y-2">
+                                ${Object.values(groupData.products).map(product => `
+                                    <li class="bg-gray-100 dark:bg-gray-800 p-2 rounded space-y-2">
+                                        <div class="flex md:flex-row flex-col flex-wrap items-center space-x-2">
+                                            <input type="hidden" name="product_ids[]" value="${product.id}" />
+                                            <img src="${product.image}" alt="${product.title}" class="w-12 h-12 object-cover rounded border border-gray-300 dark:border-gray-600" />
+                                            <span class="text-gray-900 dark:text-white text-sm">${product.title}</span>
+                                            <span class="text-gray-600 dark:text-gray-400 text-md">(${product.store})</span>
+                                            <span class="text-red-600 font-bold">${product.price} лв.</span>
+                                            <span class="text-md font-bold text-red-600">${product.price_eur} €</span>
+                                            <button type="button" class="remove-product text-red-600 hover:text-red-800 text-sm">${translate('remove')}</button>
+                                        </div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-start p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">

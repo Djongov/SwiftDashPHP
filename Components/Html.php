@@ -12,9 +12,9 @@ class Html
             array_push($extraClasses, 'text-center');
         }
         if (!$extraClasses) {
-            return '<h1 class="mx-2 my-2 text-2xl md:text-3xl lg:text-4xl font-bold leading-none tracking-tight ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">' . $text . '</h1>';
+            return '<h1 class="mx-2 my-2 text-2xl md:text-3xl lg:text-4xl font-bold leading-none ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">' . $text . '</h1>';
         } else {
-            return '<h1 class="mx-2 my-2 text-2xl md:text-3xl lg:text-4xl font-bold leading-none tracking-tight ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' ' . implode(' ', $extraClasses) . '">' . $text . '</h1>';
+            return '<h1 class="mx-2 my-2 text-2xl md:text-3xl lg:text-4xl font-bold leading-none ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' ' . implode(' ', $extraClasses) . '">' . $text . '</h1>';
         }
     }
     public static function h2($text, $center = false, $extraClasses = []): string
@@ -24,9 +24,9 @@ class Html
         }
 
         if (!$extraClasses) {
-            return '<h2 class="mx-2 my-2 text-xl md:text-2xl lg:text-3xl font-bold leading-none tracking-tight ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">' . $text . '</h2>';
+            return '<h2 class="mx-2 my-2 text-xl md:text-2xl lg:text-3xl font-bold leading-none ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '">' . $text . '</h2>';
         } else {
-            return '<h2 class="mx-2 my-2 text-xl md:text-2xl lg:text-3xl font-bold leading-none tracking-tight ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' ' . implode(' ', $extraClasses) . '">' . $text . '</h2>';
+            return '<h2 class="mx-2 my-2 text-xl md:text-2xl lg:text-3xl font-bold leading-none ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' ' . implode(' ', $extraClasses) . '">' . $text . '</h2>';
         }
     }
     public static function h3($text, $center = false, $extraClasses = []): string
@@ -440,6 +440,24 @@ class Html
     public static function selectInputClasses($theme): string
     {
         return 'ml-2 p-1 text-sm text-gray-900 border outline-none border-gray-300 rounded ' . BODY_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' focus:ring-' . $theme . '-500 focus:border-' . $theme . '-500  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-' . $theme . '-500 dark:focus:border-' . $theme . '-500';
+    }
+    public static function select(array $options, string $name, string $theme, string $selectedValue = ''): string
+    {
+        // First check if $options array is associative or indexed
+        if (array_values($options) === $options) {
+            // Indexed array, convert to associative
+            $options = array_combine($options, $options);
+        }
+        $html = '<select name="' . $name . '" class="' . self::selectInputClasses($theme) . '">';
+        foreach ($options as $value => $label) {
+            if ($value == $selectedValue) {
+                $html .= '<option value="' . $value . '" selected>' . $label . '</option>';
+                continue;
+            }
+            $html .= '<option value="' . $value . '">' . $label . '</option>';
+        }
+        $html .= '</select>';
+        return $html;
     }
     public static function badge($text, $theme): string
     {

@@ -13,19 +13,20 @@ $destinationUrl = $_GET['destination'] ?? '/';
 if ($destinationUrl === '/logout') {
     $destinationUrl = '/';
 }
-
 if (AuthToken::get() !== null) {
     $idToken = JWT::parseTokenPayLoad(AuthToken::get());
     // Decide whether it is a local login or AzureAD login
-    if ($idToken['iss'] === $_SERVER['HTTP_HOST']) {
+    if ($idToken['iss'] === JWT_ISSUER) {
         // Check if valid
         if (JWT::checkToken(AuthToken::get())) {
             header('Location: ' . $destinationUrl);
+            exit();
         }
     }
     // Check if valid
     if ($idToken['iss'] === 'https://login.microsoftonline.com/' . ENTRA_ID_TENANT_ID . '/v2.0' && AzureAD::check(AuthToken::get())) {
         header('Location: ' . $destinationUrl);
+        exit();
     }
 }
 

@@ -147,10 +147,12 @@ $files = array_map(
 );
 
 // Display the files
-echo '<div class="flex md:flex-row flex-col items-center justify-center m-4">';
+echo '<div class="flex md:flex-row flex-col flex-wrap items-center justify-center m-4">';
 foreach ($files as $file) {
-    echo '<div class="bg-gray-100 dark:bg-gray-900 max-w-lg mx-4 p-2 my-2 flex flex-col justify-center items-center border border-gray-900 dark:border-gray-400 rounded-lg">';
-        echo Html::a($file['file'], '?file=' . $file['file'], $theme, '_self', ['ml-4']);
+    $isCurrentFile = isset($_GET['file']) && $file['file'] === $_GET['file'];
+    $borderColor = ($isCurrentFile) ? 'border-2 border-red-500' : 'border border-gray-900 dark:border-gray-400';
+    echo '<div class="bg-gray-100 dark:bg-gray-900 max-w-lg mx-4 p-2 my-2 flex flex-col justify-center items-center ' . $borderColor . ' rounded-lg">';
+        echo Html::a($file['file'], '?file=' . $file['file'] . '#log', $theme, '_self', ['ml-4']);
         echo Html::p(date('Y-m-d H:i:s', $file['time']), ['text-center']);
         // Calculate if it is bytes, KB or MB
         $delimiter = 1000000;
@@ -174,7 +176,7 @@ foreach ($files as $file) {
             ],
             'theme' => 'red',
             'action' => '?delete',
-            'reloadOnSubmit' => true,
+            'redirectOnSubmit' => '/adminx/access-logs',
             "submitButton" => [
                 "text" => "Submit",
                 'style' => '&#10060;',
@@ -217,7 +219,7 @@ if (!$handle) {
 }
 
 // Read the file
-//$contents = fread($handle, filesize($filePath . '/' . $file));
+echo '<h2 id="log" class="text-center">Log file: ' . htmlspecialchars($file) . '</h2>';
 
 // If Windows, we parse the IIS log
 if ($os === 'windows') {

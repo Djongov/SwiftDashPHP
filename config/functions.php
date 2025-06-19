@@ -73,6 +73,10 @@ function currentUrl()
 {
     return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 }
+function currentProtocolAndHost()
+{
+    return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+}
 function getApiKeyFromHeaders()
 {
     $headers = getallheaders();

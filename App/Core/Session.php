@@ -36,7 +36,10 @@ class Session
     public static function reset(): void
     {
         session_unset();
-        session_destroy();
+        // Only destroy the session if it is active
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
         $_SESSION = [];
         // Delete the session cookie
         if (ini_get('session.use_cookies')) {
