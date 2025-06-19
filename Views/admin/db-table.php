@@ -24,9 +24,9 @@ $pdo = $db->getConnection();
 // Check the database driver to determine the appropriate SQL syntax
 $dbTables = $db->getTableNames();
 
-echo '<form method="get" action="" class="my-8 max-w-md mx-auto p-4 bg-white rounded-xl shadow-md space-y-4">';
+echo '<form method="get" action="" class="my-8 max-w-md mx-auto p-4 text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-900 rounded-xl shadow-md space-y-4">';
     echo '<div class="flex flex-col">';
-        echo '<label for="table" class="mb-1 text-sm font-medium text-gray-700">Select Table:</label>';
+        echo '<label for="table" class="mb-1 text-sm font-medium">Select Table:</label>';
         echo '<select name="table" class="' . Html::selectInputClasses($theme) . '">';
             echo '<option value="">-- Select a table --</option>';
             foreach ($dbTables as $table) {

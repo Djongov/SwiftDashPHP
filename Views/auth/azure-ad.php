@@ -43,9 +43,6 @@ if ($idTokenArray['iss'] === 'https://login.live.com' || $idTokenArray['iss'] ==
         Response::output('Invalid token', 400);
     }
 }
-
-// Let's set the "auth_cookie" and put the id token as it's value, set the expiration date to when the token should expire and the rest of the cookie settings
-AuthToken::set($idToken);
 // instantiate the user class
 $user = new User();
 $userModel = new UserModel();
@@ -77,6 +74,22 @@ if ($userModel->exists($idTokenArray['preferred_username'])) {
         Response::output('Could not create user', 500);
     }
 }
+
+// Issue a local JWT token if not using remote ID token
+if (!USE_REMOTE_ID_TOKEN) {
+    $idToken = JWT::generateToken([
+        'provider' => 'azure',
+        'username' => $idTokenArray['preferred_username'],
+        'name' => $idTokenArray['name'],
+        'email' => $idTokenArray['email'],
+        'roles' => [
+            $userDetailsArray['role']
+        ],
+        'last_ip' => currentIP()
+    ], JWT_TOKEN_EXPIRY);
+}
+// Let's set the "auth_cookie" and put the id token as it's value, set the expiration date to when the token should expire and the rest of the cookie settings
+AuthToken::set($idToken);
 
 $destinationUrl = $_POST['state'] ?? null;
 // Valid destination, proceed to redirect to the destination

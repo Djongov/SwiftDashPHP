@@ -14,17 +14,8 @@ define(
         ],
         'link' => '/adminx/server',
     ],
-    'System Logs' => [
-        'link' => '/adminx/system-logs',
-    ],
-    'Users' => [
-        'link' => '/adminx/users',
-    ],
-    'API Access Log' => [
-        'link' => '/adminx/api-access-log',
-    ],
-    'Cache' => [
-        'link' => '/adminx/cache',
+    'DB Table' => [
+        'link' => '/adminx/db-table',
     ],
     'CSP' => [
         'link' => [

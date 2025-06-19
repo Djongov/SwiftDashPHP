@@ -94,7 +94,7 @@ class Checks
         if ($this->userVars['usernameArray']['provider'] === 'local' && !JWT::checkToken(AuthToken::get())) {
             Response::output('Invalid local token', $this->defaultStatusCode);
         }
-        if ($this->userVars['usernameArray']['provider'] === 'azure' && !AzureAD::check(AuthToken::get())) {
+        if ($this->userVars['usernameArray']['provider'] === 'azure' && USE_REMOTE_ID_TOKEN && !AzureAD::check(AuthToken::get())) {
             Response::output('Invalid Azure token', $this->defaultStatusCode);
         }
     }
