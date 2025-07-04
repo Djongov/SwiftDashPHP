@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'site_title' => 'SwiftDashPHP',
     'docs_menu_name' => 'Docs',
     'please' => 'please',
     'go_back_button_text' => 'Go back',

@@ -5,23 +5,49 @@ declare(strict_types=1);
 namespace Models\ContentSecurityPolicy;
 
 use App\Database\DB;
-use App\Logs\SystemLog;
 use App\Exceptions\ContentSecurityPolicyExceptions;
 
 class CSPApprovedDomains
 {
+    protected DB $db;
+    public function __construct()
+    {
+        $this->db = new DB();
+    }
     public function domainExist(string $domain): bool
     {
-        $db = new DB();
-        $pdo = $db->getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM csp_approved_domains WHERE domain=?");
+        $pdo = $this->db->getConnection();
+        $query = "SELECT * FROM csp_approved_domains WHERE domain=?";
+        $stmt = $pdo->prepare($query);
+
         try {
             $stmt->execute([$domain]);
             $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             return count($result) > 0;
         } catch (\PDOException $e) {
-            SystemLog::write($e->getMessage(), 'CSP Approved Domains');
-            throw (new ContentSecurityPolicyExceptions())->genericError($e->getMessage(), 500);
+            if (ERROR_VERBOSE) {
+                throw (new ContentSecurityPolicyExceptions())->genericError($e->getMessage(), 500);
+            } else {
+                throw (new ContentSecurityPolicyExceptions())->genericError('Error checking CSP approved domain', 500);
+            }
+        }
+    }
+    public function getAll() : array
+    {
+        $pdo = $this->db->getConnection();
+        $query = "SELECT * FROM csp_approved_domains";
+        $stmt = $pdo->prepare($query);
+
+        try {
+            $stmt->execute();
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            if (ERROR_VERBOSE) {
+                throw (new ContentSecurityPolicyExceptions())->genericError($e->getMessage(), 500);
+            } else {
+                throw (new ContentSecurityPolicyExceptions())->genericError('Error fetching CSP approved domains', 500);
+            }
+            return [];
         }
     }
 }

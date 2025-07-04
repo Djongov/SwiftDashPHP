@@ -13,47 +13,73 @@ class AccessToken
         $cachedToken = DBCache::get('access_token', $username);
         return ($cachedToken) ? $cachedToken : [];
     }
-    public static function get(string $username, $scope = 'https://graph.microsoft.com/user.read'): string
+    public static function isTokenExpired(string $expiration): bool
+    {
+        $exp = new \DateTime($expiration);
+        $now = new \DateTime();
+        return $exp < $now;
+    }
+    public static function isScopeMatchingAudience(string $aud, string $scope): bool
+    {
+        $scopes = explode(' ', $scope);
+        $aud = rtrim($aud, '/');
+
+        foreach ($scopes as $s) {
+            $s = trim($s);
+
+            if ($s === $aud) {
+                return true;
+            }
+
+            if ($s === $aud . '/.default') {
+                return true;
+            }
+
+            if (str_starts_with($s, $aud . '/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    public static function get(string $username, string $scope): string
     {
         $cachedToken = self::dbGet($username);
         if ($cachedToken) {
             // Let's check if the token is expired
-            if ($cachedToken['expiration'] < date('Y-m-d H:i:s')) {
+            if (self::isTokenExpired($cachedToken['expiration'])) {
                 // If it is expired, let's delete it
                 try {
                     DBCache::delete('access_token', $username);
                 } catch (\Exception $e) {
-                    throw new \Exception('Error deleting token from cache');
+                    throw new \Exception($e->getMessage());
                 }
                 // And fetch a new one
                 $data = [
                     'state' => $_SERVER['REQUEST_URI'],
                     'username' => $username,
+                    'scope' => $scope
                 ];
-                if ($scope !== 'https://graph.microsoft.com/user.read') {
-                    $data['scope'] = $scope;
-                }
+                
                 header('Location: /auth/azure/request-access-token?' . http_build_query($data));
                 exit();
             } else {
                 // Now that we know it's not expired, let's parse it so we can see if it's the right scope
                 $parsedToken = JWT::parseTokenPayLoad($cachedToken['value']);
                 // If it is a mslive token it will not be decoded
-                if ($parsedToken['aud'] !== $scope) {
+                if (!self::isScopeMatchingAudience($parsedToken['aud'], $scope)) {
                     // If the audience is not the same, let's delete it
                     try {
                         DBCache::delete('access_token', $username);
                     } catch (\Exception $e) {
-                        throw new \Exception('Error deleting token from cache');
+                        throw new \Exception($e->getMessage());
                     }
                     // And fetch a new one
                     $data = [
                         'state' => $_SERVER['REQUEST_URI'],
                         'username' => $username,
+                        'scope' => $scope
                     ];
-                    if ($scope !== 'https://graph.microsoft.com/user.read') {
-                        $data['scope'] = $scope;
-                    }
                     header('Location: /auth/azure/request-access-token?' . http_build_query($data));
                     exit();
                 } else {
@@ -68,15 +94,14 @@ class AccessToken
             $data = [
                 'state' => $_SERVER['REQUEST_URI'],
                 'username' => $username,
+                'scope' => $scope
             ];
-            if ($scope !== 'https://graph.microsoft.com/user.read') {
-                $data['scope'] = $scope;
-            }
+            
             header('Location: /auth/azure/request-access-token?' . http_build_query($data));
             exit();
         }
     }
-    public static function save(string $token, string $username): string
+    public static function save(string $token, string $username): int|string
     {
         $parsedToken = JWT::parseTokenPayLoad($token);
 
@@ -89,32 +114,29 @@ class AccessToken
         }
 
         $expiration = date('Y-m-d H:i:s', $parsedToken['exp']);
-
+        $existingToken = self::dbGet($username);
         // If the username doesn't have an access token
-        if (!self::dbGet($username)) {
+        if (!$existingToken) {
             try {
                 return DBCache::create($token, $expiration, 'access_token', $username);
             } catch (\Exception $e) {
-                throw new \Exception('Error saving token to cache');
+                throw new \Exception($e->getMessage());
             }
         } else {
-            // Let's check if the audience is the same
-            $tokenInCache = self::dbGet($username);
-            $parsedTokenInCache = JWT::parseTokenPayLoad($tokenInCache['value']);
-            if (!$parsedToken['aud']) {
-                $parsedToken['aud'] = 'https://graph.microsoft.com';
-            }
-            if ($parsedToken['aud'] === $parsedTokenInCache['aud']) {
+            // If they have an access token, let's check if the aud is proper.
+            $existingTokenParsed = JWT::parseTokenPayLoad($existingToken['value']);
+            if ($parsedToken['aud'] === $existingTokenParsed['aud']) {
                 try {
                     return DBCache::update($token, $expiration, 'access_token', $username);
                 } catch (\Exception $e) {
-                    throw new \Exception('Error updating token in cache');
+                    throw new \Exception($e->getMessage());
                 }
             } else {
+                // If the aud is not the same, let's create a new one
                 try {
                     return DBCache::create($token, $expiration, 'access_token', $username);
                 } catch (\Exception $e) {
-                    throw new \Exception('Error saving token to cache');
+                    throw new \Exception($e->getMessage());
                 }
             }
         }

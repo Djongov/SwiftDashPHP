@@ -37,7 +37,7 @@ if (!empty($usernameArray['picture']) && isset($token['picture'])) {
 } elseif ($usernameArray['picture'] === null || empty($usernameArray['picture'])) {
     // If Azure
     if ($usernameArray['provider'] === 'azure' || $usernameArray['provider'] === 'mslive') {
-        $accessToken = AccessToken::get($usernameArray['username'], 'https://graph.microsoft.com');
+        $accessToken = AccessToken::get($usernameArray['username'], 'https://graph.microsoft.com'); // 'https://graph.microsoft.com/user.read'
         $client = new HttpClient('https://graph.microsoft.com/v1.0/me/photo/$value');
         $response = $client->call('GET', '', [], $accessToken, false, ['Accept: image/jpeg'], false, false);
         $userController = new Controllers\User();

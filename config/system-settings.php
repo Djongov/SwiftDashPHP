@@ -7,8 +7,8 @@ $phpIniSettings = [
     'memory_limit' => '512M',
     'post_max_size' => '12M',
     'upload_max_filesize' => '12M',
-    'max_execution_time' => 300,
-    'max_input_time' => 300,
+    'max_execution_time' => 60,
+    'max_input_time' => 60,
 ];
 
 foreach ($phpIniSettings as $setting => $value) {

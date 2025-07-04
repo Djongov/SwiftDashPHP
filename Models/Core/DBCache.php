@@ -28,7 +28,7 @@ class DBCache implements DBCacheInterface
         try {
             $stmt->execute([$type, $uniqueProperty]);
             $array = $stmt->fetch(\PDO::FETCH_ASSOC);
-            SystemLog::write('DBCache get: ' . $type . ' ' . $uniqueProperty, 'DBCache');
+            #SystemLog::write('DBCache get: ' . $type . ' ' . $uniqueProperty, 'DBCache');
             if (!$array) {
                 return [];
             } else {

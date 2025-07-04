@@ -66,12 +66,49 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
 
     $request = $client->call('POST', '', $postData, null, false, [], true);
 
-    if (isset($request['response'])) {
-        $response = json_decode($request['response'], true);
-    } elseif (isset($request['access_token'])) {
-        // Find out the username in the token
-        $username = JWT::parseTokenPayLoad($request['access_token'])['upn'];
+    // first check for errors
+    if (isset($request['error']) && isset($request['statusCode'])) {
+        $error = $request['error'];
+        $statusCode = $request['statusCode'];
 
+        if (!is_int($statusCode)) {
+            if (is_numeric($statusCode)) {
+                $statusCode = (int) $statusCode;
+            } else {
+                Response::output('Anomaly detected (internal API call), status code from POST request exchanging the code for a token has returned an error but te statusCode is not an integer but ' . gettype($statusCode));
+            }
+        }
+
+        Response::output($error, $statusCode);
+    }
+
+    // So the request array should have these keys: 'token_type', 'scope', 'expires_in', 'ext_expires_in', 'access_token'
+
+    if (isset($request['token_type'], $request['scope'], $request['expires_in'], $request['ext_expires_in'], $request['access_token'])) {
+        // These are the prerequisites of a proper token response.
+        if ($request['expires_in'] !== $request['ext_expires_in']) {
+            Response::output('Anomaly detected: expires_in is not equal to ext_expires_in', 400);
+        }
+        if ($request['token_type'] !== 'Bearer') {
+            Response::output('Anomaly detected: token type expected to be Bearer, got ' . $request['token_type'], 400);
+        }
+        // scope should come in "https://management.azure.com/user_impersonation https://management.azure.com/.default" for example. Not sure if we need to do something about that
+
+        $usernameFromToken = JWT::parseTokenPayLoad($request['access_token'])['upn'];
+
+        $usernameFromState = [];
+
+        parse_str($_POST['state'], $usernameFromState);
+
+        if (!isset($usernameFromState['username'])) {
+            Response::output('State should have username passed as query string');
+        }
+
+        if ($usernameFromState['username'] !== $usernameFromToken) {
+            Response::output('Anomanly deceted: token username is different from the state username. usernameFromToken - ' . $usernameFromToken . ' while the usernameFromState - ' . $usernameFromState['username'], 400);
+        } else {
+            $username = $usernameFromToken;
+        }
         try {
             AccessToken::save($request['access_token'], $username);
         } catch (Exception $e) {
@@ -80,21 +117,18 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
 
         // Remove the username query string from state
         if (isset($_POST['state'])) {
-            $split = explode("&", $_POST['state']);
-            $state = $_POST['state'] ?? '/';
-            $state = $split[0];
+            $state = explode("&", $_POST['state'])[0];
         } else {
             $state = '/';
         }
+        // Send the client to the original state
         header('Location: ' . $state);
         exit();
-    } else {
-        Response::output('Error: ' . $request['error'], 400);
     }
 
-    if (isset($response['error_description'])) {
+    if (isset($request['error_description'])) {
         // AADSTS70008: The provided authorization code or refresh token has expired due to inactivity. Send a new interactive authorization request for this user and resource
-        if (str_contains($response['error_description'], 'AADSTS70008') || str_contains($response['error_description'], 'AADSTS54005')) {
+        if (str_contains($request['error_description'], 'AADSTS70008') || str_contains($request['error_description'], 'AADSTS54005')) {
             $data = [
                 'client_id' => ENTRA_ID_CLIENT_ID,
                 'response_type' => 'code',
@@ -110,7 +144,7 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
             header('Location: ' . ENTRA_ID_OAUTH_URL . http_build_query($data));
             exit();
         } else {
-            Response::output($response['error_description'], 400);
+            Response::output($request['error_description'], 400);
         }
     }
 }
@@ -133,7 +167,7 @@ if (isset($_POST['access_token'], $_POST['token_type'], $_POST['expires_in'], $_
 }
 
 // MS Live, only code and state are returned
-if (isset($_POST['code'], $_POST['state'])) {
+if (isset($_POST['code']) && isset($_POST['state'])) {
     $code = $_POST['code'];
 
     $tokenUrl = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token';
