@@ -224,34 +224,61 @@ if (tables.length > 0) {
                 form.addEventListener('submit', (event) => {
                     deleteLoadingScreen.classList.remove('hidden');
                     event.preventDefault();
+
                     const data = new URLSearchParams(new FormData(form));
                     let responseStatus = 0;
+
                     fetch('/api/datagrid/delete-records', {
                         method: 'post',
-                        // Let's send this secret header
                         headers: {
                             'secretHeader': 'badass',
                             'X-CSRF-TOKEN': data.get('csrf_token')
                         },
                         body: data,
                         redirect: 'manual'
-                    }).then(response => {
+                    })
+                    .then(response => {
                         responseStatus = response.status;
-                        if (responseStatus === 0 || responseStatus === 401 || responseStatus === 403) {
-                            location.reload();
-                        }
-                        return response.json();
-                    }).then(json => {
-                        if (responseStatus > 400) {
-                            deleteLoadingScreenText.innerHTML = `<p class="text-red-500 font-semibold">${json.data}</p>`;
+                        return response.text(); // always parse as text first
+                    })
+                    .then(text => {
+                        let json;
+                        try {
+                            json = JSON.parse(text);
+                        } catch (e) {
+                            // Not valid JSON — show the raw response
+                            deleteLoadingScreenText.remove();
+                            alert(`Server returned an invalid response: ${text}`);
                             return;
                         }
-                        // Assuming we get here is all good, quickly display the success message and reload the page
-                        deleteLoadingScreenText.innerHTML = `<p class="text-green-500 font-semibold z-50">${json.data}</p>`;
+
+                        // Handle known bad statuses
+                        if (responseStatus === 0 || responseStatus === 401 || responseStatus === 403) {
+                            location.reload();
+                            return;
+                        }
+
+                        if (responseStatus >= 400) {
+                            deleteLoadingScreenText.innerHTML = `
+                                <p class="text-red-500 font-semibold">${json?.data ?? 'Unknown error'}</p>
+                            `;
+                            return;
+                        }
+
+                        // Success
+                        deleteLoadingScreenText.innerHTML = `
+                            <p class="text-green-500 font-semibold z-50">${json.data}</p>
+                        `;
                         location.reload();
+                    })
+                    .catch(err => {
+                        // Network or other errors
+                        deleteLoadingScreenText.innerHTML = `
+                            <p class="text-red-500 font-semibold">Unexpected error: ${err.message}</p>
+                        `;
                     });
                 }, false);
-            })
+            });
         }
 
         // Individual delete buttons

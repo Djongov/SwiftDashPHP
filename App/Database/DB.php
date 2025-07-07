@@ -28,9 +28,12 @@ class DB
             'username' => $username,
             'password' => $password,
             'port' => $port,
-            'driver' => $driver,
-            'ssl' => $ssl
+            'driver' => $driver
         ];
+
+        if (DB_DRIVER === 'mysql' && DB_SSL) {
+            $config['ssl'] = $ssl;
+        }
 
         $this->connect($config);
     }
@@ -46,7 +49,12 @@ class DB
         }
 
         $dsn = $this->buildDsn($config);
-        $options = $this->getPDOOptions($config['ssl']);
+
+        if (DB_DRIVER === 'mysql' && DB_SSL) {
+            $options = $this->getPDOOptions($config['ssl']);
+        } else {
+            $options = $this->getPDOOptions(false);
+        }
 
         try {
             $this->pdo = new \PDO($dsn, $config['username'], $config['password'], $options);
@@ -96,7 +104,7 @@ class DB
             }
 
             // Add SSL options if enabled
-            if ($config['ssl']) {
+            if (DB_DRIVER === 'mysql' && DB_SSL) {
                 $dsn .= "sslmode=require;";
                 // Add CA certificate path
                 $dsn .= "sslrootcert=" . constant('DB_CA_CERT') . ";";

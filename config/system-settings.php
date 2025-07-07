@@ -113,7 +113,7 @@ if (DB_DRIVER !== 'sqlite') {
 
 
 // This is the DigiCertGlobalRootCA.crt.pem file that is used to verify the SSL connection to the DB. It's located in the .tools folder
-define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'DigiCertGlobalRootCA.crt.pem');
+define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'NewDigiCertGlobalRootCA.crt.pem');
 // This is used by the curl requests so you don't get SSL verification errors. It's located in the .tools folder
 define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
 
