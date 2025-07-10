@@ -59,7 +59,7 @@ This works by either creating an app registration in your Azure tenant (works wi
 
 Now, in the .env file place the following:
 
-- ENTRA_ID_LOGIN_ENABLED=true or false
+- ENTRA_ID_LOGIN_ENABLED=true
 - ENTRA_ID_TENANT_ID="XXXX"
 - ENTRA_ID_CLIENT_ID="XXXX"
 - ENTRA_ID_CLIENT_SECRET="XXXX"
@@ -86,6 +86,13 @@ If you want to create a new and dedicated app registration for your MS LIve logi
     - https://example.com/auth/azure/mslive-code-exchange
 
 > App registrations with only Personal Microsoft Accounts audience cannot have App roles
+
+Now, in the .env file place the following:
+
+- MSLIVE_LOGIN_ENABLED=true
+- MS_LIVE_TENANT_ID="XXX"
+- MS_LIVE_CLIENT_ID="XXX"
+- MS_LIVE_CLIENT_SECRET="XXX"
 
 ## Google
 
