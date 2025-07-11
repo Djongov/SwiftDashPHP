@@ -6,29 +6,63 @@ namespace App\Request;
 
 class NativeHttp
 {
-    public static function get(string $url, array $headers = [], bool $sslIgnore = false): array
+    public static function get(string $url, array $headers = [], bool $sslIgnore = false, bool $expectJson = true): array
     {
         // Options
-        $options = [
+        $contextOptions = [
             'http' => [
                 'method' => 'GET',
-                'ignore_errors' => true
+                'ignore_errors' => true,
+            ],
+            'ssl' => [
+                'cafile' => CURL_CERT,
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+                'allow_self_signed' => false,
             ]
         ];
-        if (!$sslIgnore) {
-            self::sslOptions($url);
-        }
-        if (!empty($headers)) {
-            $options['http']['header'] = $headers;
+
+        if ($sslIgnore) {
+            // Bypass SSL verification (not recommended)
+            $contextOptions['ssl']['verify_peer'] = false;
+            $contextOptions['ssl']['verify_peer_name'] = false;
         }
 
-        $context  = stream_context_create($options);
+        if (!empty($headers)) {
+            $formattedHeaders = [];
+
+            foreach ($headers as $key => $value) {
+                // If the header is already a full string like "Accept: application/json", keep it as-is
+                if (is_int($key)) {
+                    $formattedHeaders[] = $value;
+                } else {
+                    $formattedHeaders[] = "{$key}: {$value}";
+                }
+            }
+
+            $contextOptions['http']['header'] = implode("\r\n", $formattedHeaders);
+        }
+
+        $context = stream_context_create($contextOptions);
 
         $response = file_get_contents($url, false, $context);
 
-        $responseCode = intval(self::getResponseCode($http_response_header[0]));
+        $responseCode = isset($http_response_header[0])
+            ? intval(self::getResponseCode($http_response_header[0]))
+            : 0;
 
-        return json_decode($response, true);
+        if ($responseCode >= 400) {
+            throw new \Exception($response, $responseCode);
+        }
+
+        if ($expectJson && $response !== false) {
+            // If we expect JSON, decode it
+            $decodedResponse = json_decode($response, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception("JSON decode error: " . json_last_error_msg(), 500);
+            }
+            return $decodedResponse;
+        }
     }
     public static function post(string $url, array $data, bool $sendJson = false, array $headers = [], bool $sslIgnore = false): array
     {

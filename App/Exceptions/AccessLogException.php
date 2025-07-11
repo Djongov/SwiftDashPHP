@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
-class AccessLogException extends TemplateException
+class AccessLogException extends ExceptionsTemplate
 {
     public function notDeleted(): self
     {

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Api\Response;
-use App\Authentication\AccessToken;
+use App\Authentication\Azure\AccessToken;
 
 if (isset($_POST['error'], $_POST['error_description'])) {
     if (str_contains($_POST['error'], 'consent_required')) {

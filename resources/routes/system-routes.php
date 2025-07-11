@@ -41,10 +41,13 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('GET', '/adminx/mailer', [$viewsFolder . '/admin/mailer.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/db-table', [$viewsFolder . '/admin/db-table.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/apim', [$viewsFolder . '/admin/apim.php', $metadataArray['admin']]);
 
     // Admin API
     $router->addRoute('POST', '/api/admin/csp/add', [$viewsFolder . '/api/admin/csp/add.php']);
     $router->addRoute('POST', '/api/admin/queries', [$viewsFolder . '/api/admin/queries.php']);
+    $router->addRoute('POST', '/api/admin/api-keys', [$viewsFolder . '/api/admin/api-keys.php']);
+    $router->addRoute('POST', '/api/admin/request-id', [$viewsFolder . '/api/admin/request-id.php']);
 
     // Tools API
     $router->addRoute('POST', '/api/tools/get-error-file', [$viewsFolder . '/api/tools/get-error-file.php']);

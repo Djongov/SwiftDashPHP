@@ -32,7 +32,6 @@ echo '<div class="p-4 m-4 max-w-md ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg b
     echo Html::p('DB User: ' . DB_USER);
     echo Html::p('DB Driver: ' . $db->getDriver());
     echo Html::p('Using SSL: ' . (DB_SSL ? 'Yes' : 'No'));
-    echo Html::p('DB_CERT:' . DB_CA_CERT);
     echo Html::p('Total tables: ' . count($dbTables));
     echo Table::auto($dbTables);
 echo '</div>';

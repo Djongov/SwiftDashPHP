@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
-class FirewallException extends TemplateException
+class FirewallException extends ExceptionsTemplate
 {
     public function ipAlreadyExists(): self
     {

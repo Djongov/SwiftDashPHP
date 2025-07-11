@@ -207,6 +207,39 @@ class Checks
             Response::output('Invalid required header value', $this->defaultStatusCode);
         }
     }
+    public function checkApiKeyHeader(string $action, int $executions = 1): void
+    {
+        $apiKey = getApiKeyFromHeaders();
+
+        if (!$apiKey) {
+            Response::output('Missing API key header', $this->defaultStatusCode);
+        }
+
+        $apiKeyCheck = new \Models\APIKeys();
+
+        $get = $apiKeyCheck->get($apiKey);
+
+        if (!$get) {
+            Response::output('Invalid API key', $this->defaultStatusCode);
+        }
+
+        if (!$get['enabled']) {
+            Response::output('API key is disabled', $this->defaultStatusCode);
+        }
+
+        // Check if executions limit is reached
+        if ($get['executions'] >= $get['executions_limit']) {
+            Response::output('API key executions limit reached', 429);
+        }
+
+        // Let's check if the access is allowed
+        if ($get['access'] !== $action) {
+            Response::output('API key does not have access to perform this action', 403);
+        }
+
+        // Need to think whether to increment the executions count here or not
+        $apiKeyCheck->incrementExecutionCount($apiKey, $executions);
+    }
     public function checkImage(array $image): void
     {
         // Check if the image is set
@@ -329,6 +362,9 @@ class Checks
     {
         // Let's catch php input stream
         $putData = file_get_contents('php://input');
+        if (!$putData) {
+            Response::output('Payload is empty', 400);
+        }
         // Now we need to get the put data and make into array
         $putData = json_decode($putData, true);
         if (!is_array($putData)) {

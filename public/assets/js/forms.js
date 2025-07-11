@@ -220,10 +220,13 @@ const handleFormFetch = (form, currentEvent, resultType) => {
         });
 
         fetchOptions.body = JSON.stringify(formDataObject);
-    } else if (formMethod === 'DELETE' || formMethod === 'GET') {
+    } else if (formMethod === 'GET') {
         // For DELETE and GET, handle URL-encoded data (no files)
         const data = new URLSearchParams(formData);
         fetchOptions.body = data;
+    } else if (formMethod === 'DELETE') {
+        // Let's be compliant and not have any body for DELETE requests
+        fetchOptions.body = null;
     } else {
         // For other methods (like PATCH), use FormData (including file uploads)
         fetchOptions.body = formData;
@@ -297,6 +300,7 @@ const handleFormFetch = (form, currentEvent, resultType) => {
                             console.log(`redraw occured`);
                             buildDataGridFilters(dataTable, tableId, []);
                         });
+                        initializeAllDataGrids();
                     })
                 }
                 if (form.getAttribute("data-reload") === "true") {
@@ -484,6 +488,10 @@ const initiateGenericForms = () => {
     }
     // Loop through each
     genericForms.forEach(form => {
+        // if data-trigger is set on the form and is false, we skip all javascript functionality
+        if (form.getAttribute('data-trigger') === 'false') {
+            return;
+        }
         // Let's search for checkbox groups in the form. They all start with checkbox-group- followed by a random string. Let's try to catch each group
         const checkboxesInGroups = form.querySelectorAll('[class*="checkbox-group-"]');
 
@@ -585,6 +593,7 @@ const handleFetchDataResponse = (response, form) => {
                     dataTable.on('draw', () => {
                         buildDataGridFilters(dataTable, tableId, []);
                     });
+                    initializeAllDataGrids();
                 })
             }
             // If there were copy buttons in the response, let's initiate them

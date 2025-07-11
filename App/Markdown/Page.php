@@ -10,7 +10,7 @@ use App\Markdown\Parsedown;
 
 class Page
 {
-    public static function render(string $fileName, string $theme): string
+    public static function render(string $fileName, array $variableMap = [], string $theme = COLOR_SCHEME): string
     {
         // Now let's get the contents of the file
         if (file_exists($fileName . '.md') === false) {
@@ -18,6 +18,11 @@ class Page
             return Alerts::danger('page does not exist');
         }
         $fileContents = file_get_contents($fileName . '.md');
+
+        if ($variableMap) {
+            $fileContents = str_replace(array_keys($variableMap), array_values($variableMap), $fileContents);
+        }
+        
         if (str_starts_with($fileContents, '---')) {
             // If metadata exists, split the content into metadata and Markdown content
             list($metadata, $markdown) = explode("\n---\n", $fileContents, 2);

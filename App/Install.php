@@ -54,7 +54,7 @@ class Install
                 // PostgreSQL does not support the 'IF NOT EXISTS' clause for CREATE DATABASE
                 $query = $conn->query("SELECT 1 FROM pg_database WHERE datname = '" . DB_NAME . "'");
                 if (!$query->fetch()) {
-                    $conn->exec("CREATE DATABASE " . DB_NAME);
+                    $conn->exec("CREATE DATABASE \"" . DB_NAME . "\"");
                 }
             } elseif (DB_DRIVER === 'sqlite') {
                 // For sqlite we need to create the database file

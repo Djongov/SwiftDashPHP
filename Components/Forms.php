@@ -248,6 +248,16 @@ class Forms
             $formAttributesArray['data-confirm'] = 'Are you sure?';
         }
 
+        if (isset($options['triggerJS'])) {
+            // If triggerJS is set to true, we will add a data-trigger attribute to the form
+            if (!is_bool($options['triggerJS'])) {
+                throw new \Exception('triggerJS option must be a boolean');
+            }
+            if (!$options['triggerJS']) {
+                $formAttributesArray['data-trigger'] = 'false';
+            }
+        }
+
         // Double confirm feature, first let's see if it's passed
         if (isset($options['doubleConfirm'])) {
             // If it is passed, let's make sure it's a boolean, if not throw an exception

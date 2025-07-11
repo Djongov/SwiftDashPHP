@@ -7,7 +7,7 @@ declare(strict_types=1);
         <?= translate('terms_of_service_heading') ?>
     </h1>
     <p class="text-sm text-gray-500 mb-6">
-        <?= str_replace('{date}', date('F j, Y', 1747503381), translate('terms_of_service_subtext')) ?>
+        <?= str_replace('{date}', date('F j, Y', 1752003381), translate('terms_of_service_subtext')) ?>
     </p>
 
     <p class="mb-6">
@@ -84,6 +84,6 @@ declare(strict_types=1);
         <?= translate('terms_of_service_contact_us_heading') ?>
     </h2>
     <p class="mb-6">
-        <?= str_replace('{email}', 'admin@gamerz-bg.com', translate('terms_of_service_contact_us')) ?>
+        <?= str_replace('{email}', ADMINISTRATOR_EMAIL, translate('terms_of_service_contact_us')) ?>
     </p>
 </div>

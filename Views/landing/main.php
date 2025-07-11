@@ -30,7 +30,7 @@ try {
     return;
 }
 
-if ($usernameArray) {
+if ($usernameArray && DB_DRIVER !== 'sqlite') {
     echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
     echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
 
@@ -97,7 +97,7 @@ $featuresArray = [
   // Charts
   'Charts (via Chart.js and QuickChart.io)' => 'Chart.js and Quickchart.io ready to use chart functions for the most popular chart types. Also easily autoload JS charts only with PHP code with the autoloading mechanism. See more the example ' . Html::a('Charts', '/charts', $theme),
   // Markdown
-  'Markdown rendering' => 'With the power of Parsedown (which sadly as of now is not up to date for PHP 8.4) and some custom classes we have here, you can render locally stored or remotely stored Markdown files automatically styled with Tailwind. Check out the ' . Html::a('Docs', '/docs', $theme) . ' section. Here let\'s render some MD below. ' . Html::p(Page::render(ROOT . '/Views/docs/index', $theme)),
+  'Markdown rendering' => 'With the power of Parsedown (which sadly as of now is not up to date for PHP 8.4) and some custom classes we have here, you can render locally stored or remotely stored Markdown files automatically styled with Tailwind. Check out the ' . Html::a('Docs', '/docs', $theme) . ' section. Here let\'s render some MD below. ' . Html::p(Page::render(ROOT . '/Views/docs/index', [], $theme)),
   // Forms
   'Forms' => 'This is a big one. All (or almost all) of the buttons that do something on the framework are actually Form Components. Forms component takes out the big headache of creating the form and the submission hurdles of it. Easily do modals too. Built-in CSRF protecton too. Check out the ' . Html::a('Forms', '/forms', $theme) . ' section',
   // API

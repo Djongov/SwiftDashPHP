@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Authentication;
+namespace App\Authentication\Azure;
 
 use Models\Core\DBCache;
+use App\Authentication\JWT;
 
 class AccessToken
 {
@@ -66,6 +67,10 @@ class AccessToken
             } else {
                 // Now that we know it's not expired, let's parse it so we can see if it's the right scope
                 $parsedToken = JWT::parseTokenPayLoad($cachedToken['value']);
+                if (!$parsedToken) {
+                    // It must be a mslive token, so we will not decode it, directly return it
+                    return $cachedToken['value'];
+                }
                 // If it is a mslive token it will not be decoded
                 if (!self::isScopeMatchingAudience($parsedToken['aud'], $scope)) {
                     // If the audience is not the same, let's delete it

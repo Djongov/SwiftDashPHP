@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-define("FROM", 'admin@gamerz-bg.com');
-define("FROM_NAME", 'No Reply');
-define("ADMINISTRATOR_EMAIL", "");
-
+define("FROM", "admin@gamerz-bg.com");
+define("FROM_NAME", "No Reply");
+define("ADMINISTRATOR_EMAIL", "admin@gamerz-bg.com");
+define("COMPANY_NAME", "Sunwell Solutions");
 define('MULTILINGUAL', true);
 define('DEFAULT_LANG', 'en');
 

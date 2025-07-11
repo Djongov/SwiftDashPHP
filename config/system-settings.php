@@ -121,8 +121,8 @@ define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR 
 define('SECRET_HEADER', 'secretheader');
 // Same as above
 define('SECRET_HEADER_VALUE', 'badass');
-// api key name
-define('API_KEY_NAME', 'x-api-key');
+
+define('API_KEY_HEADER_NAME', 'X-API-Key'); // The header name for the API key
 
 /*
 

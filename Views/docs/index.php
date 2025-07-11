@@ -20,7 +20,13 @@ $files = array_map(
     }, $files
 );
 
+$variableMap = [
+    '{Company Name}' => COMPANY_NAME,
+    '{Site Title}' => SITE_TITLE,
+    '{CURRENT_SCHEME_HOST}' => currentProtocolAndHost(),
+];
+
 echo '<div class="flex flex-col md:flex-row">';
     echo DocsMenu::render($basePath, $files);
-    echo Page::render(__DIR__ . DIRECTORY_SEPARATOR . $fileName, $theme);
+    echo Page::render(__DIR__ . DIRECTORY_SEPARATOR . $fileName, $variableMap, $theme);
 echo '</div>';

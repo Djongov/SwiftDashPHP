@@ -3,7 +3,7 @@
         <?= translate('privacy_policy_heading') ?>
     </h1>
     <p class="text-sm text-gray-500 mb-6">
-        <?= str_replace('{date}', date('F j, Y', 1747503381), translate('privacy_policy_subtext')) ?>
+        <?= str_replace('{date}', date('F j, Y', 1752003381), translate('privacy_policy_subtext')) ?>
     </p>
 
     <h2 class="text-xl font-semibold mt-6 mb-2">
@@ -59,7 +59,7 @@
         <?= translate('privacy_policy_user_rights_heading') ?>
     </h2>
     <p class="mb-4">
-        <?= str_replace('{email}', 'admin@gamerz-bg.com', translate('privacy_policy_user_rights')) ?>
+        <?= str_replace('{email}', ADMINISTRATOR_EMAIL, translate('privacy_policy_user_rights')) ?>
     </p>
 
     <h2 class="text-xl font-semibold mt-6 mb-2">
@@ -73,6 +73,6 @@
         <?= translate('privacy_policy_contact_heading') ?>
     </h2>
     <p class="mb-4">
-        <?= str_replace('{email}', 'admin@gamerz-bg.com', translate('privacy_policy_contact')) ?>
+        <?= str_replace('{email}', ADMINISTRATOR_EMAIL, translate('privacy_policy_contact')) ?>
     </p>
 </div>

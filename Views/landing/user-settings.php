@@ -11,7 +11,7 @@ use App\Exceptions\UserExceptions;
 use App\Request\HttpClient;
 use App\Authentication\AuthToken;
 use Components\Alerts;
-use App\Authentication\AccessToken;
+use App\Authentication\Azure\AccessToken;
 
 $user = new User();
 /* Profile picture update logic */
@@ -37,7 +37,7 @@ if (!empty($usernameArray['picture']) && isset($token['picture'])) {
 } elseif ($usernameArray['picture'] === null || empty($usernameArray['picture'])) {
     // If Azure
     if ($usernameArray['provider'] === 'azure' || $usernameArray['provider'] === 'mslive') {
-        $accessToken = AccessToken::get($usernameArray['username'], 'https://graph.microsoft.com'); // 'https://graph.microsoft.com/user.read'
+        $accessToken = AccessToken::get($usernameArray['username'], 'https://graph.microsoft.com/user.read'); // 'https://graph.microsoft.com/user.read'
         $client = new HttpClient('https://graph.microsoft.com/v1.0/me/photo/$value');
         $response = $client->call('GET', '', [], $accessToken, false, ['Accept: image/jpeg'], false, false);
         $userController = new Controllers\User();

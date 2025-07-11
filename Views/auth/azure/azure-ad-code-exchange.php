@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Api\Response;
 use App\Authentication\JWT;
-use App\Authentication\AccessToken;
+use App\Authentication\Azure\AccessToken;
 
 if (isset($_POST['error'], $_POST['error_subcode'], $_POST['state'], $_POST['canary'])) {
     header('Location: /');

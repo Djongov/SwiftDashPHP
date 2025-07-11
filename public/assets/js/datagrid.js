@@ -2,7 +2,24 @@
 
 Here are the functions that are for DataGrid display. Using DataTables 1.12.1 library
 
+REFACTORED STRUCTURE:
+- All functionality is now modular and callable
+- Use initializeDataGridActions(tableId) to initialize all actions for a specific table
+- Use initializeAllDataGrids() to initialize all existing tables with class 'datagrid'
+- Perfect for tables loaded via fetch/AJAX - just call initializeDataGridActions(tableId) after loading
+
+Main functions:
+- initializeEditButtons(tableId): Initialize edit button functionality
+- initializeCheckboxes(tableId): Initialize checkbox functionality  
+- initializeMassDelete(tableId): Initialize mass delete functionality
+- initializeDeleteButtons(tableId): Initialize individual delete buttons
+- initializeSelectAll(tableId): Initialize select all functionality
+- initializeDataGridActions(tableId): Initialize ALL actions for a table
+- initializeAllDataGrids(): Initialize all existing DataGrid tables
+
 */
+
+// Utility functions
 const countAllCheckedCheckboxes = (tableId) => {
     return document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type="checkbox"]:checked`).length;
 }
@@ -25,297 +42,277 @@ const updateFilteredResults = (tableId, newValue) => {
     }
 }
 
-const tables = document.querySelectorAll(`table.datagrid`);
+// Main function to initialize edit button functionality
+const initializeEditButtons = (tableId) => {
+    const editButtons = document.querySelectorAll(`#${tableId} button.edit`);
 
-if (tables.length > 0) {
-    tables.forEach(table => {
-        // Let's get some elements we will be using
-        const tableId = table.id;
-        // Now the modal elements for the mass delete
-        const massDeleteModalTriggerer = document.getElementById(tableId + '-mass-delete-modal-trigger');
-        const massDeleteModalText = document.getElementById(tableId + '-mass-delete-modal-text');
-        const deleteLoadingScreen = document.getElementById(tableId + '-delete-loading-screen');
-        const deleteLoadingScreenText = document.getElementById(tableId + '-delete-loading-screen-text');
-        // Now the results elements
-        let totalResults = document.getElementById(tableId + '-total');
-        updateFilteredResults(tableId, countVisibleRows(tableId));
-        // First the Edit button and get records
-        const editButtons = document.querySelectorAll(`#${tableId} button.edit`);
-
-        if (editButtons.length > 0) {
-            editButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const uniqueId = generateUniqueId(4);
-                    // Generate the modal
-                    let modal = editModal(uniqueId, button.dataset.id);
-                    // Insert the modal at the bottom of the first div after the body
-                    document.body.insertBefore(modal, document.body.firstChild);
-                    // Now show the modal
-                    modal.classList.remove('hidden');
-                    // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
-                    document.body.classList.add('overflow-hidden');
-                    // Blur the body excluding the modal
-                    toggleBlur(modal);
-                    // Let's make some bindings
-                    const modalResult = document.getElementById(`${uniqueId}-result`);
-                    // First, the close button
-                    const closeXButton = document.getElementById(`${uniqueId}-x-button`);
-                    // The cancel button
-                    const cancelButton = document.getElementById(`${uniqueId}-close-button`);
-                    // Modal Save button
-                    const saveButton = document.getElementById(`${uniqueId}-edit`);
-                    const cancelButtonsArray = [closeXButton, cancelButton];
-                    cancelButtonsArray.forEach(cancelButton => {
-                        cancelButton.addEventListener('click', () => {
-                            // Completely remove the modal
-                            modal.remove();
-                            // Return the overflow of the body
-                            document.body.classList.remove('overflow-hidden');
-                            // Remove the blur by toggling the blur class
-                            toggleBlur(modal);
-                        })
+    if (editButtons.length > 0) {
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const uniqueId = generateUniqueId(4);
+                // Generate the modal
+                let modal = editModal(uniqueId, button.dataset.id);
+                // Insert the modal at the bottom of the first div after the body
+                document.body.insertBefore(modal, document.body.firstChild);
+                // Now show the modal
+                modal.classList.remove('hidden');
+                // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
+                document.body.classList.add('overflow-hidden');
+                // Blur the body excluding the modal
+                toggleBlur(modal);
+                // Let's make some bindings
+                const modalResult = document.getElementById(`${uniqueId}-result`);
+                // First, the close button
+                const closeXButton = document.getElementById(`${uniqueId}-x-button`);
+                // The cancel button
+                const cancelButton = document.getElementById(`${uniqueId}-close-button`);
+                // Modal Save button
+                const saveButton = document.getElementById(`${uniqueId}-edit`);
+                const cancelButtonsArray = [closeXButton, cancelButton];
+                cancelButtonsArray.forEach(cancelButton => {
+                    cancelButton.addEventListener('click', () => {
+                        // Completely remove the modal
+                        modal.remove();
+                        // Return the overflow of the body
+                        document.body.classList.remove('overflow-hidden');
+                        // Remove the blur by toggling the blur class
+                        toggleBlur(modal);
                     })
-                    let modalBody = document.getElementById(`${uniqueId}-body`);
-                    let responseStatus = 0;
-                    // Now let's fetch data from the API and populate the modalBody. We need to send the id and the table name
+                })
+                
+                let modalBody = document.getElementById(`${uniqueId}-body`);
+                let responseStatus = 0;
+                const deleteLoadingScreen = document.getElementById(tableId + '-delete-loading-screen');
+                
+                // Now let's fetch data from the API and populate the modalBody. We need to send the id and the table name
+                const formData = new FormData();
+                // The Edit button has a data-columns attribute that contains the columns we need to fetch, so we want to send them to the API along with the id and table name
+                formData.append('columns', button.dataset.columns);
+                formData.append('table', button.dataset.table);
+                formData.append('id', button.dataset.id);
+                formData.append('csrf_token', button.dataset.csrf);
+                fetch('/api/datagrid/get-records', {
+                    method: 'POST',
+                    headers: {
+                        'secretHeader': 'badass',
+                        'X-CSRF-TOKEN': button.dataset.csrf
+                    },
+                    body: formData,
+                    redirect: 'manual'
+                }).then(response => {
+                    if (response.status === 0 || response.status === 401 || response.status === 403) {
+                        location.reload();
+                    }
+                    // If response is JSON, then we probably got an error because we expect html from this request
+                    if (response.headers.get('content-type').includes('application/json')) {
+                        // Let's disable the save button
+                        saveButton.disabled = true;
+                        response.json().then(errorData => {
+                            modalBody.innerHTML = `<p class="ml-4 w-fit font-bold text-red-500">${errorData.data}</p>`;
+                        }).catch(error => {
+                            modalBody.innerHTML = `<p class="ml-4 w-fit font-bold text-red-500">Error occurred, please try again later.</p>`;
+                        });
+                    }
+                    return response.text();
+                }).then(text => {
+                    modalBody.innerHTML = '';
+                    if (deleteLoadingScreen) {
+                        deleteLoadingScreen.classList.add('hidden');
+                    }
+                    modalBody.innerHTML = text;
+                });
+                // Now the edit button
+                const initialButtonText = saveButton.textContent;
+                saveButton.addEventListener('click', () => {
+                    // transform the button text to a loader
+                    saveButton.innerHTML = loaderString();
+                    // Build the body of the update request. We need to go through all the inputs and get their values
                     const formData = new FormData();
-                    // The Edit button has a data-columns attribute that contains the columns we need to fetch, so we want to send them to the API along with the id and table name
-                    formData.append('columns', button.dataset.columns);
-                    formData.append('table', button.dataset.table);
-                    formData.append('id', button.dataset.id);
-                    formData.append('csrf_token', button.dataset.csrf);
-                    fetch('/api/datagrid/get-records', {
+                    // Loop through all of the modalBody inputs, textarea and select and save them to the formData
+                    const modalBodyInputs = modal.querySelectorAll(`input, textarea, select`);
+                    modalBodyInputs.forEach(input => {
+                        let value = input.value;
+
+                        // Check if the value is a valid number
+                        if (!isNaN(value) && value.includes('.')) {
+                            // Convert to float and format to a specific number of decimal places (e.g., 2)
+                            value = parseFloat(value);
+                        }
+
+                        formData.append(input.name, value);
+                    });
+                    // Now let's take care of potential checkboxes
+                    const modalBodyCheckboxes = modal.querySelectorAll(`input[type=checkbox]`);
+                    // Loop through the checkboxes and if they are checked, we transmit the value as 1, else as 0
+                    modalBodyCheckboxes.forEach(checkbox => {
+                        formData.append(checkbox.name, checkbox.checked ? 1 : 0);
+                    });
+                    // Now let's send a fetch request to /api/process with form-data api-action and the apiAction value
+                    fetch('/api/datagrid/update-records', {
                         method: 'POST',
                         headers: {
                             'secretHeader': 'badass',
-                            'X-CSRF-TOKEN': button.dataset.csrf
+                            'X-CSRF-TOKEN': formData.get('csrf_token')
                         },
                         body: formData,
                         redirect: 'manual'
                     }).then(response => {
-                        if (response.status === 0 || response.status === 401 || response.status === 403) {
+                        responseStatus = response.status;
+                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
+                            modalBody.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
                             location.reload();
-                        }
-                        // If response is JSON, then we probably got an error because we expect html from this request
-                        if (response.headers.get('content-type').includes('application/json')) {
-                            // Let's disable the save button
-                            saveButton.disabled = true;
-                            response.json().then(errorData => {
-                                modalBody.innerHTML = `<p class="ml-4 w-fit font-bold text-red-500">${errorData.data}</p>`;
-                            }).catch(error => {
-                                modalBody.innerHTML = `<p class="ml-4 w-fit font-bold text-red-500">Error occurred, please try again later.</p>`;
-                            });
-                        }
-                        return response.text();
-                    }).then(text => {
-                        modalBody.innerHTML = '';
-                        if (deleteLoadingScreen) {
-                            deleteLoadingScreen.classList.add('hidden');
-                        }
-                        modalBody.innerHTML = text;
-                    });
-                    // Now the edit button
-                    const initialButtonText = saveButton.textContent;
-                    saveButton.addEventListener('click', () => {
-                        // transform the button text to a loader
-                        saveButton.innerHTML = loaderString();
-                        // Build the body of the update request. We need to go through all the inputs and get their values
-                        const formData = new FormData();
-                        // Loop through all of the modalBody inputs, textarea and select and save them to the formData
-                        const modalBodyInputs = modal.querySelectorAll(`input, textarea, select`);
-                        modalBodyInputs.forEach(input => {
-                            let value = input.value;
-
-                            // Check if the value is a valid number
-                            if (!isNaN(value) && value.includes('.')) {
-                                // Convert to float and format to a specific number of decimal places (e.g., 2)
-                                value = parseFloat(value);
+                        } else {
+                            // Check if the response is JSON or text/HTML
+                            if (response.headers.get('content-type').includes('application/json')) {
+                                return response.json().then(data => ({ data, isJson: true }));
+                            } else {
+                                return response.text().then(data => ({ data, isJson: false }));
                             }
-
-                            formData.append(input.name, value);
-                        });
-                        // Now let's take care of potential checkboxes
-                        const modalBodyCheckboxes = modal.querySelectorAll(`input[type=checkbox]`);
-                        // Loop through the checkboxes and if they are checked, we transmit the value as 1, else as 0
-                        modalBodyCheckboxes.forEach(checkbox => {
-                            formData.append(checkbox.name, checkbox.checked ? 1 : 0);
-                        });
-                        // Now let's send a fetch request to /api/process with form-data api-action and the apiAction value
-                        fetch('/api/datagrid/update-records', {
-                            method: 'POST',
-                            headers: {
-                                'secretHeader': 'badass',
-                                'X-CSRF-TOKEN': formData.get('csrf_token')
-                            },
-                            body: formData,
-                            redirect: 'manual'
-                        }).then(response => {
-                            responseStatus = response.status;
-                            if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                                modalBody.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                        }
+                    }).then(({ data, isJson }) => {
+                        // If the response status is >= 400, handle it as an error
+                        if (responseStatus >= 400) {
+                            saveButton.innerText = 'Retry';
+                            let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
+                        } else {
+                            saveButton.innerText = initialButtonText;
+                    
+                            if (isJson) {
+                                modalResult.innerHTML = `<p class="text-green-500 font-semibold">${data.data}</p>`;
                                 location.reload();
                             } else {
-                                // Check if the response is JSON or text/HTML
-                                if (response.headers.get('content-type').includes('application/json')) {
-                                    return response.json().then(data => ({ data, isJson: true }));
-                                } else {
-                                    return response.text().then(data => ({ data, isJson: false }));
-                                }
+                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">${data}</p>`;
                             }
-                        }).then(({ data, isJson }) => {
-                            // If the response status is >= 400, handle it as an error
-                            if (responseStatus >= 400) {
-                                saveButton.innerText = 'Retry';
-                                let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
-                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
-                            } else {
-                                saveButton.innerText = initialButtonText;
-                        
-                                if (isJson) {
-                                    modalResult.innerHTML = `<p class="text-green-500 font-semibold">${data.data}</p>`;
-                                    location.reload();
-                                } else {
-                                    modalResult.innerHTML = `<p class="text-red-500 font-semibold">${data}</p>`;
-                                }
-                            }
-                        }).catch(error => {
-                            console.error('Error during fetch:', error);
-                        });                                           
+                        }
+                    }).catch(error => {
+                        console.error('Error during fetch:', error);
+                    });                                           
+                })
+            })
+        });
+    }
+}
+
+// Initialize checkbox functionality
+const initializeCheckboxes = (tableId) => {
+    // Get the modal elements for the mass delete
+    const massDeleteModalTriggerer = document.getElementById(tableId + '-mass-delete-modal-trigger');
+    const massDeleteModalText = document.getElementById(tableId + '-mass-delete-modal-text');
+
+    // Disable it after Flowbite's JS
+    if (massDeleteModalTriggerer) {
+        massDeleteModalTriggerer.disabled = true;
+    }
+
+    // Get all the checkboxes in the table
+    const allTableCheckboxes = document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type=checkbox]`);
+    if (allTableCheckboxes.length > 0) {
+        allTableCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                // make row focused, 2 parent nodes behind
+                if (checkbox.checked) {
+                    checkbox.parentNode.parentNode.classList.add('bg-gray-200', 'text-black');
+                } else {
+                    checkbox.parentNode.parentNode.classList.remove('bg-gray-200', 'text-black');
+                }
+                const allTableCheckedCheckboxes = countAllCheckedCheckboxes(tableId);
+                updateSelectedResults(tableId, allTableCheckedCheckboxes);
+                updateFilteredResults(tableId, countVisibleRows(tableId));
+                if (massDeleteModalTriggerer && massDeleteModalText) {
+                    if (lang === 'en') {
+                        massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
+                    } else if (lang === 'bg') {
+                        massDeleteModalText.innerText = 'Искате ли да изтриете ' + allTableCheckedCheckboxes + ' записа?';
+                    }
+                    massDeleteModalTriggerer.disabled = allTableCheckedCheckboxes <= 0;
+                }
+            }, false);
+        })
+    }
+}
+
+// Initialize mass delete functionality
+const initializeMassDelete = (tableId) => {
+    const deleteLoadingScreen = document.getElementById(tableId + '-delete-loading-screen');
+    const deleteLoadingScreenText = document.getElementById(tableId + '-delete-loading-screen-text');
+
+    // Find the mass delete form, which is in the container and has a class of delete-selected-form
+    const deleteForms = document.querySelectorAll(`#${tableId}-container > form.delete-selected-form`);
+    console.log(`Found ${deleteForms.length} mass delete forms for table ${tableId}.`);
+    if (deleteForms.length > 0) {
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', (event) => {
+                deleteLoadingScreen.classList.remove('hidden');
+                event.preventDefault();
+                const data = new URLSearchParams(new FormData(form));
+                let responseStatus = 0;
+                fetch('/api/datagrid/delete-records', {
+                    method: 'post',
+                    // Let's send this secret header
+                    headers: {
+                        'secretHeader': 'badass',
+                        'X-CSRF-TOKEN': data.get('csrf_token')
+                    },
+                    body: data,
+                    redirect: 'manual'
+                }).then(response => {
+                    responseStatus = response.status;
+                    if (responseStatus === 0 || responseStatus === 401 || responseStatus === 403) {
+                        location.reload();
+                    }
+                    return response.json();
+                }).then(json => {
+                    if (responseStatus > 400) {
+                        deleteLoadingScreenText.innerHTML = `<p class="text-red-500 font-semibold">${json.data}</p>`;
+                        return;
+                    }
+                    // Assuming we get here is all good, quickly display the success message and reload the page
+                    deleteLoadingScreenText.innerHTML = `<p class="text-green-500 font-semibold z-50">${json.data}</p>`;
+                    location.reload();
+                });
+            }, false);
+        })
+    }
+}
+
+// Initialize individual delete buttons
+const initializeDeleteButtons = (tableId) => {
+    let totalResults = document.getElementById(tableId + '-total');
+    const deleteButtons = document.querySelectorAll(`#${tableId} > tbody > tr > td > button.delete`);
+
+    if (deleteButtons.length > 0) {
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                // insert the modal after the table
+                let modal = deleteModal(tableId, `Delete entry with id <b>${event.target.dataset.id}</b> in table <b>${event.target.dataset.table}</b>?`);
+                // Insert the modal at the bottom of the first div after the body
+                document.body.insertBefore(modal, document.body.firstChild);
+                // Now show the modal
+                modal.classList.remove('hidden');
+                // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
+                document.body.classList.add('overflow-hidden');
+                // Blur the body excluding the modal
+                toggleBlur(modal);
+                // First, the close button
+                const closeXButton = document.getElementById(`${tableId}-x-button`);
+                // The cancel button
+                const cancelButton = document.getElementById(`${tableId}-close-button`);
+                const cancelButtonsArray = [closeXButton, cancelButton];
+                cancelButtonsArray.forEach(cancelButton => {
+                    cancelButton.addEventListener('click', () => {
+                        // Completely remove the modal
+                        modal.remove();
+                        // Return the overflow of the body
+                        document.body.classList.remove('overflow-hidden');
+                        // Remove the blur by toggling the blur class
+                        toggleBlur(modal);
                     })
                 })
-            });
-        }
-        // Disable it after Flowbite's JS
-        if (massDeleteModalTriggerer) {
-            massDeleteModalTriggerer.disabled = true;
-        }
-        // Get all the checkboxes in the table
-        const allTableCheckboxes = document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type=checkbox]`);
-        if (allTableCheckboxes.length > 0) {
-            allTableCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    // make row focused, 2 parent nodes behind
-                    if (checkbox.checked) {
-                        checkbox.parentNode.parentNode.classList.add('bg-gray-200', 'text-black');
-                    } else {
-                        checkbox.parentNode.parentNode.classList.remove('bg-gray-200', 'text-black');
-                    }
-                    const allTableCheckedCheckboxes = countAllCheckedCheckboxes(tableId);
-                    updateSelectedResults(tableId, allTableCheckedCheckboxes);
-                    updateFilteredResults(tableId, countVisibleRows(tableId));
-                    if (massDeleteModalTriggerer && massDeleteModalText) {
-                        if (lang === 'en') {
-                            massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
-                        } else if (lang === 'bg') {
-                            massDeleteModalText.innerText = 'Искате ли да изтриете ' + allTableCheckedCheckboxes + ' записа?';
-                        }
-                        massDeleteModalTriggerer.disabled = allTableCheckedCheckboxes <= 0;
-                    }
-                }, false);
-            })
-        }
-        // Now the mass delete functionality
-
-        // Find the mass delete form, which is in the container and has a class of delete-selected-form
-        const deleteForms = document.querySelectorAll(`#${tableId}-container > form.delete-selected-form`);
-
-        if (deleteForms.length > 0) {
-            deleteForms.forEach(form => {
-                form.addEventListener('submit', (event) => {
-                    deleteLoadingScreen.classList.remove('hidden');
-                    event.preventDefault();
-
-                    const data = new URLSearchParams(new FormData(form));
-                    let responseStatus = 0;
-
-                    fetch('/api/datagrid/delete-records', {
-                        method: 'post',
-                        headers: {
-                            'secretHeader': 'badass',
-                            'X-CSRF-TOKEN': data.get('csrf_token')
-                        },
-                        body: data,
-                        redirect: 'manual'
-                    })
-                    .then(response => {
-                        responseStatus = response.status;
-                        return response.text(); // always parse as text first
-                    })
-                    .then(text => {
-                        let json;
-                        try {
-                            json = JSON.parse(text);
-                        } catch (e) {
-                            // Not valid JSON — show the raw response
-                            deleteLoadingScreenText.remove();
-                            alert(`Server returned an invalid response: ${text}`);
-                            return;
-                        }
-
-                        // Handle known bad statuses
-                        if (responseStatus === 0 || responseStatus === 401 || responseStatus === 403) {
-                            location.reload();
-                            return;
-                        }
-
-                        if (responseStatus >= 400) {
-                            deleteLoadingScreenText.innerHTML = `
-                                <p class="text-red-500 font-semibold">${json?.data ?? 'Unknown error'}</p>
-                            `;
-                            return;
-                        }
-
-                        // Success
-                        deleteLoadingScreenText.innerHTML = `
-                            <p class="text-green-500 font-semibold z-50">${json.data}</p>
-                        `;
-                        location.reload();
-                    })
-                    .catch(err => {
-                        // Network or other errors
-                        deleteLoadingScreenText.innerHTML = `
-                            <p class="text-red-500 font-semibold">Unexpected error: ${err.message}</p>
-                        `;
-                    });
-                }, false);
-            });
-        }
-
-        // Individual delete buttons
-        const deleteButtons = document.querySelectorAll(`#${tableId} > tbody > tr > td > button.delete`);
-
-        if (deleteButtons.length > 0) {
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', (event) => {
-                    // inser the modal after the table
-                    let modal = deleteModal(tableId, `Delete entry with id <b>${event.target.dataset.id}</b> in table <b>${event.target.dataset.table}</b>?`);
-                    // Insert the modal at the bottom of the first div after the body
-                    document.body.insertBefore(modal, document.body.firstChild);
-                    // Now show the modal
-                    modal.classList.remove('hidden');
-                    // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
-                    document.body.classList.add('overflow-hidden');
-                    // Blur the body excluding the modal
-                    toggleBlur(modal);
-                    // First, the close button
-                    const closeXButton = document.getElementById(`${tableId}-x-button`);
-                    // The cancel button
-                    const cancelButton = document.getElementById(`${tableId}-close-button`);
-                    const cancelButtonsArray = [closeXButton, cancelButton];
-                    cancelButtonsArray.forEach(cancelButton => {
-                        cancelButton.addEventListener('click', () => {
-                            // Completely remove the modal
-                            modal.remove();
-                            // Return the overflow of the body
-                            document.body.classList.remove('overflow-hidden');
-                            // Remove the blur by toggling the blur class
-                            toggleBlur(modal);
-                        })
-                    })
-                    const deleteModalButton = document.getElementById(`${tableId}-delete`);
-                    let modalBody = document.getElementById(`${tableId}-body`);
-                    let responseStatus = 0;
-                    deleteModalButton.addEventListener('click', () => {
+                const deleteModalButton = document.getElementById(`${tableId}-delete`);
+                let modalBody = document.getElementById(`${tableId}-body`);
+                let responseStatus = 0;
+                deleteModalButton.addEventListener('click', () => {
                     // transform the button text to a loader
                     deleteModalButton.innerHTML = loaderString();
                     // Build the body of the delete request
@@ -366,41 +363,68 @@ if (tables.length > 0) {
                         console.error('Error during fetch:', error);
                     })
                 })
-                }, false);
-            });
-        }
+            }, false);
+        });
+    }
+}
 
-        /* Check all checkboxes functionality */
-        // Get the "All" checkbox in the table
-        // So basically find the checkbox all checkbox and bind a click event on it
-        $(document).on("change", `#${tableId} input.select-all`, function (event) {
-            //$(`#${tableId} > thead > tr > th > input[type=checkbox].select-all`).click(function(event) {
-            // Find all the visible checkboxes, jquery returns an object so we user Object.entries() to conver to array so we can forEach it and get through the individual rows in the table
-            Object.entries($(`#${tableId} tbody tr:visible :checkbox`).prop('checked', this.checked).closest('tr')).forEach(([index, row]) => {
-                // Weirdly jquery returns an extra key in the array that's not an html element, so it throws errors unless we do this check
-                if (row instanceof Element) {
-                    // If select all checkbox is checked, change the color of the row
-                    if (event.target.checked) {
-                        row.classList.add('bg-gray-200', 'text-black');
-                    } else {
-                        // Else remove the extra classes
-                        row.classList.remove('bg-gray-200', 'text-black');
-                    }
+// Initialize select all functionality
+const initializeSelectAll = (tableId) => {
+    const massDeleteModalTriggerer = document.getElementById(tableId + '-mass-delete-modal-trigger');
+    const massDeleteModalText = document.getElementById(tableId + '-mass-delete-modal-text');
+
+    /* Check all checkboxes functionality */
+    // Get the "All" checkbox in the table
+    // So basically find the checkbox all checkbox and bind a click event on it
+    $(document).on("change", `#${tableId} input.select-all`, function (event) {
+        // Find all the visible checkboxes, jquery returns an object so we user Object.entries() to conver to array so we can forEach it and get through the individual rows in the table
+        Object.entries($(`#${tableId} tbody tr:visible :checkbox`).prop('checked', this.checked).closest('tr')).forEach(([index, row]) => {
+            // Weirdly jquery returns an extra key in the array that's not an html element, so it throws errors unless we do this check
+            if (row instanceof Element) {
+                // If select all checkbox is checked, change the color of the row
+                if (event.target.checked) {
+                    row.classList.add('bg-gray-200', 'text-black');
+                } else {
+                    // Else remove the extra classes
+                    row.classList.remove('bg-gray-200', 'text-black');
                 }
-            });
-            // After this action, we need to update the "Selected" count, as well as tell the modal how many rows we have selected         
-            const allTableCheckedCheckboxes = countAllCheckedCheckboxes(tableId);
-            updateSelectedResults(tableId, allTableCheckedCheckboxes);
-            if (massDeleteModalTriggerer && massDeleteModalText) {
-                if (lang === 'en') {
-                    massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
-                } else if (lang === 'bg') {
-                    massDeleteModalText.innerText = 'Искате ли да изтриете ' + allTableCheckedCheckboxes + ' записа?';
-                }
-                massDeleteModalTriggerer.disabled = (allTableCheckedCheckboxes > 0) ? false : true;
             }
         });
+        // After this action, we need to update the "Selected" count, as well as tell the modal how many rows we have selected         
+        const allTableCheckedCheckboxes = countAllCheckedCheckboxes(tableId);
+        updateSelectedResults(tableId, allTableCheckedCheckboxes);
+        if (massDeleteModalTriggerer && massDeleteModalText) {
+            if (lang === 'en') {
+                massDeleteModalText.innerText = 'Are you sure you want to delete ' + allTableCheckedCheckboxes + ' entries?';
+            } else if (lang === 'bg') {
+                massDeleteModalText.innerText = 'Искате ли да изтриете ' + allTableCheckedCheckboxes + ' записа?';
+            }
+            massDeleteModalTriggerer.disabled = (allTableCheckedCheckboxes > 0) ? false : true;
+        }
     });
+}
+
+// Initialize all DataGrid functionalities for a specific table
+const initializeDataGridActions = (tableId) => {
+    updateFilteredResults(tableId, countVisibleRows(tableId));
+    initializeEditButtons(tableId);
+    initializeCheckboxes(tableId);
+    initializeMassDelete(tableId);
+    initializeDeleteButtons(tableId);
+    initializeSelectAll(tableId);
+}
+
+// Initialize all existing DataGrid tables
+const initializeAllDataGrids = () => {
+    const tables = document.querySelectorAll(`table.datagrid`);
+    
+    if (tables.length > 0) {
+        console.log(`Found ${tables.length} DataGrid tables to initialize.`);
+        tables.forEach(table => {
+            initializeDataGridActions(table.id);
+            console.log(`Initialized DataGrid actions for table: ${table.id}`);
+        });
+    }
 }
 
 const constructOptions = (dataLength, options) => {
@@ -491,6 +515,9 @@ const drawDataGrid = (id, options = null) => {
             });
             // Remove the hidden from the table to show it after the data is loaded
             document.getElementById(`${id}`).classList.remove('hidden');
+            
+            // Initialize all actions for this table after DataTable is ready
+            initializeDataGridActions(id);
         },
     });
     return table;
@@ -569,6 +596,8 @@ const drawDataGridFromData = (json, skeletonId, options = null) => {
         }],
         initComplete: function () {
             document.getElementById(loadingScreen.id).remove();
+            // Initialize all actions for this table after DataTable is ready
+            initializeDataGridActions(skeletonId);
         }
     });
     // Example of adding Tailwind CSS classes to style the thead
@@ -793,3 +822,8 @@ const tableLoadingScreen = (tableId) => {
     loadingScreen.innerHTML = `Data Loading... Please wait<svg class="inline mx-4 w-8 h-8 text-gray-200 dark:text-white animate-spin fill-blue-600 dark:fill-gray-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/></svg>`;
     return loadingScreen;
 }
+
+// Initialize existing DataGrids when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAllDataGrids();
+});

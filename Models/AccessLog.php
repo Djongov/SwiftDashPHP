@@ -70,7 +70,7 @@ class AccessLog extends BasicModel
         // If the parameter is an integer, we assume it's an ID
         if (is_int($param)) {
             if (!$this->exists($param)) {
-                throw (new AccessLogException())->generic('access log ' . $param . ' does not exist', 404);
+                throw (new AccessLogException())->genericError('access log ' . $param . ' does not exist', 404);
             }
             $stmt = $pdo->prepare("SELECT * FROM $this->table WHERE id = ?");
             $stmt->execute([$param]);
@@ -78,7 +78,7 @@ class AccessLog extends BasicModel
         } else {
             // Check if IP exists
             if (!$this->exists($param)) {
-                throw (new AccessLogException())->generic('access log ' . $param . ' does not exist', 404);
+                throw (new AccessLogException())->genericError('access log ' . $param . ' does not exist', 404);
             }
             $stmt = $pdo->prepare("SELECT * FROM $this->table WHERE $this->mainColumn = ?");
             $stmt->execute([$param]);
@@ -95,14 +95,14 @@ class AccessLog extends BasicModel
         try {
             $stmt->execute($dataValues);
         } catch (\Exception $e) {
-            throw (new AccessLogException())->generic($e->getMessage(), 400);
+            throw (new AccessLogException())->genericError($e->getMessage(), 400);
         }
     }
     public function delete(int $id, string $deletedBy): bool
     {
         // Check if IP exists
         if (!$this->exists($id)) {
-            throw (new AccessLogException())->generic('ID ' . $id . ' does not exist', 404);
+            throw (new AccessLogException())->genericError('ID ' . $id . ' does not exist', 404);
         }
         $db = new DB();
         $pdo = $db->getConnection();

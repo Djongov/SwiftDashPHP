@@ -45,19 +45,41 @@ function searchArrayForKey($array, $key) {
     // If the key was not found, return null
     return null;
 }
+
 function currentIP(): string
 {
-    if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-        $client_ip = $_SERVER["HTTP_CF_CONNECTING_IP"];
-    } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-        $client_ip = str_replace(strstr($_SERVER['HTTP_CLIENT_IP'], ':'), '', $_SERVER['HTTP_CLIENT_IP']);
-    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        // or just use the normal remote addr
-        $client_ip = $_SERVER['REMOTE_ADDR'];
+    $ipSources = [
+        'HTTP_CF_CONNECTING_IP',
+        'HTTP_X_AZURE_CLIENTIP',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_CLIENT_IP',
+    ];
+
+    foreach ($ipSources as $key) {
+        if (!empty($_SERVER[$key])) {
+            $ip = $_SERVER[$key];
+
+            if ($key === 'HTTP_X_FORWARDED_FOR') {
+                // Take the first IP from a comma-separated list
+                $ip = trim(explode(',', $ip)[0]);
+            }
+
+            if ($key === 'HTTP_CLIENT_IP') {
+                // Remove port if present
+                if (!\App\Utilities\IP::isIpv6($ip)) {
+                    $ip = strtok($ip, ':');
+                }
+            }
+
+            // Validate format (optional, but safe)
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
     }
-    return $client_ip;
+
+    // Fallback
+    return $_SERVER['REMOTE_ADDR'];
 }
 
 function randomString(int $length = 64)
@@ -77,20 +99,16 @@ function currentProtocolAndHost()
 {
     return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
 }
-function getApiKeyFromHeaders()
+function getApiKeyFromHeaders() : ?string
 {
     $headers = getallheaders();
+    $headers = array_change_key_case($headers, CASE_LOWER); // Normalize
+    $headerKey = strtolower(API_KEY_HEADER_NAME); // Normalize expected name
 
-    // Convert the headers array keys to lowercase for case-insensitive search
-    $headers = array_change_key_case($headers, CASE_LOWER);
-
-    // Check for the API key in lowercase
-    $apiKeyHeader = strtolower(API_KEY_NAME);
-
-    if (isset($headers[$apiKeyHeader])) {
-        return $headers[$apiKeyHeader];
+    if (!isset($headers[$headerKey])) {
+        return null;
     } else {
-        return null; // or handle missing API key appropriately
+        return $headers[$headerKey];
     }
 }
 function translate(string $key, array $replace = [], $lang = DEFAULT_LANG): string

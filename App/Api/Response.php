@@ -21,34 +21,24 @@ class Response
         $requestId = random_bytes(16);
         return bin2hex($requestId);
     }
-    public static function responseJson(mixed $data, int $statusCode): string
+    public static function responseJson(mixed $data, int $statusCode, string $requestId): string
     {
         $responseStatus = 'success';
         if ($statusCode >= 400) {
             $responseStatus = 'error';
         }
-        $requestId = self::requestId();
-        // Record the request in the access log
-        (new AccessLog())->add(
-            [
-            'request_id' => $requestId,
-            'api_key' => getApiKeyFromHeaders() ?? 'no api key',
-            'status_code' => $statusCode
-            ]
-        );
         return json_encode(
             [
                 'result' => $responseStatus,
                 'timestampUTC' => gmdate(self::$dateFormat),
                 'serverResponseTimeMs' => self::responseTime(),
-                //'client_ip' => currentIP(),
                 'requestId' => $requestId,
                 'data' => $data
             ],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
         );
     }
-    public static function responseXml(mixed $data, int $statusCode): string
+    public static function responseXml(mixed $data, int $statusCode, string $requestId): string
     {
         $responseStatus = 'success';
         if ($statusCode >= 400) {
@@ -68,7 +58,6 @@ class Response
                 }
             }
         };
-        $requestId = self::requestId();
         // Populate the XML document with data
         $arrayToXml(
             [
@@ -78,16 +67,6 @@ class Response
             'requestId' => $requestId,
             'data' => $data
             ], $xml
-        );
-
-
-        // Record the request in the access log
-        (new AccessLog())->add(
-            [
-            'request_id' => $requestId,
-            'api_key' => getApiKeyFromHeaders() ?? 'no api key',
-            'status_code' => $statusCode
-            ]
         );
 
         return $xml->asXML(); // Return the XML as a string
@@ -109,11 +88,23 @@ class Response
         $contentType = self::decideContentType();
         header('Content-Type: ' . $contentType);
         http_response_code($statusCode);
+        
+        $requestId = self::requestId();
+        $apiKey = getApiKeyFromHeaders();
+
+        // Record the request in the access log
+        (new AccessLog())->add(
+            [
+            'request_id' => $requestId,
+            'api_key' => ($apiKey) ? $apiKey : 'no api key',
+            'status_code' => $statusCode
+            ]
+        );
         // Determine the response method to use
         $responseMethod = $contentType === 'application/xml' ? 'responseXml' : 'responseJson';
 
         // Call the response method dynamically
-        echo self::{$responseMethod}($data, $statusCode);
+        echo self::{$responseMethod}($data, $statusCode, $requestId);
         exit();
     }
 }

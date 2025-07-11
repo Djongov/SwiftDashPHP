@@ -27,6 +27,9 @@ define(
             ]
         ]
     ],
+    'APIM' => [
+        'link' => '/adminx/apim',
+    ],
     'Firewall' => [
         'link' => '/adminx/firewall',
     ],

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 // This trait is used to handle user-specific exceptions
-class UserExceptions extends TemplateException
+class UserExceptions extends ExceptionsTemplate
 {
     public function userAlreadyExists(): self
     {
