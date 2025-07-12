@@ -9,7 +9,7 @@ class Footer
     public static function render($theme): string
     {
         $html = '';
-        $currentYear = '2025-' . date('Y');
+        $currentYear = date('Y');
         $footerClass = 'mt-auto ' . LIGHT_COLOR_SCHEME_CLASS . ' ' . DARK_COLOR_SCHEME_CLASS;
         $html .= '<footer class="' . $footerClass . '">';
             $html .= '<div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">';
