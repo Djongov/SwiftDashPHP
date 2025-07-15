@@ -2,6 +2,31 @@
 
 declare(strict_types=1);
 
+function isXml(string|false|null $response): bool
+{
+    if (!$response) {
+        return false; // Empty or false response is not XML
+    }
+
+    libxml_use_internal_errors(true);
+    $xml = simplexml_load_string($response);
+    libxml_clear_errors();
+
+    return $xml !== false;
+}
+
+function xmlToJson(string $xml): ?string
+{
+    libxml_use_internal_errors(true);
+
+    $xmlObject = simplexml_load_string($xml, "SimpleXMLElement", LIBXML_NOCDATA);
+    if ($xmlObject === false) {
+        return null; // Failed to parse XML
+    }
+
+    $json = json_encode($xmlObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    return $json;
+}
 function getLanguageFlag($code)
 {
     $flags = [
@@ -20,6 +45,13 @@ function dd()
     );
     die;
 }
+function isAssoc(array $array): bool
+{
+    if ([] === $array) return false; // empty array = not associative
+
+    return array_keys($array) !== range(0, count($array) - 1);
+}
+
 function searchArrayForKey($array, $key) {
     // Iterate through each element in the array
     foreach ($array as $k => $v) {
@@ -140,4 +172,11 @@ function translate(string $key, array $replace = [], $lang = DEFAULT_LANG): stri
     }
 
     return $text;
+}
+function base64url_encode(string $data): string {
+    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+}
+function base64url_decode(string $data): string {
+    $data .= str_repeat('=', (4 - strlen($data) % 4) % 4); // Add padding
+    return base64_decode(strtr($data, '-_', '+/'));
 }

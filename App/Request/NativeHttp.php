@@ -6,7 +6,7 @@ namespace App\Request;
 
 class NativeHttp
 {
-    public static function get(string $url, array $headers = [], bool $sslIgnore = false, bool $expectJson = true): array
+    public static function get(string $url, array $headers = [], bool $sslIgnore = false, bool $expectJson = true): array|string
     {
         // Options
         $contextOptions = [
@@ -21,6 +21,10 @@ class NativeHttp
                 'allow_self_signed' => false,
             ]
         ];
+
+        if (parse_url($url, PHP_URL_HOST) === 'techmart.bg') {
+            $sslIgnore = true; // Techmart requires SSL ignore due to certificate issues
+        }
 
         if ($sslIgnore) {
             // Bypass SSL verification (not recommended)
@@ -47,36 +51,76 @@ class NativeHttp
 
         $response = file_get_contents($url, false, $context);
 
+        // Try decoding only if it's actually gzipped
+        $isGzipped = isset($http_response_header) && array_reduce($http_response_header, fn($carry, $line) => $carry || stripos($line, 'Content-Encoding: gzip') !== false, false);
+        
+        $decoded = $isGzipped ? gzdecode($response) : $response;
+
+        if (isXml($decoded) && $expectJson) {
+            $data = xmlToJson($decoded);
+            if ($data === null) {
+                dd([
+                    'XML parse error' => libxml_get_errors(),
+                    'XML content' => $decoded,
+                    'URL' => $url,
+                    'Headers' => $http_response_header
+                ]);
+            }
+        } elseif ($expectJson && !isXml($decoded)) {
+            $data = json_decode($decoded, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // echo '<pre>';
+                // print_r([
+                //     'JSON decode error' => json_last_error_msg(),
+                //     'JSON content' => $decoded,
+                //     'URL' => $url,
+                //     'Headers' => $http_response_header
+                // ]);
+                // echo '</pre>';
+                // die;
+            }
+        }
+
         $responseCode = isset($http_response_header[0])
             ? intval(self::getResponseCode($http_response_header[0]))
             : 0;
 
         if ($responseCode >= 400) {
-            throw new \Exception($response, $responseCode);
+            dd([
+                'HTTP error' => $responseCode,
+                'Response content' => $decoded,
+                'URL' => $url,
+                'Headers' => $http_response_header
+            ]);
+            throw new \Exception($data, $responseCode);
+        }
+        
+        if (!isset($data) || !is_array($data)) {
+            $data = $decoded; // Fallback to raw response if not JSON or XML
         }
 
-        if ($expectJson && $response !== false) {
-            // If we expect JSON, decode it
-            $decodedResponse = json_decode($response, true);
+        if (is_string($data) && str_starts_with($data, '{')) {
+            $data = json_decode($data, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception("JSON decode error: " . json_last_error_msg(), 500);
+                throw new \Exception('JSON decode error: ' . json_last_error_msg(), 500);
             }
-            return $decodedResponse;
         }
+
+        return $data;
     }
-    public static function post(string $url, array $data, bool $sendJson = false, array $headers = [], bool $sslIgnore = false): array
+    public static function post(string $url, array|string $data, bool $sendJson = false, array $headers = [], bool $sslIgnore = false): array
     {
         // Pack data
-        if ($sendJson) {
-            $data = json_encode($data);
-        } else {
-            $data = http_build_query($data);
-        }
+        // if ($sendJson) {
+        //     $data = json_encode($data);
+        // } else {
+        //     $data = http_build_query($data);
+        // }
         // Options
         $options = [
             'http' => [
                 'method' => 'POST',
-                'ignore_errors' => true,
+                'ignore_errors' => false,
                 'content' => $data
             ]
         ];
@@ -97,9 +141,32 @@ class NativeHttp
 
         $response = file_get_contents($url, false, $context);
 
+        // Decompress gzipped response if needed
+        $isGzipped = isset($http_response_header) && array_reduce($http_response_header, fn($carry, $line) => $carry || stripos($line, 'Content-Encoding: gzip') !== false, false);
+        
+        $decoded = $isGzipped ? gzdecode($response) : $response;
+
+        if ($decoded === false) {
+            $decoded = $response; // Fallback to original response if decompression fails
+        }
+
+        if (isXml($decoded)) {
+            $decoded = xmlToJson($decoded);
+        }
+
+        $decoded = json_decode($decoded, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            dd([
+                'JSON decode error' => json_last_error_msg(),
+                'JSON content' => $decoded,
+                'URL' => $url,
+                'Headers' => $http_response_header
+            ]);
+        }
+        
         $responseCode = intval(self::getResponseCode($http_response_header[0]));
 
-        return json_decode($response, true);
+        return $decoded;
     }
 
     private static function getResponseCode($responseHeader)
@@ -122,5 +189,41 @@ class NativeHttp
                 'CN_match'          => parse_url($url)['host']
             ]
         ];
+    }
+    public function diagnosticsCall(string $url) : array
+    {
+        // We want to return body, headers and response code in an array
+        $responseArray = [
+            'body' => '',
+            'headers' => [],
+            'response_code' => 0
+        ];
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'ignore_errors' => true,
+            ],
+            'ssl' => $this->sslOptions($url)
+        ]);
+
+        $response = file_get_contents($url, false, $context);
+
+        if ($response === false) {
+            $responseArray['body'] = 'Error fetching URL';
+            return $responseArray;
+        }
+
+        $responseArray['body'] = $response;
+
+        if (isset($http_response_header)) {
+            $responseArray['headers'] = $http_response_header;
+            $responseArray['response_code'] = self::getResponseCode($http_response_header[0]);
+        } else {
+            $responseArray['headers'] = [];
+            $responseArray['response_code'] = 0;
+        }
+
+        return $responseArray;
     }
 }

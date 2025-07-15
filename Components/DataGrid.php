@@ -119,11 +119,11 @@ class DataGrid
         if ($totalRows >= $maxInputVars) {
             array_push($lengthMenu[0], $maxInputVars - 10);
             array_push($lengthMenu[1], $maxInputVars - 10);
+        } else {
+            // In the end add the -1 and all
+            array_push($lengthMenu[0], -1);
+            array_push($lengthMenu[1], 'All');
         }
-
-        // In the end add the -1 and all
-        array_push($lengthMenu[0], -1);
-        array_push($lengthMenu[1], 'All');
 
         return $lengthMenu;
     }
@@ -145,16 +145,19 @@ class DataGrid
             ]
         );
     }
-    public static function fromDBTable(string $dbTable, ?string $title, string $theme, bool $edit = true, bool $delete = true, $orderBy = 'id', $sortBy = 'desc', ?array $tableOptions = null): string
+    public static function fromDBTable(string $dbTable, ?string $title, string $theme, bool $edit = true, bool $delete = true, $orderBy = 'id', $sortBy = 'desc', ?int $limit = null, ?array $tableOptions = null): string
     {
         // We pull from table
         if ($sortBy !== 'asc' && $sortBy !== 'desc') {
             return Alerts::danger('Invalid sort order. Please use either "asc" or "desc"');
         }
+        if (!$limit) {
+            $limit = ini_get('max_input_vars');
+        }
         $db = new DB();
         $pdo = $db->getConnection();
         try {
-            $stmt = $pdo->query('SELECT * FROM ' . $dbTable . ' ORDER BY ' . $orderBy . ' ' . strtoupper($sortBy) . '');
+            $stmt = $pdo->query('SELECT * FROM ' . $dbTable . ' ORDER BY ' . $orderBy . ' ' . strtoupper($sortBy) . ' LIMIT ' . $limit);
             $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             return Alerts::danger('Error fetching data from the database: ' . $e->getMessage());

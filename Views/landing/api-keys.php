@@ -79,7 +79,7 @@ $lineChartData = [
     'labels' => array_keys($groupedRequests),
     'datasets' => [
         [
-            'label' => 'Requests over time',
+            'label' => 'Daily requests usage',
             'data' => array_values($groupedRequests)
         ]
     ]
@@ -110,7 +110,7 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap justify-start
                 'labels' => array_keys($groupedRequests),
                 'datasets' => [
                     [
-                        'label' => 'Requests over time',
+                        'label' => 'Daily requests usage',
                         'data' => array_values($groupedRequests)
                     ]
                 ]

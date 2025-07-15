@@ -117,6 +117,24 @@ define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR
 // This is used by the curl requests so you don't get SSL verification errors. It's located in the .tools folder
 define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
 
+$expectedCert = realpath(CURL_CERT);
+
+$iniCafile = realpath(ini_get('openssl.cafile') ?: '');
+if ($iniCafile !== $expectedCert) {
+    die(
+        'openssl.cafile must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
+        'Currently it is set to <b>' . ($iniCafile ?: 'NOT SET or INVALID PATH') . '</b>.'
+    );
+}
+
+$iniCainfo = realpath(ini_get('curl.cainfo') ?: '');
+if ($iniCainfo !== $expectedCert) {
+    die(
+        'curl.cainfo must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
+        'Currently it is set to <b>' . ($iniCainfo ?: 'NOT SET or INVALID PATH') . '</b>.'
+    );
+}
+
 // This needs to be set to what is set across the fetch requests in the javascript files. Default is the below
 define('SECRET_HEADER', 'secretheader');
 // Same as above
