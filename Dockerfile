@@ -8,17 +8,19 @@ COPY .tools/deployment/sshd_config /etc/ssh/sshd_config
 COPY .tools/deployment/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Install required packages and configure PHP
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
     && apt-get install -y --no-install-recommends \
-    curl \
-    dialog \
-    libgmp-dev \
-    libicu-dev \
-    libssl-dev \
-    openssh-server \
-    sed \
-    unzip \
-    vim \
+       curl \
+       dialog \
+       libgmp-dev \
+       libicu-dev \
+       libssl-dev \
+       openssh-server \
+       sed \
+       unzip \
+       vim \
+    && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) intl pdo_mysql mysqli \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
@@ -38,12 +40,10 @@ RUN apt-get update \
     && a2enmod rewrite \
     && a2enmod headers
 
-# SSH-specific setup (can be commented out if not needed)
+# SSH-specific and final setup
 RUN mkdir /var/run/sshd \
-    && chmod 600 /etc/ssh/sshd_config
-
-# Final setup
-RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && chmod 600 /etc/ssh/sshd_config \
+    && chmod +x /usr/local/bin/entrypoint.sh \
     && rm -rf /var/lib/apt/lists/* \
     \
     # Enable additional access log for logrotate
@@ -51,7 +51,14 @@ RUN chmod +x /usr/local/bin/entrypoint.sh \
     && chown www-data:adm /var/log/apache2/custom_access.log \
     && chmod 644 /var/log/apache2/custom_access.log \
     && chown www-data:www-data /var/log/apache2/custom_access.log \
-    && echo "/var/log/apache2/custom_access.log {\n    daily\n    rotate 7\n    compress\n    missingok\n    notifempty\n    create 0640 www-data adm\n}" | tee /etc/logrotate.d/apache2-custom > /dev/null \
+    && echo "/var/log/apache2/custom_access.log {" > /etc/logrotate.d/apache2-custom \
+    && echo "    daily" >> /etc/logrotate.d/apache2-custom \
+    && echo "    rotate 7" >> /etc/logrotate.d/apache2-custom \
+    && echo "    compress" >> /etc/logrotate.d/apache2-custom \
+    && echo "    missingok" >> /etc/logrotate.d/apache2-custom \
+    && echo "    notifempty" >> /etc/logrotate.d/apache2-custom \
+    && echo "    create 0640 www-data adm" >> /etc/logrotate.d/apache2-custom \
+    && echo "}" >> /etc/logrotate.d/apache2-custom \
     && service apache2 restart \
     && rm -rf /var/www/html/.tools/deployment \
     && rm -rf /var/www/html/.dockerignore

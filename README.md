@@ -127,3 +127,21 @@ The foundation for localisation is there; you just need to expand it. A working 
 ## SendGrid mailsender
 
 API endpoint for sending mails and a TinyMCE endpoint for sending manually.
+
+## Docker
+
+```cmd
+DOCKER_BUILDKIT=1 docker build -t swiftdashphp:latest .
+```
+
+```cmd
+az acr login --name swisscrmacrsn
+```
+
+```cmd
+docker tag swiftdashphp:latest swisscrmacrsn.azurecr.io/swiftdashphp:latest
+```
+
+```cmd
+docker push swisscrmacrsn.azurecr.io/swiftdashphp:latest
+```
