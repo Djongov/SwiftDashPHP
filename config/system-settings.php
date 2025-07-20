@@ -2,21 +2,6 @@
 
 declare(strict_types=1);
 
-// PHP ini settings checks
-$phpIniSettings = [
-    'memory_limit' => '512M',
-    'post_max_size' => '12M',
-    'upload_max_filesize' => '12M',
-    'max_execution_time' => 60,
-    'max_input_time' => 60,
-];
-
-foreach ($phpIniSettings as $setting => $value) {
-    if (ini_get($setting) < $value) {
-        die($setting . ' should be at least ' . $value);
-    }
-}
-
 define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']));
 
 if (ini_get('display_errors') == 1) {

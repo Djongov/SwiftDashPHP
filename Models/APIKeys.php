@@ -6,7 +6,7 @@ namespace Models;
 
 use App\Database\DB;
 
-class APIKeys
+class APIKeys extends BasicModel
 {
     protected DB $db;
     protected string $table = 'api_keys';

@@ -2,6 +2,50 @@
 
 declare(strict_types=1);
 
+// PHP ini settings checks
+function parseIniSize(string $size): int {
+    $unit = strtolower(substr($size, -1));
+    $bytes = (int)$size;
+
+    switch ($unit) {
+        case 'g':
+            $bytes *= 1024;
+            // no break - fall through
+        case 'm':
+            $bytes *= 1024;
+            // no break - fall through
+        case 'k':
+            $bytes *= 1024;
+            break;
+    }
+
+    return $bytes;
+}
+
+$phpIniSettings = [
+    'memory_limit' => '512M',
+    'post_max_size' => '12M',
+    'upload_max_filesize' => '12M',
+    'max_execution_time' => 60,
+    'max_input_time' => 60,
+];
+
+foreach ($phpIniSettings as $setting => $value) {
+    $current = ini_get($setting);
+
+    // For time settings, compare as int
+    if (in_array($setting, ['max_execution_time', 'max_input_time'])) {
+        if ((int)$current < (int)$value) {
+            die("$setting should be at least $value");
+        }
+    } else {
+        // For size settings, parse sizes to bytes
+        if (parseIniSize($current) < parseIniSize($value)) {
+            die("$setting should be at least $value");
+        }
+    }
+}
+
 define("FROM", "admin@gamerz-bg.com");
 define("FROM_NAME", "No Reply");
 define("ADMINISTRATOR_EMAIL", "admin@gamerz-bg.com");

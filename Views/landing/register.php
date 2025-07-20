@@ -75,13 +75,13 @@ echo '<div class="flex items-center justify-center mx-4">
             'method' => 'POST', // Optional, defaults to POST
             'redirectOnSubmit' => '/login',
             'submitButton' => [
-                'text' => 'Register',
+                'text' => translate('register'),
                 'size' => 'medium',
                 //'style' => '&#10060;'
             ],
         ];
-        echo Html::h2('Register', true);
-        echo Html::small('Register a new local user account.');
+        echo Html::h2(translate('register'), true);
+        echo Html::small(translate('register_description'));
         echo Forms::render($registrationForm);
-        echo '</div>';
-        echo '</div>';
+    echo '</div>';
+echo '</div>';
