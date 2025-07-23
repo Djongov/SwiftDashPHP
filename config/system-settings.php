@@ -112,8 +112,8 @@ define('SECRET_HEADER_VALUE', 'badass');
 
 define('API_KEY_HEADER_NAME', 'X-API-Key'); // The header name for the API key
 
-define('WEBHOOK_SECRET_NAME', 'webhook_secret'); // The name of the webhook secret in the .env file
-define('WEBHOOK_SECRET', $_ENV[WEBHOOK_SECRET_NAME] ?? ''); // The value of the webhook secret
+define('WEBHOOK_SECRET_NAME', 'webhook-secret'); // The name of the webhook secret in the .env file
+define('WEBHOOK_SECRET', $_ENV['WEBHOOK_SECRET'] ?? ''); // The value of the webhook secret
 
 /*
 
