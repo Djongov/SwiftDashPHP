@@ -12,11 +12,11 @@ class DB
     private $_pdo;
 
     public function __construct(
-        string $host = DB_HOST,
-        string $username = DB_USER,
-        string $password = DB_PASS,
+        ?string $host = DB_HOST,
+        ?string $username = DB_USER,
+        ?string $password = DB_PASS,
         string $database = DB_NAME,
-        int $port = DB_PORT,
+        ?int $port = DB_PORT,
         string $driver = DB_DRIVER
     )
     {

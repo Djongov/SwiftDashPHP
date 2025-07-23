@@ -73,23 +73,23 @@ define(
     ]
 );
 
-$expectedCert = realpath(CURL_CERT);
+// $expectedCert = realpath(CURL_CERT);
 
-$iniCafile = realpath(ini_get('openssl.cafile') ?: '');
-if ($iniCafile !== $expectedCert) {
-    die(
-        'openssl.cafile must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
-        'Currently it is set to <b>' . ($iniCafile ?: 'NOT SET or INVALID PATH') . '</b>.'
-    );
-}
+// $iniCafile = realpath(ini_get('openssl.cafile') ?: '');
+// if ($iniCafile !== $expectedCert) {
+//     die(
+//         'openssl.cafile must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
+//         'Currently it is set to <b>' . ($iniCafile ?: 'NOT SET or INVALID PATH') . '</b>.'
+//     );
+// }
 
-$iniCainfo = realpath(ini_get('curl.cainfo') ?: '');
-if ($iniCainfo !== $expectedCert) {
-    die(
-        'curl.cainfo must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
-        'Currently it is set to <b>' . ($iniCainfo ?: 'NOT SET or INVALID PATH') . '</b>.'
-    );
-}
+// $iniCainfo = realpath(ini_get('curl.cainfo') ?: '');
+// if ($iniCainfo !== $expectedCert) {
+//     die(
+//         'curl.cainfo must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
+//         'Currently it is set to <b>' . ($iniCainfo ?: 'NOT SET or INVALID PATH') . '</b>.'
+//     );
+// }
 
 // Insert manual files in App\App
 $pathsToIncludeInAppApp = [

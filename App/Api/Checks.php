@@ -260,6 +260,22 @@ class Checks
             Response::output('Invalid image type', 400);
         }
     }
+    public function apiWebhookCheck(): void
+    {
+        // get all headers
+        $headers = getallheaders();
+        $lowercaseHeaders = array_change_key_case($headers);
+        // Check if the secret header is set
+        $expectedSecretHeader = WEBHOOK_SECRET_NAME;
+
+        if (!isset($lowercaseHeaders[$expectedSecretHeader])) {
+            Response::output('Missing required header', $this->defaultStatusCode);
+        }
+
+        if (trim($lowercaseHeaders[$expectedSecretHeader]) !== WEBHOOK_SECRET) {
+            Response::output('Invalid required header value', $this->defaultStatusCode);
+        }
+    }
     /**
      * A complete set of checks, suitable for api calls
      *
