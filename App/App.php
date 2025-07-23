@@ -31,7 +31,6 @@ class App
                 die('Required file ' . $path . ' not found in App\App');
             }
         }
-        
 
         // Set the default language in session
         if (MULTILINGUAL && !isset($_SESSION['lang'])) {
@@ -52,7 +51,7 @@ class App
         // Fetch method and URI from somewhere
         $httpMethod = $_SERVER['REQUEST_METHOD'];
         $uri = $_SERVER['REQUEST_URI'];
-
+        
         // Strip query string (?foo=bar) and decode URI
         if ($pos = strpos($uri, '?')) {
             $uri = substr($uri, 0, $pos);
@@ -102,7 +101,6 @@ class App
             case \FastRoute\Dispatcher::FOUND:
                 $controllerInfo = $routeInfo[1];
                 $controllerName = $controllerInfo[0]; // Path to controller file
-
                 // Extract route parameters if any
                 $params = $controllerInfo[1] ?? [];
 
@@ -131,7 +129,7 @@ class App
                     break;
                 }
                 // Non-API Endpoints
-                if ($httpMethod === 'GET' && !empty($params)) {
+                if ($httpMethod === 'GET' && !empty($params) && !$isApi) {
                     $menuArray = $params['menu'] ?? [];
                     $page = new Page();
                     echo $page->build(
@@ -147,6 +145,11 @@ class App
                         $routeInfo // Pass route info to the controllers that are GET and build a page
                     );
                 } else {
+                    $usernameArray = $loginInfo['usernameArray'];
+                    $isAdmin = $loginInfo['isAdmin'];
+                    $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+                    $loggedIn = $loginInfo['loggedIn'];
+                    // Include the controller file
                     include_once $controllerName;
                 }
                 break;
