@@ -77,7 +77,8 @@ if ($userModel->exists($idTokenArray['preferred_username'])) {
 
 // Issue a local JWT token if not using remote ID token
 if (!USE_REMOTE_ID_TOKEN && LOCAL_USER_LOGIN) {
-    $idToken = JWT::generateToken([
+    $idToken = JWT::generateToken(
+        [
         'provider' => 'azure',
         'username' => $idTokenArray['preferred_username'],
         'name' => $idTokenArray['name'],
@@ -86,7 +87,8 @@ if (!USE_REMOTE_ID_TOKEN && LOCAL_USER_LOGIN) {
             $userDetailsArray['role']
         ],
         'last_ip' => currentIP()
-    ], JWT_TOKEN_EXPIRY);
+        ], JWT_TOKEN_EXPIRY
+    );
 }
 // Let's set the "auth_cookie" and put the id token as it's value, set the expiration date to when the token should expire and the rest of the cookie settings
 AuthToken::set($idToken);

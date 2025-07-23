@@ -15,6 +15,13 @@ class CSPReports
      * @param array $data. Array of the CSP report originally sent
      * @return array
      */
+    public string $dbTable;
+    private DB $_db;
+    public function __construct()
+    {
+        $this->dbTable = 'csp_reports';
+        $this->_db = new DB();
+    }
     public function create(array $data): array
     {
         $jsonData = json_encode($data) ?? null;
@@ -31,8 +38,7 @@ class CSPReports
         $statusCode = $data['csp-report']['status-code'] ?? null;
         $scriptSample = $data['csp-report']['script-sample'] ?? null;
         $domain = parse_url($data['csp-report']['document-uri'], PHP_URL_HOST);
-        $db = new DB();
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
         $stmt = $pdo->prepare("INSERT INTO csp_reports (data, domain, url, referrer, violated_directive, effective_directive, original_policy, disposition, blocked_uri, line_number, column_number, source_file, status_code, script_sample) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         try {
             $stmt->execute([$jsonData, $domain, $url, $referrer, $violatedDirective, $effectiveDirective, $originalPolicy, $disposition, $blockedUri, $lineNumber, $columnNumber, $sourceFile, $statusCode, $scriptSample]);

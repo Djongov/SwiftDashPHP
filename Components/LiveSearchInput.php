@@ -6,7 +6,7 @@ namespace Components;
 
 class LiveSearchInput
 {
-    public static function render(string $searchForTextInClass, string $filterParentElement, string $theme, string $placeholder = "Търси продукт") : string
+    public static function render(string $searchForTextInClass, string $filterParentElement, string $theme, string $placeholder = "Търси продукт"): string
     {
         $html = '';
         $html .= '<label for="live-search-input" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>';

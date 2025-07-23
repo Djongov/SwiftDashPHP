@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 // PHP ini settings checks
-function parseIniSize(string $size): int {
+function parseIniSize(string $size): int
+{
     $unit = strtolower(substr($size, -1));
     $bytes = (int)$size;
 
@@ -56,7 +57,9 @@ define('DEFAULT_LANG', 'en');
 // Site title, Goes on footer and main menu header
 define("SITE_TITLE", translate('site_title'));
 
-define('LOGIN_EXEMPTIONS', [
+define(
+    'LOGIN_EXEMPTIONS',
+    [
     '/',
     '/docs',
     '/docs/*',
@@ -67,7 +70,31 @@ define('LOGIN_EXEMPTIONS', [
     '/forms',
     '/datagrid',
     '/blablabla', // to showcase the 404 page,
-]);
+    ]
+);
+
+$expectedCert = realpath(CURL_CERT);
+
+$iniCafile = realpath(ini_get('openssl.cafile') ?: '');
+if ($iniCafile !== $expectedCert) {
+    die(
+        'openssl.cafile must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
+        'Currently it is set to <b>' . ($iniCafile ?: 'NOT SET or INVALID PATH') . '</b>.'
+    );
+}
+
+$iniCainfo = realpath(ini_get('curl.cainfo') ?: '');
+if ($iniCainfo !== $expectedCert) {
+    die(
+        'curl.cainfo must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
+        'Currently it is set to <b>' . ($iniCainfo ?: 'NOT SET or INVALID PATH') . '</b>.'
+    );
+}
+
+// Insert manual files in App\App
+$pathsToIncludeInAppApp = [
+    //'config/product-functions.php',
+];
 
 /*
 
@@ -81,7 +108,8 @@ define('SYSTEM_USER_AGENT', SITE_TITLE . '/' . VERSION . ' (+https://' . $_SERVE
 
 // Key words for SEO
 define(
-    "GENERIC_KEYWORDS", [
+    "GENERIC_KEYWORDS",
+    [
     SITE_TITLE,
     ]
 );

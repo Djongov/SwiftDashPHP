@@ -14,18 +14,18 @@ class Checks
     /**
      * @var array
      */
-    private array $userVars;
-    private array $data;
+    private array $_userVars;
+    private array $_data;
     public int $defaultStatusCode = 401;
     /**
      * Checks constructor.
      *
      * @param array $loginInfo
      */
-    public function __construct(array $userVars, array $data)
+    public function __construct(array $_userVars, array $_data)
     {
-        $this->userVars = $userVars;
-        $this->data = $data;
+        $this->_userVars = $_userVars;
+        $this->_data = $_data;
     }
     /**
      * Checks if the user is an admin
@@ -34,7 +34,7 @@ class Checks
      */
     public function isAdmin(): bool
     {
-        return $this->userVars['isAdmin'] ?? false;
+        return $this->_userVars['isAdmin'] ?? false;
     }
     /**
      * Checks if the user is an admin from the JWT token
@@ -68,7 +68,7 @@ class Checks
      */
     public function adminCheck(): void
     {
-        if (!isset($this->userVars['isAdmin'])) {
+        if (!isset($this->_userVars['isAdmin'])) {
             Response::output('Administator status not set', $this->defaultStatusCode);
         }
         if (!$this->isAdmin()) {
@@ -88,13 +88,13 @@ class Checks
         if (AuthToken::get() === null) {
             Response::output('Missing token', $this->defaultStatusCode);
         }
-        if (!isset($this->userVars['usernameArray']['provider'])) {
+        if (!isset($this->_userVars['usernameArray']['provider'])) {
             Response::output('Missing provider in user');
         }
-        if ($this->userVars['usernameArray']['provider'] === 'local' && !JWT::checkToken(AuthToken::get())) {
+        if ($this->_userVars['usernameArray']['provider'] === 'local' && !JWT::checkToken(AuthToken::get())) {
             Response::output('Invalid local token', $this->defaultStatusCode);
         }
-        if ($this->userVars['usernameArray']['provider'] === 'azure' && USE_REMOTE_ID_TOKEN && !AzureAD::check(AuthToken::get())) {
+        if ($this->_userVars['usernameArray']['provider'] === 'azure' && USE_REMOTE_ID_TOKEN && !AzureAD::check(AuthToken::get())) {
             Response::output('Invalid Azure token', $this->defaultStatusCode);
         }
     }
@@ -109,10 +109,10 @@ class Checks
         if (AuthToken::get() === null) {
             Response::output('Missing auth token', $this->defaultStatusCode);
         }
-        if (!isset($this->userVars['usernameArray']['username'])) {
+        if (!isset($this->_userVars['usernameArray']['username'])) {
             Response::output('Missing username', $this->defaultStatusCode);
         }
-        if ($this->userVars['usernameArray']['username'] !== JWT::extractUserName(AuthToken::get())) {
+        if ($this->_userVars['usernameArray']['username'] !== JWT::extractUserName(AuthToken::get())) {
             JWT::handleValidationFailure();
             Response::output('Username anomaly', $this->defaultStatusCode);
         }
@@ -127,11 +127,11 @@ class Checks
         if (!isset($_SESSION['csrf_token'])) {
             Response::output('Missing Session CSRF Token', $this->defaultStatusCode);
         }
-        if (!isset($this->data['csrf_token'])) {
+        if (!isset($this->_data['csrf_token'])) {
             Response::output('Missing POST CSRF Token', $this->defaultStatusCode);
         }
         // Compare the postToken to the $_SESSION['csrf_token']
-        if ($this->data['csrf_token'] !== $_SESSION['csrf_token']) {
+        if ($this->_data['csrf_token'] !== $_SESSION['csrf_token']) {
             Response::output('Invalid CSRF Token', $this->defaultStatusCode);
         }
     }
@@ -148,10 +148,10 @@ class Checks
         if (!isset($lowercaseHeaders['x-csrf-token'])) {
             Response::output('Missing CSRF Token header', $this->defaultStatusCode);
         }
-        if (!isset($this->data['csrf_token'])) {
+        if (!isset($this->_data['csrf_token'])) {
             Response::output('Missing POST CSRF Token', $this->defaultStatusCode);
         }
-        if ($this->data['csrf_token'] !== $lowercaseHeaders['x-csrf-token']) {
+        if ($this->_data['csrf_token'] !== $lowercaseHeaders['x-csrf-token']) {
             Response::output('Invalid CSRF Token', $this->defaultStatusCode);
         }
     }
@@ -173,23 +173,23 @@ class Checks
     public function loginCheck(): void
     {
         // Check if $loginInfo['loggedIn'] is set
-        if (!isset($this->userVars['loggedIn'])) {
+        if (!isset($this->_userVars['loggedIn'])) {
             Response::output('You are not logged in (loggedIn not set)', $this->defaultStatusCode);
         }
         // Check if $loginInfo['loggedIn'] is true
-        if (!$this->userVars['loggedIn']) {
+        if (!$this->_userVars['loggedIn']) {
             Response::output('You are not logged in (loggedIn false)', $this->defaultStatusCode);
         }
         // Now check if the usernameArray is set
-        if (!isset($this->userVars['usernameArray'])) {
+        if (!isset($this->_userVars['usernameArray'])) {
             Response::output('You are not logged in (usernameArray not set)', $this->defaultStatusCode);
         }
         // Now check if the usernameArray is an array
-        if (!is_array($this->userVars['usernameArray'])) {
+        if (!is_array($this->_userVars['usernameArray'])) {
             Response::output('You are not logged in (usernameArray not an array)', $this->defaultStatusCode);
         }
         // Now check if the usernameArray is not empty
-        if (empty($this->userVars['usernameArray'])) {
+        if (empty($this->_userVars['usernameArray'])) {
             Response::output('You are not logged in (usernameArray empty)', $this->defaultStatusCode);
         }
     }

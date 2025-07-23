@@ -8,7 +8,7 @@ use App\Api\Response;
 
 $requiredQueryStrings = ['state', 'username', 'scope'];
 
-foreach($requiredQueryStrings as $queryString) {
+foreach ($requiredQueryStrings as $queryString) {
     if (!isset($_GET[$queryString])) {
         Response::output("{$queryString} query string is required", 400);
     }

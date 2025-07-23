@@ -28,7 +28,9 @@ class Cookies
 
         $domainCookie = str_replace($colonPosition, '', $domainCookie);
         setcookie(
-            AUTH_COOKIE_NAME, $token, [
+            AUTH_COOKIE_NAME,
+            $token,
+            [
             'expires' => JWT::parseTokenPayLoad($token)['exp'] + $expiry,
             'path' => '/',
             'domain' => $domainCookie, // strip : from HOST in cases where localhost:8080 is used

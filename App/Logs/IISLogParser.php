@@ -9,21 +9,21 @@ class IISLogParser
     /**
      * @var resource
      */
-    protected $file;
+    protected $_file;
 
     /**
      * Create a new parser instance.
      *
-     * @param mixed $file A valid file resource (opened via fopen())
+     * @param mixed $_file A valid file resource (opened via fopen())
      *
      * @throws InvalidArgumentException if not given a resource.
      */
-    public function __construct($file)
+    public function __construct($_file)
     {
-        if (!is_resource($file)) {
+        if (!is_resource($_file)) {
             throw new \InvalidArgumentException('A valid file resource is required.');
         }
-        $this->file = $file;
+        $this->_file = $_file;
     }
 
     /**
@@ -43,13 +43,13 @@ class IISLogParser
     public function parse(): array
     {
         // Reset file pointer to the beginning.
-        rewind($this->file);
+        rewind($this->_file);
 
         $columns   = [];
         $dataLines = [];
 
         // Read the file line by line.
-        while (($line = fgets($this->file)) !== false) {
+        while (($line = fgets($this->_file)) !== false) {
             $line = trim($line);
             if ($line === '') {
                 continue; // skip empty lines

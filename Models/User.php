@@ -12,13 +12,17 @@ use Models\BasicModel;
 class User extends BasicModel
 {
     public string $table = 'users';
+    protected DB $_db;
+    public function __construct()
+    {
+        $this->_db = new DB();
+    }
     // Existence checks
     public function exists(string|int $param): bool
     {
         // If it is an integer, we'll assume it's an id, otherwise we'll assume it's an api key
         $column = is_int($param) ? 'id' : 'username';
-        $db = new DB();
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
         $stmt = $pdo->prepare("SELECT * FROM users WHERE $column=?");
         $stmt->execute([$param]);
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -29,8 +33,7 @@ class User extends BasicModel
     // User get
     public function get(string|int|null $param = null): array
     {
-        $db = new DB();
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
         if ($param === null) {
             // Let's pull all
             try {
@@ -38,7 +41,7 @@ class User extends BasicModel
 
                 $array = $result->fetchAll(\PDO::FETCH_ASSOC);
             } catch (\PDOException $e) {
-                throw (new UserExceptions())->generic($e->getMessage(), 500);
+                throw (new UserExceptions())->genericError($e->getMessage(), 500);
             }
             if (!$array) {
                 throw (new UserExceptions())->userNotFound();
@@ -57,7 +60,7 @@ class User extends BasicModel
                     return $array;
                 }
             } catch (\PDOException $e) {
-                throw (new UserExceptions())->generic($e->getMessage(), 500);
+                throw (new UserExceptions())->genericError($e->getMessage(), 500);
             }
         }
         // Finally, let's pull the api key by the api key
@@ -66,14 +69,14 @@ class User extends BasicModel
             $stmt->execute([$param]);
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
-            throw (new UserExceptions())->generic($e->getMessage() . ' and query is: ', 500);
+            throw (new UserExceptions())->genericError($e->getMessage() . ' and query is: ', 500);
         }
 
         if (!$result) {
             if (ERROR_VERBOSE) {
                 throw (new UserExceptions())->userNotFound();
             } else {
-                throw (new UserExceptions())->generic('Invalid username or password', 401);
+                throw (new UserExceptions())->genericError('Invalid username or password', 401);
             }
         }
         return $result;
@@ -89,7 +92,7 @@ class User extends BasicModel
         // Now let's check if the structure of the data matches the table
         foreach ($data as $key => $value) {
             if (!in_array($key, $tableColumns)) {
-                throw (new UserExceptions())->generic('Invalid field ' . $key, 400);
+                throw (new UserExceptions())->genericError('Invalid field ' . $key, 400);
             }
         }
 
@@ -98,15 +101,13 @@ class User extends BasicModel
             throw (new UserExceptions())->userAlreadyExists();
         }
 
-        $db = new DB();
-
         // Prepare the password
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
 
         // Now let's check if the structure of the data matches the table
-        $db->checkDBColumnsAndTypes($data, 'users');
+        $this->_db->checkDBColumnsAndTypes($data, 'users');
 
         $query = 'INSERT INTO users (';
         $columns = [];
@@ -118,7 +119,7 @@ class User extends BasicModel
 
         $query .= implode(', ', $columns) . ') VALUES (' . implode(', ', $values) . ')';
 
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
         $stmt = $pdo->prepare($query);
         $stmt->execute(array_values($data));
 
@@ -140,8 +141,7 @@ class User extends BasicModel
             throw (new UserExceptions())->userNotFound();
         }
 
-        $db = new DB();
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
 
         $query = 'UPDATE users SET ';
         $updates = [];
@@ -168,14 +168,11 @@ class User extends BasicModel
             if (ini_get('display_errors') === '1') {
                 throw new \PDOException($e->getMessage());
             } else {
-                throw (new UserExceptions())->generic('Could not update user', 500);
+                throw (new UserExceptions())->genericError('Could not update user', 500);
             }
         }
 
-        $rowCount = $stmt->rowCount();
-
-
-        return $rowCount;
+        return $stmt->rowCount();
     }
     // User Deleter
     public function delete(string|int $param): bool
@@ -188,8 +185,7 @@ class User extends BasicModel
             } else {
                 $column = 'id';
             }
-            $db = new DB();
-            $pdo = $db->getConnection();
+            $pdo = $this->_db->getConnection();
             $stmt = $pdo->prepare('DELETE FROM users WHERE ' . $column . ' =?');
             $stmt->execute([$param]);
             if ($stmt->rowCount() === 0) {

@@ -130,7 +130,13 @@ class DataGrid
     public static function simpleTable(array $data, string $theme): string
     {
         return self::createTable(
-            '', null, $data, $theme, false, false, [
+            '',
+            null,
+            $data,
+            $theme,
+            false,
+            false,
+            [
             'searching' => false,
             'filters' => false,
             'ordering' => false,

@@ -56,7 +56,6 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
         ], JWT_TOKEN_EXPIRY
     );
 
-    //$expiry_addition = ($_POST['remember'] === "1") ? 86400 * 24 * 12 : 86400;
     AuthToken::set($idToken);
     // Record last login
     $user->updateLastLogin($userArray['username']);

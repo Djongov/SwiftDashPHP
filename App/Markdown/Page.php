@@ -22,7 +22,7 @@ class Page
         if ($variableMap) {
             $fileContents = str_replace(array_keys($variableMap), array_values($variableMap), $fileContents);
         }
-        
+
         if (str_starts_with($fileContents, '---')) {
             // If metadata exists, split the content into metadata and Markdown content
             list($metadata, $markdown) = explode("\n---\n", $fileContents, 2);
@@ -65,8 +65,9 @@ class Page
         $files = array_diff($files, ['.', '..', 'index.php']);
         $files = array_map(
             function ($file) {
-            return str_replace('.md', '', $file);
-            }, $files
+                return str_replace('.md', '', $file);
+            },
+            $files
         );
         return $files;
     }

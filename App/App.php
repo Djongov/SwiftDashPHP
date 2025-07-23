@@ -19,12 +19,19 @@ class App
             $_SESSION['nonce'] = \App\Utilities\General::randomString(24);
         }
 
-        // Require the functions file
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
-
-        // Now that we've loaded the env, let's get the site settings
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
+
+        // Insert required files
+        foreach ($pathsToIncludeInAppApp as $path) {
+            if (file_exists(ROOT . DIRECTORY_SEPARATOR . $path)) {
+                require_once ROOT . DIRECTORY_SEPARATOR . $path;
+            } else {
+                die('Required file ' . $path . ' not found in App\App');
+            }
+        }
+        
 
         // Set the default language in session
         if (MULTILINGUAL && !isset($_SESSION['lang'])) {

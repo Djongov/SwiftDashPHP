@@ -9,14 +9,14 @@ class IP
     public static function currentIP(): string
     {
         if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-            $client_ip = $_SERVER["HTTP_CF_CONNECTING_IP"];
-        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $client_ip = str_replace(strstr($_SERVER['HTTP_CLIENT_IP'], ':'), '', $_SERVER['HTTP_CLIENT_IP']);
+            $clientIp = $_SERVER["HTTP_CF_CONNECTING_IP"];
+        } elseif (isset($_SERVER['HTTP_clientIp'])) {
+            $clientIp = str_replace(strstr($_SERVER['HTTP_clientIp'], ':'), '', $_SERVER['HTTP_clientIp']);
         } else {
             // or just use the normal remote addr
-            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $clientIp = $_SERVER['REMOTE_ADDR'];
         }
-        return $client_ip;
+        return $clientIp;
     }
     public static function isPublicIp($ip): bool
     {
@@ -56,17 +56,17 @@ class IP
     public static function isCgnatIp($ip)
     {
         // Define the CGNAT range in CIDR notation
-        $cgnat_range = '100.64.0.0/10';
+        $cgnatRange = '100.64.0.0/10';
 
         // Convert the IP and range to long integers
-        $ip_long = ip2long($ip);
-        list($range_ip, $subnet) = explode('/', $cgnat_range);
-        $range_ip_long = ip2long($range_ip);
+        $ipLong = ip2long($ip);
+        list($rangeIp, $subnet) = explode('/', $cgnatRange);
+        $rangeIpLong = ip2long($rangeIp);
 
         // Calculate the mask
         $mask = -1 << (32 - $subnet);
 
         // Check if the IP is within the CGNAT range
-        return (($ip_long & $mask) == ($range_ip_long & $mask)) ? true : false;
+        return (($ipLong & $mask) == ($rangeIpLong & $mask)) ? true : false;
     }
 }

@@ -9,26 +9,26 @@ class AccessLogsParser
     /**
      * @var resource
      */
-    protected $file;
+    protected $_file;
 
     /**
      * @var string
      */
-    protected $logPattern = '/^(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>.*?) HTTP\/\d+\.\d+" (?P<status>\d{3}) (?P<size>\d+) "(?P<referrer>.*?)" "(?P<user_agent>.*?)"$/';
+    protected $_logPattern = '/^(?P<ip>\d+\.\d+\.\d+\.\d+) - - \[(?P<datetime>[^\]]+)\] "(?P<method>[A-Z]+) (?P<url>.*?) HTTP\/\d+\.\d+" (?P<status>\d{3}) (?P<size>\d+) "(?P<referrer>.*?)" "(?P<user_agent>.*?)"$/';
 
     /**
      * Create a new parser instance.
      *
-     * @param mixed $file A valid file resource (opened via fopen())
+     * @param mixed $_file A valid file resource (opened via fopen())
      *
      * @throws InvalidArgumentException if not given a resource.
      */
-    public function __construct($file)
+    public function __construct($_file)
     {
-        if (!is_resource($file)) {
+        if (!is_resource($_file)) {
             throw new \InvalidArgumentException('A valid file resource is required.');
         }
-        $this->file = $file;
+        $this->_file = $_file;
     }
 
     /**
@@ -43,18 +43,18 @@ class AccessLogsParser
     public function parse(): array
     {
         // Reset file pointer to the beginning.
-        rewind($this->file);
+        rewind($this->_file);
 
         $columns   = [];
         $dataLines = [];
 
-        while (($line = fgets($this->file)) !== false) {
+        while (($line = fgets($this->_file)) !== false) {
             $line = str_replace("\r", '', trim($line));
             if (empty($line)) {
                 continue;
             }
 
-            if (preg_match($this->logPattern, $line, $matches)) {
+            if (preg_match($this->_logPattern, $line, $matches)) {
                 // Keep only named matches if needed
                 $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
@@ -68,7 +68,7 @@ class AccessLogsParser
             }
         }
 
-        fclose($this->file);
+        fclose($this->_file);
 
         // Now Counts
 

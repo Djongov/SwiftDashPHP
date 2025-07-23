@@ -13,7 +13,7 @@ function projectRoutes(RouteCollector $router, string $viewsFolder, string $cont
     #$router->addRoute('GET', '/adminx/products', [$viewsFolder . '/admin/products.php', $metadataArray['admin']]);
     #$router->addRoute('GET', '/adminx/product-prices', [$viewsFolder . '/admin/product-prices.php', $metadataArray['admin']]);
     #$router->addRoute('POST', '/api/fetch-product', [$viewsFolder . '/api/price-watcher/fetch-product.php']);
-    
+
     // Example
     $router->addRoute('GET', '/charts', [$viewsFolder . '/example/charts.php', $metadataArray['main']]);
     $router->addRoute('GET', '/forms', [$viewsFolder . '/example/forms.php', $metadataArray['main']]);

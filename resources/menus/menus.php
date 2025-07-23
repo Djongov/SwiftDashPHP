@@ -3,7 +3,8 @@
 declare(strict_types=1);
 
 define(
-    "ADMIN_MENU", [
+    "ADMIN_MENU",
+    [
     'Admin Home' => [
         'link' => '/adminx',
     ],
@@ -60,7 +61,8 @@ define(
 /* Menu Settings */
 
 define(
-    "MAIN_MENU", [
+    "MAIN_MENU",
+    [
     translate('docs_menu_name') => [
         'icon' => [
             'type' => 'svg',
@@ -86,7 +88,8 @@ define(
 /* Username drop down menu */
 
 define(
-    "USERNAME_DROPDOWN_MENU", [
+    "USERNAME_DROPDOWN_MENU",
+    [
         translate('menu_user_settings') => [
             'path' => '/user-settings',
             'admin' => false

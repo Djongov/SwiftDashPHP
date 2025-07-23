@@ -61,7 +61,7 @@ class AccessToken
                     'username' => $username,
                     'scope' => $scope
                 ];
-                
+
                 header('Location: /auth/azure/request-access-token?' . http_build_query($data));
                 exit();
             } else {
@@ -101,7 +101,7 @@ class AccessToken
                 'username' => $username,
                 'scope' => $scope
             ];
-            
+
             header('Location: /auth/azure/request-access-token?' . http_build_query($data));
             exit();
         }

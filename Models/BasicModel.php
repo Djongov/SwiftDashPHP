@@ -8,11 +8,17 @@ use App\Database\DB;
 
 class BasicModel
 {
+    protected DB $_db;
+
+    public function __construct()
+    {
+        $this->_db = new DB();
+    }
+
     // get columns from the table
     public function getColumns(string $table): array
     {
-        $db = new DB();
-        $describeArray = $db->describe($table);
+        $describeArray = $this->_db->describe($table);
         $columns = [];
         foreach ($describeArray as $column => $type) {
             array_push($columns, $column);

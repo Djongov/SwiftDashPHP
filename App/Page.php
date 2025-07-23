@@ -117,17 +117,17 @@ class Page
                 $html .= '<main id="main-content" class="flex-1 ' . $mainContentClass . '">';
 
                     // Check if the file exists before including it
-                    if (file_exists($controlerPath)) {
-                        ob_start();
-                        include $controlerPath;
-                        $html .= ob_get_clean();
-                    } else {
-                        if (!$controlerPath) {
-                            throw new \Exception('Controller path is empty');
-                        } else {
-                            $html .= $controlerPath;
-                        }
-                    }
+        if (file_exists($controlerPath)) {
+            ob_start();
+            include $controlerPath;
+            $html .= ob_get_clean();
+        } else {
+            if (!$controlerPath) {
+                throw new \Exception('Controller path is empty');
+            } else {
+                $html .= $controlerPath;
+            }
+        }
 
                 $html .= '</main>'; // Close main (takes up remaining space)
 

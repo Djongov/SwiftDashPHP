@@ -8,18 +8,18 @@ use App\Database\DB;
 
 class APIKeys extends BasicModel
 {
-    protected DB $db;
-    protected string $table = 'api_keys';
-    protected string $primaryKey = 'id';
+    protected DB $_db;
+    protected string $_table = 'api_keys';
+    protected string $_primaryKey = 'id';
 
     public function __construct()
     {
-        $this->db = new DB();
+        $this->_db = new DB();
     }
     public function get(string $apiKey): array
     {
-        $pdo = $this->db->getConnection();
-        $query = "SELECT * FROM {$this->table} WHERE api_key = :apiKey";
+        $pdo = $this->_db->getConnection();
+        $query = "SELECT * FROM {$this->_table} WHERE api_key = :apiKey";
         $stmt = $pdo->prepare($query);
         $stmt->bindValue(':apiKey', $apiKey);
         $stmt->execute();
@@ -38,8 +38,8 @@ class APIKeys extends BasicModel
     }
     public function getApiKeyByNote(string $note): ?string
     {
-        $pdo = $this->db->getConnection();
-        $query = "SELECT api_key FROM {$this->table} WHERE note = :note";
+        $pdo = $this->_db->getConnection();
+        $query = "SELECT api_key FROM {$this->_table} WHERE note = :note";
         $stmt = $pdo->prepare($query);
         $stmt->bindValue(':note', $note);
         try {
@@ -55,15 +55,15 @@ class APIKeys extends BasicModel
             }
         }
     }
-    public function create(string $access, string $note, string $createdBy, int $executionLimit) : string
+    public function create(string $access, string $note, string $createdBy, int $executionLimit): string
     {
         $accessAllowedValues = ['read', 'write'];
         if (!in_array($access, $accessAllowedValues, true)) {
             throw new \InvalidArgumentException('Invalid access level provided. Allowed values are: ' . implode(', ', $accessAllowedValues));
         }
-        $pdo = $this->db->getConnection();
+        $pdo = $this->_db->getConnection();
         $apiKey = bin2hex(random_bytes(32)); // Generate a random API key
-        $query = "INSERT INTO {$this->table} (api_key, access, note, created_by, executions_limit) VALUES (:apiKey, :access, :note, :createdBy, :executionLimit)";
+        $query = "INSERT INTO {$this->_table} (api_key, access, note, created_by, executions_limit) VALUES (:apiKey, :access, :note, :createdBy, :executionLimit)";
         $stmt = $pdo->prepare($query);
         $stmt->bindValue(':apiKey', $apiKey);
         $stmt->bindValue(':access', $access);
@@ -84,9 +84,9 @@ class APIKeys extends BasicModel
     }
     public function incrementExecutionCount(string $apiKey, int $executions = 1): void
     {
-        $pdo = $this->db->getConnection();
+        $pdo = $this->_db->getConnection();
         $query = "
-            UPDATE {$this->table}
+            UPDATE {$this->_table}
             SET 
                 executions = executions + :executions,
                 executions_total = executions_total + :executions
@@ -109,7 +109,7 @@ class APIKeys extends BasicModel
     }
     public function getAccessLogsPerApiKey(string $apiKey): array
     {
-        $pdo = $this->db->getConnection();
+        $pdo = $this->_db->getConnection();
         $query = "SELECT * FROM api_access_log WHERE api_key = :apiKey ORDER BY date_created DESC";
         $stmt = $pdo->prepare($query);
         $stmt->bindValue(':apiKey', $apiKey);
@@ -128,8 +128,8 @@ class APIKeys extends BasicModel
     }
     public function delete(string $apiKey): bool
     {
-        $pdo = $this->db->getConnection();
-        $query = "DELETE FROM {$this->table} WHERE api_key = :apiKey";
+        $pdo = $this->_db->getConnection();
+        $query = "DELETE FROM {$this->_table} WHERE api_key = :apiKey";
         $stmt = $pdo->prepare($query);
         $stmt->bindValue(':apiKey', $apiKey);
         try {

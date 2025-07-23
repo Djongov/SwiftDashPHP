@@ -173,10 +173,8 @@ class User
             Response::output('Passwords do not match', 400);
         }
 
+        // Unset the confirm_password and do not hash the password yet, the Model will do it
         unset($data['confirm_password']);
-
-        // Hash the password
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
         try {
             $createUser = new UserModel();
@@ -285,7 +283,7 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception deleting profile picture', 'unable to delete profile picture');
         }
     }
-    private function handleUserErrorsApiResponse(\Exception $e, string $verboseError, string $publicError): void
+    private function handleUserErrorsApiResponse(\Exception $e, string $verboseError, string $publicError): never
     {
         if (ERROR_VERBOSE) {
             Response::output($verboseError . '. Error: ' . $e->getMessage());

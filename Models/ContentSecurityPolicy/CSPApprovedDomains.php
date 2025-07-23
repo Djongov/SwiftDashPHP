@@ -9,14 +9,14 @@ use App\Exceptions\ContentSecurityPolicyExceptions;
 
 class CSPApprovedDomains
 {
-    protected DB $db;
+    protected DB $_db;
     public function __construct()
     {
-        $this->db = new DB();
+        $this->_db = new DB();
     }
     public function domainExist(string $domain): bool
     {
-        $pdo = $this->db->getConnection();
+        $pdo = $this->_db->getConnection();
         $query = "SELECT * FROM csp_approved_domains WHERE domain=?";
         $stmt = $pdo->prepare($query);
 
@@ -32,9 +32,9 @@ class CSPApprovedDomains
             }
         }
     }
-    public function getAll() : array
+    public function getAll(): array
     {
-        $pdo = $this->db->getConnection();
+        $pdo = $this->_db->getConnection();
         $query = "SELECT * FROM csp_approved_domains";
         $stmt = $pdo->prepare($query);
 

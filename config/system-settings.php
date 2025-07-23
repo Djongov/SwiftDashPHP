@@ -12,7 +12,9 @@ if (ini_get('display_errors') == 1) {
     define('ERROR_VERBOSE', false);
 }
 
-define('SYSTEM_LOGIN_EXEMPTIONS', [
+define(
+    'SYSTEM_LOGIN_EXEMPTIONS',
+    [
     '/api/csp-report',
     '/api/set-lang',
     '/api/cookie-consent',
@@ -24,7 +26,8 @@ define('SYSTEM_LOGIN_EXEMPTIONS', [
     '/api/user',
     '/install',
     '/logout',
-]);
+    ]
+);
 
 define('VERSION', trim(file_get_contents(ROOT . DIRECTORY_SEPARATOR . 'version.txt')));
 
@@ -102,24 +105,6 @@ define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR
 // This is used by the curl requests so you don't get SSL verification errors. It's located in the .tools folder
 define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
 
-$expectedCert = realpath(CURL_CERT);
-
-$iniCafile = realpath(ini_get('openssl.cafile') ?: '');
-if ($iniCafile !== $expectedCert) {
-    die(
-        'openssl.cafile must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
-        'Currently it is set to <b>' . ($iniCafile ?: 'NOT SET or INVALID PATH') . '</b>.'
-    );
-}
-
-$iniCainfo = realpath(ini_get('curl.cainfo') ?: '');
-if ($iniCainfo !== $expectedCert) {
-    die(
-        'curl.cainfo must be set to <b>' . ($expectedCert ?: 'NOT FOUND') . '</b> in <code>php.ini</code>. ' .
-        'Currently it is set to <b>' . ($iniCainfo ?: 'NOT SET or INVALID PATH') . '</b>.'
-    );
-}
-
 // This needs to be set to what is set across the fetch requests in the javascript files. Default is the below
 define('SECRET_HEADER', 'secretheader');
 // Same as above
@@ -174,7 +159,7 @@ Authentication Settings
 
 // Name of the authentication cookie which holds the JWT token
 define('AUTH_HANDLER', 'session'); // cookie/session
-define('JWT_ISSUER', currentProtocolAndHost());
+define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
 define('JWT_TOKEN_EXPIRY', 86400);
 define('USE_REMOTE_ID_TOKEN', false);
 define('AUTH_COOKIE_EXPIRY', 86400); // In case cookie is used for handler, make the duration 1 day. Even if Azure tokens cannot exceed 1 hour, if cookie is present it will redirect on its own to refresh the token, so for best user experience it's good to have a longer duration than the token itself
@@ -220,38 +205,38 @@ if (GOOGLE_LOGIN) {
 }
 
 // /* App checks */
-$missing_extensions = [];
+$missingExtensions = [];
 
-$required_extensions = [
+$requiredExtensions = [
     'curl',
     'openssl',
     'intl'
 ];
 
 if (DB_DRIVER === 'pgsql') {
-    $required_extensions[] = 'pdo_pgsql';
+    $requiredExtensions[] = 'pdo_pgsql';
 }
 
 if (DB_DRIVER === 'sqlsrv') {
-    $required_extensions[] = 'pdo_sqlsrv';
+    $requiredExtensions[] = 'pdo_sqlsrv';
 }
 
 if (DB_DRIVER === 'sqlite') {
-    $required_extensions[] = 'pdo_sqlite';
+    $requiredExtensions[] = 'pdo_sqlite';
 }
 
 if (DB_DRIVER === 'mysql') {
-    $required_extensions[] = 'pdo_mysql';
+    $requiredExtensions[] = 'pdo_mysql';
 }
 
-foreach ($required_extensions as $extension) {
+foreach ($requiredExtensions as $extension) {
     if (!extension_loaded($extension)) {
-        $missing_extensions[] = $extension;
+        $missingExtensions[] = $extension;
     }
 }
 
-if (!empty($missing_extensions)) {
-    die('The following extensions are missing: ' . implode(', ', $missing_extensions));
+if (!empty($missingExtensions)) {
+    die('The following extensions are missing: ' . implode(', ', $missingExtensions));
 }
 
 // Check if the server is running PHP 8.4 or higher

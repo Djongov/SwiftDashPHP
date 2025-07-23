@@ -31,9 +31,9 @@ if (MICROSOFT_LIVE_LOGIN) {
         'state' => $destination
     ];
     // This basically merges OAUTH URL and $data
-    $ms_live_request_token_url = MS_LIVE_OAUTH_URL . http_build_query($authenticationData);
+    $msLiveRequestTokenUrl = MS_LIVE_OAUTH_URL . http_build_query($authenticationData);
     // Let's form what the login url will be
-    define('MS_LIVE_LOGIN_BUTTON_URL', $ms_live_request_token_url);
+    define('MS_LIVE_LOGIN_BUTTON_URL', $msLiveRequestTokenUrl);
     // For this one, the logout will be our own script
     define('MS_LIVE_LOGOUT_BUTTON_URL', 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=https://' . $_SERVER['HTTP_HOST']);
 }

@@ -37,19 +37,19 @@ if (isset($_POST['type'])) {
 $fileName = $type . "-logs-data-" . date('Y-m-d-H-i-s') . ".tsv";
 
 $excelData = '';
-$unique_heads = [];
+$uniqueHeads = [];
 
 
-$unique_heads = array_keys(reset($data));
+$uniqueHeads = array_keys(reset($data));
 
 
 // Display column names as first row
-$excelData = implode("\t", $unique_heads) . "\n";
+$excelData = implode("\t", $uniqueHeads) . "\n";
 
 // And the actual data under the columns
 foreach ($data as $value) {
     $row = [];
-    foreach ($unique_heads as $key) {
+    foreach ($uniqueHeads as $key) {
         $row[] = $value[$key] ?? '';
     }
     $excelData .= implode("\t", $row) . "\n";

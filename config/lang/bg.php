@@ -27,10 +27,11 @@ return [
     'if_you_dont_have_account_contact_admin' => 'Ако нямате акаунт, моля, свържете се с вашия администратор',
     // Register page
     'register' => 'Регистрация',
+    'register_description' => 'Регистрирайте нов акаунт',
     'manual_registration_disabled' => 'Ръчната регистрация е деактивирана. Моля, свържете се с вашия администратор.',
-    'conrifm_password' => 'Потвърди паролата',
+    'confirm_password' => 'Потвърди паролата',
     'confirm_password_description' => 'Потвърдете паролата си',
-    'usrname_description' => 'Въведете потребителско име',
+    'username_description' => 'Въведете потребителско име',
     'email_description' => 'Въведете валиден имейл',
     'password_description' => 'Въведете парола',
     'name_description' => 'Въведете вашето име',
@@ -65,7 +66,7 @@ return [
     'delete_selected_button_text' => 'Изтрий избраното',
     'modal_yes_button_text' => 'Да, сигурен съм',
     'modal_no_button_text' => 'Не, отказ',
-        
+
     // User API responses
     'user_api_response_cannot_edit_other_user_data' => 'Не можете да редактирате данните на друг потребител',
     'user_api_response_passwords_do_not_match' => 'Паролите не съвпадат',

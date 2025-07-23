@@ -53,18 +53,20 @@ class NativeHttp
 
         // Try decoding only if it's actually gzipped
         $isGzipped = isset($http_response_header) && array_reduce($http_response_header, fn($carry, $line) => $carry || stripos($line, 'Content-Encoding: gzip') !== false, false);
-        
+
         $decoded = $isGzipped ? gzdecode($response) : $response;
 
         if (isXml($decoded) && $expectJson) {
             $data = xmlToJson($decoded);
             if ($data === null) {
-                dd([
+                dd(
+                    [
                     'XML parse error' => libxml_get_errors(),
                     'XML content' => $decoded,
                     'URL' => $url,
                     'Headers' => $http_response_header
-                ]);
+                    ]
+                );
             }
         } elseif ($expectJson && !isXml($decoded)) {
             $data = json_decode($decoded, true);
@@ -86,15 +88,17 @@ class NativeHttp
             : 0;
 
         if ($responseCode >= 400) {
-            dd([
+            dd(
+                [
                 'HTTP error' => $responseCode,
                 'Response content' => $decoded,
                 'URL' => $url,
                 'Headers' => $http_response_header
-            ]);
+                ]
+            );
             throw new \Exception($data, $responseCode);
         }
-        
+
         if (!isset($data) || !is_array($data)) {
             $data = $decoded; // Fallback to raw response if not JSON or XML
         }
@@ -143,7 +147,7 @@ class NativeHttp
 
         // Decompress gzipped response if needed
         $isGzipped = isset($http_response_header) && array_reduce($http_response_header, fn($carry, $line) => $carry || stripos($line, 'Content-Encoding: gzip') !== false, false);
-        
+
         $decoded = $isGzipped ? gzdecode($response) : $response;
 
         if ($decoded === false) {
@@ -156,14 +160,16 @@ class NativeHttp
 
         $decoded = json_decode($decoded, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            dd([
+            dd(
+                [
                 'JSON decode error' => json_last_error_msg(),
                 'JSON content' => $decoded,
                 'URL' => $url,
                 'Headers' => $http_response_header
-            ]);
+                ]
+            );
         }
-        
+
         $responseCode = intval(self::getResponseCode($http_response_header[0]));
 
         return $decoded;
@@ -190,7 +196,7 @@ class NativeHttp
             ]
         ];
     }
-    public function diagnosticsCall(string $url) : array
+    public function diagnosticsCall(string $url): array
     {
         // We want to return body, headers and response code in an array
         $responseArray = [
@@ -199,13 +205,15 @@ class NativeHttp
             'response_code' => 0
         ];
 
-        $context = stream_context_create([
+        $context = stream_context_create(
+            [
             'http' => [
                 'method' => 'GET',
                 'ignore_errors' => true,
             ],
             'ssl' => $this->sslOptions($url)
-        ]);
+            ]
+        );
 
         $response = file_get_contents($url, false, $context);
 

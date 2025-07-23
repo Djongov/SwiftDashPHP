@@ -39,7 +39,7 @@ $client->setAccessType('offline');
 // Set the state too
 $client->setState($destination);
 // Set nonce
-$client->setLoginHint($google_nonce);
+$client->setLoginHint($googleNonce);
 $client->setHttpClient(new \GuzzleHttp\Client(['verify' => CURL_CERT, 'timeout' => 60, 'http_errors' => false]));
 // Exchange the code for an access token
 $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
@@ -79,7 +79,8 @@ if ($userModel->exists($idTokenArray['email'])) {
 
 // Issue a local JWT token if not using remote ID token
 if (!USE_REMOTE_ID_TOKEN && LOCAL_USER_LOGIN) {
-    $idToken = JWT::generateToken([
+    $idToken = JWT::generateToken(
+        [
         'provider' => 'google',
         'username' => $idTokenArray['email'],
         'name' => $idTokenArray['name'],
@@ -88,7 +89,8 @@ if (!USE_REMOTE_ID_TOKEN && LOCAL_USER_LOGIN) {
             $userDetailsArray['role']
         ],
         'last_ip' => currentIP()
-    ], JWT_TOKEN_EXPIRY);
+        ], JWT_TOKEN_EXPIRY
+    );
 }
 
 AuthToken::set($idToken);

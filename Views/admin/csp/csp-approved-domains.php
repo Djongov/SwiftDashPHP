@@ -21,7 +21,7 @@ echo Html::p('Here you can control the CSP approved domains list. You can add do
 // Provide a form that will allow the user to add a new domain to the CSP approved domains list
 echo '<div class="p-4 m-4 max-w-md ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">';
     echo Html::h2('Add Domain', true);
-    $CspApprovedDomainsForm = [
+    $cspApprovedDomainsForm = [
         'inputs' => [
             'input' => [
                 [
@@ -42,7 +42,7 @@ echo '<div class="p-4 m-4 max-w-md ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg b
         ],
     ];
 
-    echo Forms::render($CspApprovedDomainsForm, $theme);
+    echo Forms::render($cspApprovedDomainsForm, $theme);
     echo '</div>';
 
     echo DataGrid::fromDBTable('csp_approved_domains', 'CSP Approved Domains', $theme);

@@ -50,18 +50,18 @@ class Menu
                 $html .= '</div>';
                 $html .= '<div id="dropdownNavbar-' . $uniqueIdCounter . '" class="z-10 w-44 font-normal ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 block hidden" data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="bottom" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate3d(381px, 66px, 0px);">';
                 $html .= '<ul class="py-1 text-sm ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . '" aria-labelledby="dropdownLargeButton">';
-                foreach ($value['link'] as $sub_name => $sub_array) {
+                foreach ($value['link'] as $subName => $subArray) {
                     $html .= '<li class="min-w-fit">';
                     $html .= '<div class="flex flex-row items-center">';
-                    $html .= '<a href="' . $sub_array['sub_link'] . '" class="w-full text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">';
-                    if (isset($sub_array['icon'])) {
-                        if ($sub_array['icon']['type'] === 'image') {
-                            $html .= '<img class="w-6 h-4" src="' . $sub_array['icon']['src'] . '" alt="' . $sub_name . '" />';
+                    $html .= '<a href="' . $subArray['sub_link'] . '" class="w-full text-center py-2 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">';
+                    if (isset($subArray['icon'])) {
+                        if ($subArray['icon']['type'] === 'image') {
+                            $html .= '<img class="w-6 h-4" src="' . $subArray['icon']['src'] . '" alt="' . $subName . '" />';
                         } else {
-                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mx-2 w-6 h-6 stroke-' . $theme . '-500">' . $sub_array['icon']['src'] . '</svg>';
+                            $html .= '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mx-2 w-6 h-6 stroke-' . $theme . '-500">' . $subArray['icon']['src'] . '</svg>';
                         }
                     }
-                    $html .= $sub_name . '</a>';
+                    $html .= $subName . '</a>';
                     $html .= '</div>';
                     $html .= '</li>';
                 }

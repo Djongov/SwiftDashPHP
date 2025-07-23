@@ -57,8 +57,8 @@ foreach ($dataArray as $key => $value) {
         $value = htmlentities($value);
     }
         // Decide whether a field is disabled or not
-        $read_only_columns = ['date_created', 'id', 'invited_on', 'created_at', 'created_by', 'client_ip', 'last_updated'];
-    if (in_array($key, $read_only_columns)) {
+        $readOnlyColumns = ['date_created', 'id', 'invited_on', 'created_at', 'created_by', 'client_ip', 'last_updated'];
+    if (in_array($key, $readOnlyColumns)) {
         $readonly = true;
     } else {
         $readonly = false;

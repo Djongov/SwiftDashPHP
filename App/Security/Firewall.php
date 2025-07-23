@@ -31,35 +31,35 @@ class Firewall
     public static function activate()
     {
         // Find out the real client IP
-        $client_ip = currentIP();
+        $clientIp = currentIP();
         $db = new DB();
         $pdo = $db->getConnection();
         $stmt = $pdo->prepare("SELECT * FROM firewall");
         $stmt->execute();
-        $firewall_array = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        $allow_list = [];
-        foreach ($firewall_array as $array) {
+        $firewallArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $allowList = [];
+        foreach ($firewallArray as $array) {
             foreach ($array as $name => $value) {
                 if ($name === 'ip_cidr') {
-                    array_push($allow_list, $value);
+                    array_push($allowList, $value);
                 }
             }
         }
         // Initiate validator variable
-        $valid_ip = false;
+        $validIp = false;
         // Loop through the allow list
-        foreach ($allow_list as $addr) {
+        foreach ($allowList as $addr) {
             // If there is a match
-            if (self::cirdMatch($client_ip, $addr)) {
+            if (self::cirdMatch($clientIp, $addr)) {
                 // Set the validator to true
-                $valid_ip = true;
+                $validIp = true;
                 // and break the loop
                 break;
             }
         }
-        if (!$valid_ip) {
+        if (!$validIp) {
             SystemLog::write('just tried to access the web app and got Unauthorized', 'Access');
-            Response::output('Unauthorized access for IP Address ' . $client_ip . ' on uri ' . $_SERVER['REQUEST_URI'], 401);
+            Response::output('Unauthorized access for IP Address ' . $clientIp . ' on uri ' . $_SERVER['REQUEST_URI'], 401);
         }
     }
 }

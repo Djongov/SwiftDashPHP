@@ -9,7 +9,7 @@ use App\Logs\SystemLog;
 
 class Templates
 {
-    public static function informAdministrator(string $subject, string $message) : void
+    public static function informAdministrator(string $subject, string $message): void
     {
         $html = '<p><b>Hello ' . ADMINISTRATOR_EMAIL . ',</b></p>';
         $html .= '<p>' . $message . '</p>';
@@ -18,16 +18,20 @@ class Templates
         $html .= '<p><small>This is an automated message. Please do not reply.</small></p>';
         $html .= '<p><small>Version: ' . VERSION . '</small></p>';
         try {
-            Send::send([
+            Send::send(
+                [
                 [
                     'email' => ADMINISTRATOR_EMAIL
                 ]
-            ], $subject, $html);
+                ],
+                $subject,
+                $html
+            );
         } catch (\Exception $e) {
             SystemLog::write('Mail', 'Error sending email to ' . ADMINISTRATOR_EMAIL . ': ' . $e->getMessage(), 'informAdministrator');
         }
     }
-    public static function lowestPriceAlertHtml(string $user, int $internalId, string $store, array $data, $lang = DEFAULT_LANG) : string
+    public static function lowestPriceAlertHtml(string $user, int $internalId, string $store, array $data, $lang = DEFAULT_LANG): string
     {
         $stockColorGood = 'green';
         $stockColorWarning = 'orange';
@@ -39,7 +43,7 @@ class Templates
         }
         // If warning
         if (in_array($data['stock'], STOCK_WARNING_VALUES) || in_array($data['stock_text'], STOCK_TEXT_WARNING_VALUES)) {
-            $stockAddition = '<p>'. translate('stock_limited_qty_message', [], $lang) . '<span style="color:' . $stockColorWarning . ';"><b>' . $data['stock_text'] . '</b></span></p>';
+            $stockAddition = '<p>' . translate('stock_limited_qty_message', [], $lang) . '<span style="color:' . $stockColorWarning . ';"><b>' . $data['stock_text'] . '</b></span></p>';
         }
         // If good
         if (in_array($data['stock'], STOCK_GOOD_VALUES) || in_array($data['stock_text'], STOCK_TEXT_GOOD_VALUES)) {

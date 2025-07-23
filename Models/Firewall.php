@@ -17,13 +17,19 @@ use Models\BasicModel;
 
 class Firewall extends BasicModel
 {
-    private $table = 'firewall';
-    private $mainColumn = 'ip_cidr';
+    private $_table = 'firewall';
+    private $_mainColumn = 'ip_cidr';
+    protected DB $_db;
+
+    public function __construct()
+    {
+        $this->_db = new DB();
+    }
 
     public function setter($table, $mainColumn): void
     {
-        $this->table = $table;
-        $this->mainColumn = $mainColumn;
+        $this->_table = $table;
+        $this->_mainColumn = $mainColumn;
     }
     /**
      * Checks if an IP exists in the firewall table, accepts an ID or an IP in CIDR notation
@@ -34,14 +40,14 @@ class Firewall extends BasicModel
      */
     public function exists(string|int $param): bool
     {
-        $db = new DB();
         // If the parameter is an integer, we assume it's an ID
         if (is_int($param)) {
-            $query = "SELECT $this->mainColumn FROM $this->table WHERE id = ?";
+            $query = "SELECT $this->_mainColumn FROM $this->_table WHERE id = ?";
         } else {
-            $query = "SELECT $this->mainColumn FROM $this->table WHERE $this->mainColumn = ?";
+            $query = "SELECT $this->_mainColumn FROM $this->_table WHERE $this->_mainColumn = ?";
         }
-        $stmt = $db->getConnection()->prepare($query);
+
+        $stmt = $this->_db->getConnection()->prepare($query);
         $stmt->execute([$param]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $rowCount = count($rows);
@@ -57,11 +63,10 @@ class Firewall extends BasicModel
      */
     public function get(string|int|null $param = null, ?string $sort = null, ?int $limit = null, ?string $orderBy = null): array
     {
-        $db = new DB();
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
 
         if (!$param) {
-            $query = "SELECT * FROM $this->table";
+            $query = "SELECT * FROM $this->_table";
             $query = self::applySortingAndLimiting($query, $orderBy, $sort, $limit);
             $stmt = $pdo->query($query);
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -71,7 +76,7 @@ class Firewall extends BasicModel
             if (!$this->exists($param)) {
                 throw (new FirewallException())->ipDoesNotExist();
             }
-            $stmt = $pdo->prepare("SELECT * FROM $this->table WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT * FROM $this->_table WHERE id = ?");
             $stmt->execute([$param]);
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         } else {
@@ -79,7 +84,7 @@ class Firewall extends BasicModel
             if (!$this->exists($param)) {
                 throw (new FirewallException())->ipDoesNotExist();
             }
-            $stmt = $pdo->prepare("SELECT * FROM $this->table WHERE $this->mainColumn = ?");
+            $stmt = $pdo->prepare("SELECT * FROM $this->_table WHERE $this->_mainColumn = ?");
             $stmt->execute([$param]);
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         }
@@ -103,9 +108,8 @@ class Firewall extends BasicModel
         if ($this->exists($ip)) {
             throw (new FirewallException())->ipAlreadyExists();
         }
-        $db = new DB();
-        $pdo = $db->getConnection();
-        $stmt = $pdo->prepare("INSERT INTO $this->table ($this->mainColumn, created_by, comment) VALUES (?,?,?)");
+        $pdo = $this->_db->getConnection();
+        $stmt = $pdo->prepare("INSERT INTO $this->_table ($this->_mainColumn, created_by, comment) VALUES (?,?,?)");
         $stmt->execute([$ip, $createdBy, $comment]);
         if ($stmt->rowCount() === 1) {
             SystemLog::write('IP ' . $ip . ' added to the firewall table by ' . $createdBy . ' under the id ' . $pdo->lastInsertId(), 'Firewall');
@@ -127,16 +131,15 @@ class Firewall extends BasicModel
      */
     public function update(array $data, int $id, string $updatedBy): bool
     {
-        $db = new DB();
         // Check if the data matches the columns
 
-        $db->checkDBColumnsAndTypes($data, $this->table);
+        $this->_db->checkDBColumnsAndTypes($data, $this->_table);
 
         if (!$this->exists($id)) {
             throw (new FirewallException())->ipDoesNotExist();
         }
         // Check if data is correct
-        $sql = "UPDATE $this->table SET ";
+        $sql = "UPDATE $this->_table SET ";
         $updates = [];
         // Check if all keys in $array match the columns
         foreach ($data as $key => $value) {
@@ -152,7 +155,7 @@ class Firewall extends BasicModel
         // Prepare and execute the query using queryPrepared
         $values = array_values($data);
         $values[] = $id; // Add the id for the WHERE clause
-        $pdo = $db->getConnection();
+        $pdo = $this->_db->getConnection();
         $stmt = $pdo->prepare($sql);
         $stmt->execute($values);
 
@@ -180,10 +183,9 @@ class Firewall extends BasicModel
             throw (new FirewallException())->ipDoesNotExist();
         }
         // We only know the id, so just for logging purposes, we will pull the IP
-        $ip = $this->get($id)[$this->mainColumn];
-        $db = new DB();
-        $pdo = $db->getConnection();
-        $stmt = $pdo->prepare("DELETE FROM $this->table WHERE id = ?");
+        $ip = $this->get($id)[$this->_mainColumn];
+        $pdo = $this->_db->getConnection();
+        $stmt = $pdo->prepare("DELETE FROM $this->_table WHERE id = ?");
         $stmt->execute([$id]);
         if ($stmt->rowCount() === 1) {
             SystemLog::write('IP ' . $ip . ' (id ' . $id . ') deleted by ' . $deletedBy, 'Firewall');

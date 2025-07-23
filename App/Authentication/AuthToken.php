@@ -31,10 +31,10 @@ class AuthToken
         if (AUTH_HANDLER === 'cookie') {
             unset($_COOKIE[AUTH_COOKIE_NAME]);
             $host = $_SERVER['HTTP_HOST'];
-            $colon_pos = strstr($host, ':');
-            $cleaned_host = $colon_pos !== false ? str_replace($colon_pos, '', $host) : $host;
+            $colonPos = strstr($host, ':');
+            $cleanedHost = $colonPos !== false ? str_replace($colonPos, '', $host) : $host;
 
-            setcookie(AUTH_COOKIE_NAME, '', -1, '/', $cleaned_host);
+            setcookie(AUTH_COOKIE_NAME, '', -1, '/', $cleanedHost);
         } elseif (AUTH_HANDLER === 'session') {
             unset($_SESSION[AUTH_SESSION_NAME]);
         }

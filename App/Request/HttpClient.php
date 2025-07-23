@@ -27,7 +27,7 @@ class HttpClient
         );
     }
 
-    public function call($method, $path, $data = [], ?string $bearer_token = null, $sendJson = false, $headers = [], $expectJson = true): mixed
+    public function call($method, $path, $data = [], ?string $bearerToken = null, $sendJson = false, $headers = [], $expectJson = true): mixed
     {
         $method = strtoupper($method);
 
@@ -38,8 +38,8 @@ class HttpClient
             $headers['Content-Type'] = 'application/json';
         }
 
-        if ($bearer_token !== null) {
-            $headers['Authorization'] = 'Bearer ' . $bearer_token;
+        if ($bearerToken !== null) {
+            $headers['Authorization'] = 'Bearer ' . $bearerToken;
         }
 
         if ($method === 'GET' && !empty($data)) {

@@ -103,8 +103,10 @@ class General
     {
         return array_map(
             function ($key, $value) {
-            return [$key, $value];
-            }, array_keys($array), $array
+                return [$key, $value];
+            },
+            array_keys($array),
+            $array
         );
     }
     // Random RGBA
@@ -176,9 +178,11 @@ class General
     public static function decodeUnicodeString($str): string
     {
         return preg_replace_callback(
-            '/\\\\u([0-9a-fA-F]{4})/', function ($match) {
-            return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-            }, $str
+            '/\\\\u([0-9a-fA-F]{4})/',
+            function ($match) {
+                return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+            },
+            $str
         );
     }
     public static function countryCodeToLocale($countryCode): string

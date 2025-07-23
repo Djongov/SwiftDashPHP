@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Database;
 
@@ -7,7 +9,7 @@ use App\Api\Response;
 
 class DB
 {
-    private $pdo;
+    private $_pdo;
 
     public function __construct(
         string $host = DB_HOST,
@@ -16,7 +18,8 @@ class DB
         string $database = DB_NAME,
         int $port = DB_PORT,
         string $driver = DB_DRIVER
-    ) {
+    )
+    {
         $config = [
             'driver' => $driver,
             'host' => $host,
@@ -46,13 +49,13 @@ class DB
                 throw new \PDOException("DB: SQLite database file does not exist: " . $config['dbname']);
             }
         }
-    
+
         $dsn = $this->buildDsn($config);
         $options = $this->getPDOOptions();
-    
+
         try {
-            $this->pdo = new \PDO($dsn, $config['username'], $config['password'], $options);
-            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->_pdo = new \PDO($dsn, $config['username'], $config['password'], $options);
+            $this->_pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             if (ERROR_VERBOSE) {
                 throw new \PDOException("DB: PDO connection failed: " . $e->getMessage());
@@ -68,11 +71,11 @@ class DB
             }
         }
     }
-    
+
     public function getConnection(): \PDO
     {
-        if ($this->pdo instanceof \PDO) {
-            return $this->pdo;
+        if ($this->_pdo instanceof \PDO) {
+            return $this->_pdo;
         } else {
             throw new \PDOException("DB: Database connection has not been established.");
         }
@@ -117,10 +120,10 @@ class DB
         return $options;
     }
 
-    public function executeQuery(\PDO $pdo, string $sql, array $params = []) : \PDOStatement
+    public function executeQuery(\PDO $_pdo, string $sql, array $params = []): \PDOStatement
     {
         try {
-            $stmt = $pdo->prepare($sql);
+            $stmt = $_pdo->prepare($sql);
             $stmt->execute($params);
             return $stmt;
         } catch (\PDOException $e) {
@@ -140,39 +143,39 @@ class DB
 
     public function __destruct()
     {
-        $this->pdo = null;
+        $this->_pdo = null;
     }
 
-    public function multiQuery(array $queryArray) : void
+    public function multiQuery(array $queryArray): void
     {
         try {
-            $pdo = $this->getConnection();
-            $pdo->beginTransaction();
+            $_pdo = $this->getConnection();
+            $_pdo->beginTransaction();
 
             foreach ($queryArray as $query) {
-                $pdo->exec($query);
+                $_pdo->exec($query);
             }
 
-            $pdo->commit();
+            $_pdo->commit();
         } catch (\PDOException $e) {
             // If an error occurs, roll back the transaction
-            $pdo->rollBack();
+            $_pdo->rollBack();
 
             // Handle the exception, log it, or throw a custom exception
             throw new \PDOException("Error executing multiple queries: " . $e->getMessage());
         }
     }
 
-    public function checkDBColumns(array $columns, string $table) : void
+    public function checkDBColumns(array $columns, string $table): void
     {
         $dbTableArray = $this->describe($table);
-    
+
         // Extract column names from the table structure
         $dbColumns = [];
         foreach ($dbTableArray as $row => $type) {
             array_push($dbColumns, $row);
         }
-    
+
         // Check if all columns in the input array exist in the database
         foreach ($columns as $column) {
             if (!in_array($column, $dbColumns)) {
@@ -181,7 +184,7 @@ class DB
         }
     }
 
-    public function checkDBColumnsAndTypes(array $array, string $table) : void
+    public function checkDBColumnsAndTypes(array $array, string $table): void
     {
         $dbTableArray = $this->describe($table);
 
@@ -237,7 +240,7 @@ class DB
         return false;
     }
 
-    private static function normalizeDataType($type) : string
+    private static function normalizeDataType($type): string
     {
         // Convert common MySQL/PostgreSQL data types to PHP types
         $typeMap = [
@@ -283,8 +286,8 @@ class DB
         return $type; // Return original type if no match found
     }
 
-    
-    public function mapDataTypesArray(string $value) : string
+
+    public function mapDataTypesArray(string $value): string
     {
         $type = '';
         $value = strtolower($value);
@@ -315,13 +318,13 @@ class DB
     }
     public function getDriver(): string
     {
-        $pdo = $this->getConnection();
-        return $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $_pdo = $this->getConnection();
+        return $_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
     }
 
     public function getTableNames(): array
     {
-        $pdo = $this->getConnection();
+        $_pdo = $this->getConnection();
         $driver = $this->getDriver();
         $dbTables = [];
         try {
@@ -339,7 +342,7 @@ class DB
                     throw new \Exception("Unsupported database driver: $driver");
             }
 
-            $stmt = $pdo->prepare($sql);
+            $stmt = $_pdo->prepare($sql);
             $stmt->execute();
 
             // Fetch table names based on the database driver
@@ -381,14 +384,14 @@ class DB
     public function describe(string $table): array
     {
         $db = new self();
-        $pdo = $db->getConnection();
+        $_pdo = $db->getConnection();
 
         // Check the database driver to determine the appropriate SQL syntax
-        $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $driver = $_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
         switch ($driver) {
             case 'mysql':
                 $sql = "DESCRIBE $table";
-                $stmt = $pdo->prepare($sql);
+                $stmt = $_pdo->prepare($sql);
                 $stmt->execute();
                 $dbTableArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
                 // Map MySQL columns to a uniform format
@@ -399,7 +402,7 @@ class DB
                 break;
             case 'pgsql':
                 $sql = "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = ?";
-                $stmt = $pdo->prepare($sql);
+                $stmt = $_pdo->prepare($sql);
                 $stmt->execute([$table]);
                 $dbTableArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
                 // Extract column names and data types from the table structure
@@ -410,7 +413,7 @@ class DB
                 break;
             case 'sqlite':
                 $sql = "PRAGMA table_info($table)";
-                $stmt = $pdo->prepare($sql);
+                $stmt = $_pdo->prepare($sql);
                 $stmt->execute();
                 $dbTableArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
                 // Extract column names and data types from the table structure

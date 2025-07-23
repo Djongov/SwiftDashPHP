@@ -117,10 +117,10 @@ class Charts
         );
 
         // Convert labels array to JSON-safe format
-        $labels_json = json_encode($labels, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $labelsJson = json_encode($labels, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         // Background color array (kept as JS array)
-        $background_color_string = '[
+        $backGroundColorString = '[
             "rgba(54, 162, 235, 1)",  // blue
             "rgba(75, 192, 192, 1)",  // green
             "rgba(255, 99, 132, 1)",  // red
@@ -137,7 +137,7 @@ class Charts
         $config = [
             "type" => $type,
             "data" => [
-                "labels" => json_decode($labels_json), // Decode to prevent double encoding
+                "labels" => json_decode($labelsJson), // Decode to prevent double encoding
                 "datasets" => [[
                     "label" => $title,
                     "backgroundColor" => null, // Placeholder
@@ -204,7 +204,7 @@ class Charts
         $jsonConfig = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         // Manually inject JavaScript expressions
-        $jsonConfig = str_replace('"backgroundColor":null', '"backgroundColor":' . $background_color_string, $jsonConfig);
+        $jsonConfig = str_replace('"backgroundColor":null', '"backgroundColor":' . $backGroundColorString, $jsonConfig);
         $jsonConfig = str_replace('"pointBackgroundColor":null', '"pointBackgroundColor": function(context) { var index = context.dataIndex; var value = context.dataset.data[index]; return value === \'DenyList\' ? \'green\' : \'blue\'; }', $jsonConfig);
 
         $chart->setConfig($jsonConfig);

@@ -27,10 +27,11 @@ return [
     'if_you_dont_have_account_contact_admin' => 'If you do not have an account, please contact your administrator',
     // Register page
     'register' => 'Register',
+    'register_description' => 'Register a new account',
     'manual_registration_disabled' => 'Manual registration is disabled. Please contact your administrator.',
-    'conrifm_password' => 'Confirm Password',
+    'confirm_password' => 'Confirm Password',
     'confirm_password_description' => 'Confirm your password',
-    'usrname_description' => 'Provide a username',
+    'username_description' => 'Provide a username',
     'email_description' => 'Provide a valid email',
     'password_description' => 'Provide a password',
     'name_description' => 'Provide your name',

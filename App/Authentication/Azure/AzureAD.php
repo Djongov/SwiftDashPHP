@@ -58,9 +58,9 @@ class AzureAD
         // Let's place the public key in a public key string
         $pkeyString = $pkeyArray['key'];
 
-        $token_valid = openssl_verify($base64UrlHeader . '.' . $base64UrlPayload, $signature, $pkeyString, OPENSSL_ALGO_SHA256);
+        $tokenValid = openssl_verify($base64UrlHeader . '.' . $base64UrlPayload, $signature, $pkeyString, OPENSSL_ALGO_SHA256);
 
-        if ($token_valid !== 1) {
+        if ($tokenValid !== 1) {
             // Invalid signature
             return false;
         }
@@ -96,33 +96,38 @@ class AzureAD
 
         return true;
     }
-    public static function getSignatures(string $appId, string $tenant, string $header_kid): ?array
+    public static function getSignatures(string $appId, string $tenant, string $headerKid): ?array
     {
         $url = "https://login.microsoftonline.com/$tenant/discovery/keys?appid=$appId";
 
         $request = new HttpClient($url);
 
         $result = $request->call(
-            'GET', $url, null, null, false, [
+            'GET',
+            $url,
+            null,
+            null,
+            false,
+            [
             'Accept' => 'application/json'
             ]
         );
 
-        $kid_array = [];
+        $kidArray = [];
 
         if ($result !== null) {
             foreach ($result as $keys) {
                 foreach ($keys as $props) {
-                    if (in_array($header_kid, $props)) {
+                    if (in_array($headerKid, $props)) {
                         return $props;
                     }
-                    array_push($kid_array, $props['kid']);
+                    array_push($kidArray, $props['kid']);
                 }
             }
         } else {
             return null;
         }
 
-        return $kid_array;
+        return $kidArray;
     }
 }

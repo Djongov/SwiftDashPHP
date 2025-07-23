@@ -40,19 +40,23 @@ function dd()
 {
     array_map(
         function ($x) {
-        var_dump($x);
-        }, func_get_args()
+            var_dump($x);
+        },
+        func_get_args()
     );
     die;
 }
 function isAssoc(array $array): bool
 {
-    if ([] === $array) return false; // empty array = not associative
+    if ([] === $array) {
+        return false; // empty array = not associative
+    }
 
     return array_keys($array) !== range(0, count($array) - 1);
 }
 
-function searchArrayForKey($array, $key) {
+function searchArrayForKey($array, $key)
+{
     // Iterate through each element in the array
     foreach ($array as $k => $v) {
         // If the current key matches the one we're looking for
@@ -113,7 +117,16 @@ function currentIP(): string
     // Fallback
     return $_SERVER['REMOTE_ADDR'];
 }
-
+function getUserCountry(): ?string
+{
+    // Get the country code from the browser's language settings
+    $lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+    if (preg_match('/([a-z]{2})-([A-Z]{2})/', $lang, $matches)) {
+        return strtolower($matches[1]); // Return the language code
+    } else {
+        return null; // No country code found
+    }
+}
 function randomString(int $length = 64)
 {
     $length = ($length < 4) ? 4 : $length;
@@ -131,7 +144,7 @@ function currentProtocolAndHost()
 {
     return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
 }
-function getApiKeyFromHeaders() : ?string
+function getApiKeyFromHeaders(): ?string
 {
     $headers = getallheaders();
     $headers = array_change_key_case($headers, CASE_LOWER); // Normalize
@@ -173,10 +186,12 @@ function translate(string $key, array $replace = [], $lang = DEFAULT_LANG): stri
 
     return $text;
 }
-function base64url_encode(string $data): string {
+function base64url_encode(string $data): string
+{
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 }
-function base64url_decode(string $data): string {
+function base64url_decode(string $data): string
+{
     $data .= str_repeat('=', (4 - strlen($data) % 4) % 4); // Add padding
     return base64_decode(strtr($data, '-_', '+/'));
 }

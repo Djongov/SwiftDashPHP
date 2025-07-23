@@ -66,7 +66,8 @@ class Response
             'serverResponseTimeMs' => self::responseTime(),
             'requestId' => $requestId,
             'data' => $data
-            ], $xml
+            ],
+            $xml
         );
 
         return $xml->asXML(); // Return the XML as a string
@@ -79,7 +80,7 @@ class Response
         }
         return $headerValue; // Return the correct header value
     }
-    public static function output(mixed $data, int $statusCode = 200): string
+    public static function output(mixed $data, int $statusCode = 200): never
     {
         if ($statusCode === 204) {
             http_response_code(204);
@@ -88,7 +89,7 @@ class Response
         $contentType = self::decideContentType();
         header('Content-Type: ' . $contentType);
         http_response_code($statusCode);
-        
+
         $requestId = self::requestId();
         $apiKey = getApiKeyFromHeaders();
 
