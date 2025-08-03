@@ -17,7 +17,7 @@ class DataGrid
         'searching' => true,
         'filters' => true,
         'ordering' => true,
-        'order' => [[0, 'desc']],
+        'order' => [[0, 'asc']],
         'paging' => true,
         'lengthMenu' => [[25, 50, 100, -1], [25, 50, 100, "All"]],
         'info' => true,

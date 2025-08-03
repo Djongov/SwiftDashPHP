@@ -269,11 +269,11 @@ class Checks
         $expectedSecretHeader = WEBHOOK_SECRET_NAME;
 
         if (!isset($lowercaseHeaders[$expectedSecretHeader])) {
-            Response::output('Missing required header', $this->defaultStatusCode);
+            Response::output('Missing webhook secret', $this->defaultStatusCode);
         }
 
         if (trim($lowercaseHeaders[$expectedSecretHeader]) !== WEBHOOK_SECRET) {
-            Response::output('Invalid required header value', $this->defaultStatusCode);
+            Response::output('Invalid webhook secret value', $this->defaultStatusCode);
         }
     }
     /**
