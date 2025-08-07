@@ -11,15 +11,22 @@ COPY .tools/deployment/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update \
     && apt-get install -y --no-install-recommends \
-       curl \
-       dialog \
-       libgmp-dev \
-       libicu-dev \
-       libssl-dev \
-       openssh-server \
-       sed \
-       unzip \
-       vim \
+    curl \
+    dialog \
+    libgmp-dev \
+    libicu-dev \
+    libssl-dev \
+    openssh-server \
+    iputils-ping \
+    dnsutils \
+    redis-tools \
+    net-tools \
+    telnet \
+    curl \
+    wget \
+    sed \
+    unzip \
+    vim \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) intl pdo_mysql mysqli \

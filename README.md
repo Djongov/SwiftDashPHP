@@ -139,13 +139,17 @@ DOCKER_BUILDKIT=1 docker build -t swiftdashphp:latest .
 ```
 
 ```cmd
-az acr login --name {ACR}
+ACR="XXXX"
 ```
 
 ```cmd
-docker tag swiftdashphp:latest {ACR}.azurecr.io/swiftdashphp:latest
+az acr login --name $ACR
 ```
 
 ```cmd
-docker push {ACR}.azurecr.io/swiftdashphp:latest
+docker tag swiftdashphp:latest $ACR.azurecr.io/swiftdashphp:latest
+```
+
+```cmd
+docker push $ACR.azurecr.io/swiftdashphp:latest
 ```
