@@ -41,6 +41,15 @@ foreach ($dataTypes as $key => $value) {
     $dataTypes[$key] = $db->mapDataTypesArray($value);
 }
 
+// Check if we have any null or empty dataTypes
+$hasNullOrEmptyDataTypes = false;
+
+foreach ($dataTypes as $column => $dataType) {
+    if (empty($dataType)) {
+        throw new \Exception("Data type for column '$column' is empty or null. Please check your database schema.");
+    }
+}
+
 $dataArray = $stmt->fetch(\PDO::FETCH_ASSOC);
 
 if (!$dataArray) {
@@ -117,6 +126,9 @@ foreach ($dataArray as $key => $value) {
         } else {
             $html .= Html::input('default', 'text', uniqid(), $key, $key, $value, '', '', $key, $theme, false, true, ($readonly) ? true : false);
         }
+    }
+    if ($dataTypes[$key] === 'json') {
+        $html .= Html::textArea(null, $key, html_entity_decode($value), '', $key, '', '', $theme, false, false, false, 10, 50);
     }
         $html .= '</div>';
 }
