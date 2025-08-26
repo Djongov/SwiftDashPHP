@@ -391,4 +391,47 @@ class General
         // Default to 'en_US' if the country code is not found
         return $countryCodeToLocale[strtoupper($countryCode)] ?? 'en_US';
     }
+
+    /**
+     * Remove UTM parameters from a URL
+     *
+     * @param string $url The URL to clean
+     * @return string The cleaned URL without UTM parameters
+     */
+    public static function stripUtmParameters(string $url): string
+    {
+        $parsedUrl = parse_url($url);
+        
+        if (!isset($parsedUrl['query'])) {
+            return $url; // No query parameters, return original URL
+        }
+
+        parse_str($parsedUrl['query'], $queryParams);
+
+        // Remove all UTM parameters (utm_source, utm_medium, utm_campaign, utm_term, utm_content, etc.)
+        $cleanedParams = array_filter($queryParams, function($key) {
+            return !str_starts_with(strtolower($key), 'utm_');
+        }, ARRAY_FILTER_USE_KEY);
+
+        // Rebuild the URL
+        $cleanedUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
+        
+        if (isset($parsedUrl['port'])) {
+            $cleanedUrl .= ':' . $parsedUrl['port'];
+        }
+        
+        if (isset($parsedUrl['path'])) {
+            $cleanedUrl .= $parsedUrl['path'];
+        }
+        
+        if (!empty($cleanedParams)) {
+            $cleanedUrl .= '?' . http_build_query($cleanedParams);
+        }
+        
+        if (isset($parsedUrl['fragment'])) {
+            $cleanedUrl .= '#' . $parsedUrl['fragment'];
+        }
+
+        return $cleanedUrl;
+    }
 }

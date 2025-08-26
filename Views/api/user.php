@@ -96,5 +96,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 // Handle DELETE requests
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    $controller->delete($routeInfo, $loginInfo);
+    // Check if body is empty
+    if ($_SERVER['CONTENT_LENGTH'] > 0) {
+        Response::output('body must be empty in DELETE requests', 400);
+        exit();
+    }
+    // Let's check if the csrf token is passed as a query string in the DELETE request
+    if (!isset($_GET['csrf_token'])) {
+        Response::output('missing csrf token', 401);
+        exit();
+    }
+
+    // Also the router info should bring us the id
+    if (!isset($routeInfo[2]['id'])) {
+        Response::output('missing id parameter', 400);
+        exit();
+    }
+
+    $checks = new Checks($loginInfo, $_GET);
+
+    $checks->checkCSRFDelete($_GET['csrf_token']);
+
+    $id = $routeInfo[2]['id'];
+    try {
+        $controller->delete((int) $id);
+    } catch (\Throwable $e) {
+        Response::output('Error deleting user: ' . $e->getMessage(), 400);
+    }
 }

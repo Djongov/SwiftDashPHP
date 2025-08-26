@@ -268,7 +268,7 @@ echo '<div class="flex flex-row flex-wrap items-start mb-4 justify-center">';
             'theme' => 'red',
             'method' => 'DELETE',
             'action' => '/api/user/' . $usernameArray['id'] . '?csrf_token=' . $_SESSION['csrf_token'],
-            'redirectOnSubmit' => '/logout',
+            //'redirectOnSubmit' => '/logout',
             'confirm' => true,
             'confirmText' => translate('forget_about_me_modal_text'),
             'doubleConfirm' => true,
