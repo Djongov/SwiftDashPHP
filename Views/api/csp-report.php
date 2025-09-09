@@ -46,6 +46,14 @@ if (!$domain && $jsonArray['csp-report']['document-uri'] === 'about') {
     $domain = 'about';
 }
 
+$sandboxSourceFiles = ['moz-extension', 'chrome-extension', 'safari-extension', 'sandbox eval code'];
+
+if (in_array($jsonArray['csp-report']['source-file'], $sandboxSourceFiles)) {
+    // Skipping sandboxed source files
+    http_response_code(204);
+    exit();
+}
+
 if ($domain === false || $domain === null || $domain === '' && $domain !== 'about') {
     SystemLog::write('Invalid domain, got \'\', null or false', 'CSP Domain Not Allowed');
     Response::output('Invalid domain', 400);

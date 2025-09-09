@@ -385,6 +385,83 @@ class DB
             }
         }
     }
+    public function getTableNamesAndSizes(): array
+    {
+        $_pdo = $this->getConnection();
+        $driver = $this->getDriver();
+        $dbTables = [];
+
+        try {
+            switch ($driver) {
+                case 'mysql':
+                    $sql = "
+                        SELECT 
+                            table_name AS name,
+                            ROUND((data_length + index_length) / 1024 / 1024, 2) AS size_mb
+                        FROM information_schema.tables
+                        WHERE table_schema = DATABASE()
+                    ";
+                    break;
+
+                case 'pgsql':
+                    $sql = "
+                        SELECT 
+                            relname AS name,
+                            pg_total_relation_size(relid) AS size_bytes
+                        FROM pg_catalog.pg_statio_user_tables
+                    ";
+                    break;
+
+                case 'sqlite':
+                    // SQLite does not track per-table size easily, we approximate using page count
+                    $sql = "
+                        SELECT 
+                            name,
+                            (pgsize / 1024.0 / 1024.0) AS size_mb
+                        FROM dbstat
+                        WHERE name IN (SELECT name FROM sqlite_master WHERE type='table')
+                    ";
+                    break;
+
+                default:
+                    throw new \Exception('Unsupported database driver: ' . $driver);
+            }
+
+            $stmt = $_pdo->prepare($sql);
+            $stmt->execute();
+
+            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                if ($driver === 'mysql') {
+                    $dbTables[$row['name']] = $row['size_mb'] . ' MB';
+                } elseif ($driver === 'pgsql') {
+                    $dbTables[$row['name']] = round($row['size_bytes'] / 1024 / 1024, 2) . ' MB';
+                } elseif ($driver === 'sqlite') {
+                    $dbTables[$row['name']] = round($row['size_mb'], 2) . ' MB';
+                }
+            }
+
+            return $dbTables;
+
+        } catch (\PDOException $e) {
+            if (ERROR_VERBOSE) {
+                throw new \PDOException('Error fetching table sizes: ' . $e->getMessage());
+            } else {
+                throw new \PDOException('Error fetching table sizes');
+            }
+        } catch (\Exception $e) {
+            if (ERROR_VERBOSE) {
+                throw new \PDOException('Error fetching table sizes: ' . $e->getMessage());
+            } else {
+                throw new \PDOException('Error fetching table sizes');
+            }
+        } catch (\Exception $e) {
+            if (ERROR_VERBOSE) {
+                throw new \PDOException('Error fetching table sizes: ' . $e->getMessage());
+            } else {
+                throw new \PDOException('Error fetching table sizes');
+            }
+        }
+    }
     public function describe(string $table): array
     {
         $db = new self();

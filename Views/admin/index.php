@@ -22,7 +22,7 @@ $db = new DB();
 $pdo = $db->getConnection();
 
 // Check the database driver to determine the appropriate SQL syntax
-$dbTables = $db->getTableNames();
+$dbTables = $db->getTableNamesAndSizes();
 
 // $dbTables now contains the table names fetched from the database
 echo '<div class="p-4 m-4 max-w-md ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700 overflow-auto">';
