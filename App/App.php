@@ -37,6 +37,7 @@ class App
             $_SESSION['lang'] = DEFAULT_LANG;
         }
 
+        // Capture UTM parameters if present in the URL
         $utmSources = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
         $currentUtms = [];
