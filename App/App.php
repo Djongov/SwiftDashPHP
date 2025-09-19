@@ -37,6 +37,42 @@ class App
             $_SESSION['lang'] = DEFAULT_LANG;
         }
 
+        $utmSources = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+
+        $currentUtms = [];
+        foreach ($utmSources as $source) {
+
+            if (isset($_GET[$source])) {
+                $currentUtms[$source] = $_GET[$source];
+            }
+        }
+
+        if (!empty($currentUtms)) {
+            // Capture UTM parameters
+            $captureUtm = new \Models\UtmCapturer();
+            $data = [
+                'ip_address' => currentIP(),
+                'utm_source' => $currentUtms['utm_source'] ?? null,
+                'utm_medium' => $currentUtms['utm_medium'] ?? null,
+                'utm_campaign' => $currentUtms['utm_campaign'] ?? null,
+                'utm_term' => $currentUtms['utm_term'] ?? null,
+                'utm_content' => $currentUtms['utm_content'] ?? null,
+                'referrer_url' => $_SERVER['HTTP_REFERER'] ?? null,
+                'landing_page' => isset($_SERVER['REQUEST_URI'])
+                    ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+                    : null
+            ];
+
+            try {
+                $captureUtm->create($data);
+            } catch (\Exception $e) {
+                // Log the error or handle it as needed
+                //throw new \Exception("Failed to capture UTM parameters: " . $e->getMessage());
+                error_log("Failed to capture UTM parameters: " . $e->getMessage());
+            }
+            
+        }
+
         /*
             Now Routing
         */

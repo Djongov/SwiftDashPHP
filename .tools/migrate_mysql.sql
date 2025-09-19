@@ -122,6 +122,23 @@ CREATE TABLE IF NOT EXISTS api_access_log (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE utm_captures (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NULL,
+
+    utm_source VARCHAR(255) NULL,
+    utm_medium VARCHAR(255) NULL,
+    utm_campaign VARCHAR(255) NULL,
+    utm_term VARCHAR(255) NULL,
+    utm_content VARCHAR(255) NULL,
+
+    referrer_url TEXT NULL,
+    landing_page TEXT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 -- BACKGROUND CLEANUP EVENT FOR CACHE
 SET GLOBAL event_scheduler = ON;
 

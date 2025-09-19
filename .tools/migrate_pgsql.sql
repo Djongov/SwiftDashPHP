@@ -123,3 +123,20 @@ CREATE TABLE IF NOT EXISTS api_access_log (
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- UTM CAPTURES TABLE
+CREATE TABLE utm_captures (
+    id BIGSERIAL PRIMARY KEY,
+    ip_address INET NULL,
+
+    utm_source VARCHAR(255) NULL,
+    utm_medium VARCHAR(255) NULL,
+    utm_campaign VARCHAR(255) NULL,
+    utm_term VARCHAR(255) NULL,
+    utm_content VARCHAR(255) NULL,
+
+    referrer_url TEXT NULL,
+    landing_page TEXT NULL,
+
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);

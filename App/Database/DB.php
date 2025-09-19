@@ -186,39 +186,32 @@ class DB
 
     public function checkDBColumnsAndTypes(array $array, string $table): void
     {
-        $dbTableArray = $this->describe($table);
+        $dbTableArray = $this->describe($table); // returns ['column_name' => ['type' => '...', 'nullable' => true|false]]
 
-        // First check if all columns exist in the database
         foreach ($array as $column => $data) {
             if (!array_key_exists($column, $dbTableArray)) {
                 throw new \Exception("Column '$column' does not exist in table '$table'");
             }
 
-            // Now let's check the data types
-            $expectedType = $dbTableArray[$column];
-            $expectedType = self::normalizeDataType($expectedType);
+            $expectedType = self::normalizeDataType($dbTableArray[$column]['type']);
+            $isNullable = $dbTableArray[$column]['nullable'] ?? false;
 
-            // Determine the actual data type
+            // If the value is NULL and the column is nullable, skip type checking
+            if (is_null($data) && $isNullable) {
+                continue;
+            }
+
+            // Determine actual data type
             if (is_string($data)) {
-                if (General::isDateOrDatetime($data)) {
-                    $dataType = 'datetime';
-                } else {
-                    $dataType = 'string';
-                }
+                $dataType = General::isDateOrDatetime($data) ? 'datetime' : 'string';
             } elseif (in_array($data, ['0', '1', 'true', 'false', true, false, 1, 0], true)) {
-                // Determine if the column should be treated as boolean
-                if ($this->isBooleanColumn($expectedType)) {
-                    $dataType = 'bool';
-                } else {
-                    $dataType = 'int';
-                }
+                $dataType = $this->isBooleanColumn($expectedType) ? 'bool' : 'int';
             } elseif (is_numeric($data)) {
                 $dataType = 'int';
             } else {
                 $dataType = gettype($data);
             }
 
-            // Compare the data types
             if ($dataType !== $expectedType) {
                 throw new \Exception("Data type mismatch for column '$column'. Expected '$expectedType', got '$dataType'");
             }
@@ -413,14 +406,26 @@ class DB
                     break;
 
                 case 'sqlite':
-                    // SQLite does not track per-table size easily, we approximate using page count
-                    $sql = "
-                        SELECT 
-                            name,
-                            (pgsize / 1024.0 / 1024.0) AS size_mb
-                        FROM dbstat
-                        WHERE name IN (SELECT name FROM sqlite_master WHERE type='table')
-                    ";
+                $tables = $_pdo->query("
+                    SELECT name 
+                    FROM sqlite_master 
+                    WHERE type='table' AND name NOT LIKE 'sqlite_%'
+                ")->fetchAll(\PDO::FETCH_COLUMN);
+
+                foreach ($tables as $table) {
+                    $cols = $_pdo->query("PRAGMA table_info($table)")->fetchAll(\PDO::FETCH_ASSOC);
+                    $colExpr = implode(' + ', array_map(fn($c) => "LENGTH(\"{$c['name']}\")", $cols));
+
+                    if ($colExpr === '') {
+                        $dbTables[$table] = '0 MB';
+                        continue;
+                    }
+
+                    $sql = "SELECT SUM($colExpr) AS total_bytes FROM \"$table\"";
+                    $size = $_pdo->query($sql)->fetch(\PDO::FETCH_ASSOC);
+                    $dbTables[$table] = round(($size['total_bytes'] ?? 0) / 1024 / 1024, 2) . ' MB';
+                }
+                return $dbTables;
                     break;
 
                 default:
@@ -466,47 +471,54 @@ class DB
     {
         $db = new self();
         $_pdo = $db->getConnection();
-
-        // Check the database driver to determine the appropriate SQL syntax
         $driver = $_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $dbColumns = [];
+
         switch ($driver) {
             case 'mysql':
                 $sql = "DESCRIBE $table";
                 $stmt = $_pdo->prepare($sql);
                 $stmt->execute();
                 $dbTableArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                // Map MySQL columns to a uniform format
-                $dbColumns = [];
                 foreach ($dbTableArray as $row) {
-                    $dbColumns[$row['Field']] = $row['Type'];
+                    $dbColumns[$row['Field']] = [
+                        'type' => $row['Type'],
+                        'nullable' => strtoupper($row['Null']) === 'YES'
+                    ];
                 }
                 break;
+
             case 'pgsql':
-                $sql = "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = ?";
+                $sql = "SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = ?";
                 $stmt = $_pdo->prepare($sql);
                 $stmt->execute([$table]);
                 $dbTableArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                // Extract column names and data types from the table structure
-                $dbColumns = [];
                 foreach ($dbTableArray as $row) {
-                    $dbColumns[$row['column_name']] = $row['data_type'];
+                    $dbColumns[$row['column_name']] = [
+                        'type' => $row['data_type'],
+                        'nullable' => strtoupper($row['is_nullable']) === 'YES'
+                    ];
                 }
                 break;
+
             case 'sqlite':
                 $sql = "PRAGMA table_info($table)";
                 $stmt = $_pdo->prepare($sql);
                 $stmt->execute();
                 $dbTableArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                // Extract column names and data types from the table structure
-                $dbColumns = [];
                 foreach ($dbTableArray as $row) {
-                    $dbColumns[$row['name']] = $row['type'];
+                    $dbColumns[$row['name']] = [
+                        'type' => $row['type'],
+                        'nullable' => $row['notnull'] == 0
+                    ];
                 }
                 break;
+
             default:
                 throw new \Exception("Unsupported database driver: $driver");
         }
 
         return $dbColumns;
     }
+
 }
