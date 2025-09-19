@@ -48,7 +48,7 @@ if (!$domain && $jsonArray['csp-report']['document-uri'] === 'about') {
 
 $sandboxSourceFiles = ['moz-extension', 'chrome-extension', 'safari-extension', 'sandbox eval code'];
 
-if (in_array($jsonArray['csp-report']['source-file'], $sandboxSourceFiles)) {
+if (isset($jsonArray['csp-report']['source-file']) && in_array($jsonArray['csp-report']['source-file'], $sandboxSourceFiles)) {
     // Skipping sandboxed source files
     http_response_code(204);
     exit();
