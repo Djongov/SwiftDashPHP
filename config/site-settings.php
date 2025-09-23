@@ -54,6 +54,16 @@ define("COMPANY_NAME", "Sunwell Solutions");
 define('MULTILINGUAL', true);
 define('DEFAULT_LANG', 'en');
 
+// Backend API URL for React frontend
+define('BACKEND_API_URL', 'https://swiftdashphp.gamerz-bg.com');
+// Allowed origins for CORS
+define('CORS_ALLOWED_ORIGINS', [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'https://swiftdashphp.gamerz-bg.com'
+]);
+
 // Site title, Goes on footer and main menu header
 define("SITE_TITLE", translate('site_title'));
 
@@ -70,6 +80,7 @@ define(
     '/forms',
     '/datagrid',
     '/blablabla', // to showcase the 404 page,
+    '/api/auth/check'
     ]
 );
 

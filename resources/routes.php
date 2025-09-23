@@ -7,14 +7,10 @@ use FastRoute\RouteCollector;
 return function (RouteCollector $router) {
     // Common resources
     require_once ROOT . '/resources/menus/menus.php';
-
-    // Include route groups
-    require_once ROOT . '/resources/routes/system-routes.php';
-    require_once ROOT . '/resources/routes/project-routes.php';
-
-
     $viewsFolder = ROOT . '/Views';
     $controllersFolder = ROOT . '/Controllers';
+
+
 
     $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
 
@@ -44,6 +40,11 @@ return function (RouteCollector $router) {
         'admin' => $genericMetaAdminDataArray
     ];
 
+
+    // Include route groups
+    require_once ROOT . '/resources/routes/system-routes.php';
+    require_once ROOT . '/resources/routes/project-routes.php';
+    require_once ROOT . '/resources/routes/react-routes.php';
     // Call each route group initializer
     systemRoutes($router, $viewsFolder, $controllersFolder, $metadataArray);
     projectRoutes($router, $viewsFolder, $controllersFolder, $metadataArray);

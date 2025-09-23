@@ -9,8 +9,41 @@ use App\Api\Response;
 
 class App
 {
+    private function handleCorsEarly(): void
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        
+        // Always allow localhost origins for development
+        $allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:3002',
+            'http://localhost:3003',
+            'https://swiftdashphp.gamerz-bg.com'
+        ];
+        
+        // Check if origin is allowed
+        if (in_array($origin, $allowedOrigins, true)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+        
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        header('Access-Control-Max-Age: 86400');
+        
+        // Handle preflight requests immediately
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit();
+        }
+    }
+
     public function init(): void
     {
+        // Handle CORS headers FIRST - before any other processing
+        $this->handleCorsEarly();
+        
         // Start session
         \App\Core\Session::start();
 
@@ -22,6 +55,9 @@ class App
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
+
+        // Handle CORS headers for React frontend (after config is loaded)
+        \App\Core\CorsHandler::handle();
 
         // Insert required files
         foreach ($pathsToIncludeInAppApp as $path) {
@@ -136,58 +172,56 @@ class App
                 break;
             /* Handle FOUND ROUTE OK */
             case \FastRoute\Dispatcher::FOUND:
-                $controllerInfo = $routeInfo[1];
-                $controllerName = $controllerInfo[0]; // Path to controller file
-                // Extract route parameters if any
-                $params = $controllerInfo[1] ?? [];
-
-                if (!file_exists($controllerName)) {
-                    throw new \Exception("Controller file ($controllerName) not found");
-                }
-
-                // Check login status
-                // $loginInfo['usernameArray'] = $loginInfo['usernameArray'];
-                // $loginInfo['isAdmin'] = $loginInfo['isAdmin'];
-                // $loginInfo['loggedIn'] = $loginInfo['loggedIn'];
-
-                // // Set theme (fallback to default if not set)
-                // $loginInfo['theme'] = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-
-                // API Endpoints: Directly include and run
-                if ($isApi) {
-                    // Add those variables so they are available for API calls too before the include
-                    $usernameArray = $loginInfo['usernameArray'];
-                    $isAdmin = $loginInfo['isAdmin'];
-                    $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-                    $loggedIn = $loginInfo['loggedIn'];
-
-                    include_once $controllerName;
-
-                    break;
-                }
-                // Non-API Endpoints
-                if ($httpMethod === 'GET' && !empty($params) && !$isApi) {
-                    $menuArray = $params['menu'] ?? [];
-                    $page = new Page();
-                    echo $page->build(
-                        $params['title'],
-                        $params['description'],
-                        $params['keywords'],
-                        $params['thumbimage'],
-                        $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME,
-                        $menuArray,
-                        $loginInfo['usernameArray'],
-                        $controllerName,
-                        $loginInfo['isAdmin'],
-                        $routeInfo // Pass route info to the controllers that are GET and build a page
-                    );
+                $handler = $routeInfo[1];
+                $routeParams = $routeInfo[2] ?? [];
+                
+                // Check if handler is a Closure (function) or array (file path + params)
+                if (is_callable($handler)) {
+                    // Handler is a Closure - execute it directly
+                    $handler($routeParams);
                 } else {
-                    $usernameArray = $loginInfo['usernameArray'];
-                    $isAdmin = $loginInfo['isAdmin'];
-                    $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-                    $loggedIn = $loginInfo['loggedIn'];
-                    // Include the controller file
-                    include_once $controllerName;
+                    // Handler is an array with file path and parameters
+                    $controllerName = $handler[0]; // Path to controller file
+                    $params = $handler[1] ?? []; // Additional parameters
+
+                    if (!file_exists($controllerName)) {
+                        throw new \Exception("Controller file ($controllerName) not found");
+                    }
+
+                    // API Endpoints: Directly include and run
+                    if ($isApi) {
+                        // Add those variables so they are available for API calls too before the include
+                        $usernameArray = $loginInfo['usernameArray'];
+                        $isAdmin = $loginInfo['isAdmin'];
+                        $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+                        $loggedIn = $loginInfo['loggedIn'];
+
+                        include_once $controllerName;
+                    } else if ($httpMethod === 'GET' && !empty($params)) {
+                        // Non-API GET Endpoints with parameters
+                        $menuArray = $params['menu'] ?? [];
+                        $page = new Page();
+                        echo $page->build(
+                            $params['title'],
+                            $params['description'],
+                            $params['keywords'],
+                            $params['thumbimage'],
+                            $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME,
+                            $menuArray,
+                            $loginInfo['usernameArray'],
+                            $controllerName,
+                            $loginInfo['isAdmin'],
+                            $routeInfo // Pass route info to the controllers that are GET and build a page
+                        );
+                    } else {
+                        // Other endpoints
+                        $usernameArray = $loginInfo['usernameArray'];
+                        $isAdmin = $loginInfo['isAdmin'];
+                        $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+                        $loggedIn = $loginInfo['loggedIn'];
+                        // Include the controller file
+                        include_once $controllerName;
+                    }
                 }
                 break;
         }
