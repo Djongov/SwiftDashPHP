@@ -20,8 +20,16 @@ a[target="_blank"]::after {
     vertical-align: middle; /* Aligns the icon vertically with the text */
 }
 tr:focus td {
-    color: white !important;
     font-weight: 600 !important;
+}
+/* Light mode focused row text */
+.light tr:focus td,
+html:not(.dark) tr:focus td {
+    color: white !important;
+}
+/* Dark mode focused row text */
+.dark tr:focus td {
+    color: white !important;
 }
 /*
   these type the CSS variable as color

@@ -316,7 +316,7 @@ class DataGrid
             $evenDarkBackgroundColor = DARK_COLOR_SCHEME_CLASS;
             $oddDarkBackgroundColor = BODY_DARK_COLOR_SCHEME_CLASS;
             $html .= '<tr tabindex="' . $indexes . '" data-row-id="' . $currentId . '" class="even:' . $evenBackgroundColor  . ' odd:' . $oddBackgroundColor . ' dark:even:' . $evenDarkBackgroundColor . ' dark:odd:' . $oddDarkBackgroundColor . ' focus:bg-' . $theme . '-500 dark:focus:' . DATAGRID_TBODY_DARK_COLOR_SCHEME . '">';
-                $tdClassArray = ['px-4', 'py-2', 'text-sm', 'max-w-xs', 'break-words', 'focus-within:text-white', 'focus-within:text-semibold'];
+                $tdClassArray = ['px-4', 'py-2', 'text-sm', 'max-w-xs', 'break-words', 'focus-within:text-white', 'dark:focus-within:text-white'];
             foreach ($arrays as $column => $value) {
                 if ($column === 'id' && $delete) {
                     $html .= '<td class="' . implode(' ', $tdClassArray) . '"><input type="checkbox" value="' . $currentId . '" name="row[]"></td>';
@@ -459,7 +459,7 @@ class DataGrid
         $html .= <<<JS
             <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
                 $(document).ready(() => {
-                    const table = drawDataGrid('$id', $jsonEncodedTableOptions);
+                    const table = drawDataGrid('$id', $jsonEncodedTableOptions, '$theme');
                     $filterJS
                 });
             </script>

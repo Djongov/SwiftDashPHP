@@ -195,7 +195,7 @@ const initializeEditButtons = (tableId) => {
 }
 
 // Initialize checkbox functionality
-const initializeCheckboxes = (tableId) => {
+const initializeCheckboxes = (tableId, theme = 'blue') => {
     // Get the modal elements for the mass delete
     const massDeleteModalTriggerer = document.getElementById(tableId + '-mass-delete-modal-trigger');
     const massDeleteModalText = document.getElementById(tableId + '-mass-delete-modal-text');
@@ -212,9 +212,9 @@ const initializeCheckboxes = (tableId) => {
             checkbox.addEventListener('change', () => {
                 // make row focused, 2 parent nodes behind
                 if (checkbox.checked) {
-                    checkbox.parentNode.parentNode.classList.add('bg-gray-200', 'text-black');
+                    checkbox.parentNode.parentNode.classList.add(`bg-${theme}-500`, `dark:bg-${theme}-600`, 'text-white', 'dark:text-white');
                 } else {
-                    checkbox.parentNode.parentNode.classList.remove('bg-gray-200', 'text-black');
+                    checkbox.parentNode.parentNode.classList.remove(`bg-${theme}-500`, `dark:bg-${theme}-600`, 'text-white', 'dark:text-white');
                 }
                 const allTableCheckedCheckboxes = countAllCheckedCheckboxes(tableId);
                 updateSelectedResults(tableId, allTableCheckedCheckboxes);
@@ -369,7 +369,7 @@ const initializeDeleteButtons = (tableId) => {
 }
 
 // Initialize select all functionality
-const initializeSelectAll = (tableId) => {
+const initializeSelectAll = (tableId, theme = 'blue') => {
     const massDeleteModalTriggerer = document.getElementById(tableId + '-mass-delete-modal-trigger');
     const massDeleteModalText = document.getElementById(tableId + '-mass-delete-modal-text');
 
@@ -383,10 +383,10 @@ const initializeSelectAll = (tableId) => {
             if (row instanceof Element) {
                 // If select all checkbox is checked, change the color of the row
                 if (event.target.checked) {
-                    row.classList.add('bg-gray-200', 'text-black');
+                    row.classList.add(`bg-${theme}-500`, `dark:bg-${theme}-600`, 'text-white', 'dark:text-white');
                 } else {
                     // Else remove the extra classes
-                    row.classList.remove('bg-gray-200', 'text-black');
+                    row.classList.remove(`bg-${theme}-500`, `dark:bg-${theme}-600`, 'text-white', 'dark:text-white');
                 }
             }
         });
@@ -405,13 +405,13 @@ const initializeSelectAll = (tableId) => {
 }
 
 // Initialize all DataGrid functionalities for a specific table
-const initializeDataGridActions = (tableId) => {
+const initializeDataGridActions = (tableId, theme = 'blue') => {
     updateFilteredResults(tableId, countVisibleRows(tableId));
     initializeEditButtons(tableId);
-    initializeCheckboxes(tableId);
+    initializeCheckboxes(tableId, theme);
     initializeMassDelete(tableId);
     initializeDeleteButtons(tableId);
-    initializeSelectAll(tableId);
+    initializeSelectAll(tableId, theme);
 }
 
 // Initialize all existing DataGrid tables
@@ -421,8 +421,18 @@ const initializeAllDataGrids = () => {
     if (tables.length > 0) {
         console.log(`Found ${tables.length} DataGrid tables to initialize.`);
         tables.forEach(table => {
-            initializeDataGridActions(table.id);
-            console.log(`Initialized DataGrid actions for table: ${table.id}`);
+            // Try to extract theme from table row classes or use default
+            const firstRow = table.querySelector('tbody tr');
+            let theme = 'blue'; // default theme
+            if (firstRow) {
+                const rowClasses = firstRow.className;
+                const themeMatch = rowClasses.match(/focus:bg-(\w+)-500/);
+                if (themeMatch) {
+                    theme = themeMatch[1];
+                }
+            }
+            initializeDataGridActions(table.id, theme);
+            console.log(`Initialized DataGrid actions for table: ${table.id} with theme: ${theme}`);
         });
     }
 }
@@ -483,7 +493,7 @@ const constructOptions = (dataLength, options) => {
     }
     return options;
 }
-const drawDataGrid = (id, options = null) => {
+const drawDataGrid = (id, options = null, theme = 'blue') => {
     // Let's analyze the options passed to the function
     options = constructOptions(0, options);
 
@@ -517,14 +527,14 @@ const drawDataGrid = (id, options = null) => {
             document.getElementById(`${id}`).classList.remove('hidden');
             
             // Initialize all actions for this table after DataTable is ready
-            initializeDataGridActions(id);
+            initializeDataGridActions(id, theme);
         },
     });
     return table;
 }
 
 
-const drawDataGridFromData = (json, skeletonId, options = null) => {
+const drawDataGridFromData = (json, skeletonId, options = null, theme = 'blue') => {
 
     options = constructOptions(json.length, options);
 
@@ -597,7 +607,7 @@ const drawDataGridFromData = (json, skeletonId, options = null) => {
         initComplete: function () {
             document.getElementById(loadingScreen.id).remove();
             // Initialize all actions for this table after DataTable is ready
-            initializeDataGridActions(skeletonId);
+            initializeDataGridActions(skeletonId, theme);
         }
     });
     // Example of adding Tailwind CSS classes to style the thead

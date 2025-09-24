@@ -38,7 +38,7 @@ $dataTypes = $db->describe($_POST['table']);
 
 // Normalize the datatypes
 foreach ($dataTypes as $key => $value) {
-    $dataTypes[$key] = $db->mapDataTypesArray($value);
+    $dataTypes[$key] = $db->mapDataTypesArray($value['type']);
 }
 
 // Check if we have any null or empty dataTypes
