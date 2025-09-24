@@ -18,7 +18,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
+    port: 3001,
     // No proxy needed since we're using the actual backend URL
     cors: true
   },

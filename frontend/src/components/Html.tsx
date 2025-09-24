@@ -123,18 +123,34 @@ export const Button = ({
     large: 'px-6 py-3 text-lg'
   }
 
-  const variantClasses = {
-    primary: `bg-${theme}-600 hover:bg-${theme}-700 text-white`,
-    secondary: `bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white`,
-    danger: 'bg-red-600 hover:bg-red-700 text-white'
+  // Use explicit color classes based on theme
+  const getThemeClasses = (theme: string, variant: string) => {
+    if (variant === 'primary') {
+      switch (theme) {
+        case 'blue':
+          return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500'
+        case 'indigo':
+          return 'bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-indigo-500'
+        case 'purple':
+          return 'bg-purple-600 hover:bg-purple-700 text-white focus:ring-purple-500'
+        case 'green':
+          return 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500'
+        default:
+          return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500'
+      }
+    } else if (variant === 'secondary') {
+      return 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white focus:ring-gray-500'
+    } else if (variant === 'danger') {
+      return 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500'
+    }
+    return 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500'
   }
 
   const classes = [
     'font-medium rounded-lg transition-colors duration-200',
     'focus:outline-none focus:ring-2 focus:ring-offset-2',
-    `focus:ring-${theme}-500`,
     sizeClasses[size],
-    variantClasses[variant],
+    getThemeClasses(theme, variant),
     disabled && 'opacity-50 cursor-not-allowed',
     className
   ].filter(Boolean).join(' ')

@@ -42,8 +42,25 @@ class ApiService {
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Handle authentication errors
-          window.location.href = '/login'
+          // Only redirect on 401 if it's NOT an auth-related endpoint
+          const isAuthEndpoint = error.config?.url?.includes('/auth/login') || 
+                                 error.config?.url?.includes('/auth/check')
+          
+          console.log('🔍 401 Response Details:', {
+            url: error.config?.url,
+            isAuthEndpoint,
+            status: error.response?.status,
+            statusText: error.response?.statusText
+          })
+          
+          if (!isAuthEndpoint) {
+            // Handle authentication errors for authenticated endpoints
+            console.log('🔒 401 Unauthorized - Redirecting to login')
+            window.location.href = '/login'
+          } else {
+            // For auth endpoints, let the calling code handle the 401
+            console.log('🔍 401 on auth endpoint - NOT redirecting, letting caller handle it')
+          }
         } else if (error.response?.status === 403) {
           // Handle CSRF token errors
           this.refreshCsrfToken()

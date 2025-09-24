@@ -4,6 +4,7 @@ import { Form, type FormField } from '../components/Form'
 import { SuccessAlert, DangerAlert } from '../components/Alerts'
 import { useAuth } from '../hooks/useAuth'
 
+
 const LoginPage = () => {
   const { login, isLoading } = useAuth()
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -25,19 +26,89 @@ const LoginPage = () => {
     }
   ]
 
-  const handleLogin = async (data: Record<string, any>) => {
+  const handleLogin = async (data: Record<string, string>) => {
     setMessage(null)
+    
+    console.log('🔐 Attempting login with:', { username: data.username })
     
     const result = await login(data.username, data.password)
     
+    console.log('📡 Full login API response:', result)
+    
     if (result.success) {
-      setMessage({ type: 'success', text: 'Login successful! Redirecting...' })
-      // Redirect handled by auth context
+      setMessage({ type: 'success', text: 'Login successful! Redirecting to dashboard...' })
+      // Give user feedback, then redirect to dashboard
       setTimeout(() => {
-        window.location.href = '/'
+        window.location.href = '/dashboard'
       }, 1500)
     } else {
-      setMessage({ type: 'error', text: result.error || 'Login failed' })
+      // Enhanced error handling with detailed HTTP response info
+      console.error('❌ Login failed - Full Details:', {
+        error: result.error,
+        networkError: result.networkError,
+        apiResponse: result.apiResponse,
+        fullResult: result
+      })
+
+      // Extract detailed response information from the actual error response
+      const networkErrorResponse = (result.networkError && typeof result.networkError === 'object' && 'response' in result.networkError) 
+        ? (result.networkError as { response: unknown }).response 
+        : null
+      const actualResponse = networkErrorResponse || result.apiResponse
+      
+      // Type guard for response objects
+      const typedResponse = actualResponse as { status?: number, statusText?: string, config?: { url?: string }, url?: string, data?: unknown } | null
+      
+      const httpStatus = typedResponse?.status || 'Unknown'
+      const statusText = typedResponse?.statusText || 'Unknown' 
+      const responseUrl = typedResponse?.config?.url || typedResponse?.url || 'Unknown'
+      
+      // Create comprehensive error message
+      const errorDetails = result.error || 'Login failed'
+      const debugInfo = {
+        httpStatus: `${httpStatus} ${statusText}`,
+        url: responseUrl,
+        networkError: result.networkError || 'None',
+        timestamp: new Date().toISOString(),
+        rawResponse: result.apiResponse || 'No response data'
+      }
+      
+      let networkErrorStr = 'None'
+      if (result.networkError) {
+        networkErrorStr = typeof result.networkError === 'string' 
+          ? result.networkError 
+          : result.networkError.toString()
+      }
+
+      // Extract server debug info if available
+      const responseData = typedResponse?.data || (result.apiResponse as { data?: unknown })?.data
+      const serverDebugInfo = (responseData as { debug?: unknown })?.debug
+      
+      const fullError = `${errorDetails}
+
+🔍 HTTP Status: ${httpStatus} ${statusText}
+🌐 Request URL: ${responseUrl}
+⚠️ Network Error: ${networkErrorStr}
+⏰ Timestamp: ${debugInfo.timestamp}
+
+${serverDebugInfo ? `🐛 Server Debug Info:
+${JSON.stringify(serverDebugInfo, null, 2)}
+
+` : ''}📋 Full Debug Data:
+${JSON.stringify(debugInfo, null, 2)}
+
+🔧 Raw API Response:
+${JSON.stringify(result.apiResponse, null, 2)}
+
+📡 Complete Server Response:
+${JSON.stringify(typedResponse?.data || (result.apiResponse as { data?: unknown })?.data, null, 2)}`
+      
+      setMessage({ 
+        type: 'error', 
+        text: fullError
+      })
+
+      // DO NOT redirect on error - keep user on login page to see the error
     }
   }
 
@@ -48,6 +119,8 @@ const LoginPage = () => {
       </div>
     )
   }
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -61,7 +134,20 @@ const LoginPage = () => {
           message.type === 'success' ? (
             <SuccessAlert>{message.text}</SuccessAlert>
           ) : (
-            <DangerAlert>{message.text}</DangerAlert>
+            <div className="space-y-3">
+              <DangerAlert>{message.text}</DangerAlert>
+              {/* API Debug Information */}
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <details className="cursor-pointer">
+                  <summary className="font-medium text-red-800 dark:text-red-200 mb-2">
+                    🔍 API Debug Information (Click to expand)
+                  </summary>
+                  <pre className="text-xs text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/40 p-3 rounded overflow-auto max-h-40">
+                    {message.text}
+                  </pre>
+                </details>
+              </div>
+            </div>
           )
         )}
 
@@ -78,6 +164,7 @@ const LoginPage = () => {
               }
             }}
           />
+
 
           <div className="mt-6 space-y-4">
             <div className="text-center">

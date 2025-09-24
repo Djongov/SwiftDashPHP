@@ -7,7 +7,7 @@ export default {
     "../Views/**/*.php",
     "../Components/**/*.php",
   ],
-  darkMode: 'class',
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
       // Match the existing color scheme from the PHP app
@@ -21,10 +21,6 @@ export default {
           900: '#1e3a8a',
         }
       },
-      // Enable gradients
-      backgroundImage: {
-        'gradient-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
-      }
     },
   },
   plugins: [],
