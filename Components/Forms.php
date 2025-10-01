@@ -62,6 +62,8 @@ class Forms
                 $max = (isset($inputOptionsArray['max'])) ? $inputOptionsArray['max'] : null;
                 // Step
                 $step = (isset($inputOptionsArray['step'])) ? $inputOptionsArray['step'] : null;
+                // Input mode
+                $inputmode = (isset($inputOptionsArray['inputmode'])) ? $inputOptionsArray['inputmode'] : null;
 
                 // Inputs such as text, email .. etc
                 if ($inputType === 'input') {
@@ -83,7 +85,7 @@ class Forms
                     }
                     $size = (isset($inputOptionsArray['size'])) ? $inputOptionsArray['size'] : 'default';
                     // Pull the input from the Html::input method
-                    $html .= Html::input($size, $inputOptionsArray['type'], $id, $inputOptionsArray['name'], $title, $value, $placeholder, $description, $label, $theme, $disabled, $required, $readonly, true, $min, $max, $step, $regex, $extraClasses, $dataAttributes);
+                    $html .= Html::input($size, $inputOptionsArray['type'], $id, $inputOptionsArray['name'], $title, $value, $placeholder, $description, $label, $theme, $disabled, $required, $readonly, true, $min, $max, $step, $regex, $extraClasses, $dataAttributes, $inputmode);
                 }
                 // If textarea
                 if ($inputType === 'textarea') {

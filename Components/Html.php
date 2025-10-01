@@ -106,7 +106,7 @@ class Html
         }
     }
     /* Form elements */
-    public static function input(string $size, string $type, ?string $id, string $name, string $title, mixed $value, string $placeholder, string $description, string $labelName, string $theme, bool $disabled, bool $required, bool $readOnly, bool $encased = true, ?int $min = null, ?int $max = null, float|int|null $step = null, $pattern = '', $extraClasses = [], $dataAttributes = []): string
+    public static function input(string $size, string $type, ?string $id, string $name, string $title, mixed $value, string $placeholder, string $description, string $labelName, string $theme, bool $disabled, bool $required, bool $readOnly, bool $encased = true, ?int $min = null, ?int $max = null, float|int|null $step = null, $pattern = '', $extraClasses = [], $dataAttributes = [], ?string $inputmode = null): string
     {
         if ($disabled || $readOnly) {
             $theme = 'red';
@@ -201,6 +201,12 @@ class Html
                 $dataAttributesString .= 'data-' . $key . '="' . $v . '" ';
             }
         }
+
+        // Input mode attribute
+        $inputmodeString = '';
+        if ($inputmode !== null && $inputmode !== '') {
+            $inputmodeString = 'inputmode="' . $inputmode . '" ';
+        }
         // handle file
 
         if ($type === 'file') {
@@ -208,15 +214,15 @@ class Html
                 $html = '';
                 $html .= '<div class="my-4">';
                     $html .= ($labelName !== '') ? self::label($id, $labelName, $requiredOriginal) : '';
-                    $html .= '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $dataAttributesString . ' autocomplete="on" />';
+                    $html .= '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $inputmodeString . $dataAttributesString . ' autocomplete="on" />';
                     $html .= ($description !== '') ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . $description . '</p>' : '';
                 $html .= '</div>';
                 return $html;
             } else {
-                return '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $dataAttributesString . ' autocomplete="on" />';
+                return '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $inputmodeString . $dataAttributesString . ' autocomplete="on" />';
             }
         }
-        $inputHtml = '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $dataAttributesString . ' autocomplete="on" />';
+        $inputHtml = '<input id="' . $id . '" type="' . $type . '" name="' . $name . '" class="' . implode(' ', $inputClasses) . '" ' . $placeholder . ' ' . $required . ' ' . $disabled . ' ' . $readOnly . ' ' . $value . $pattern . ' ' . $title . $minMaxString . $stepString . $inputmodeString . $dataAttributesString . ' autocomplete="on" />';
 
         $html = '';
         if ($encased) {

@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM php:8.4.2-apache
 
 # Copy application and configuration files before executing RUN commands
 COPY . /var/www/html/
@@ -7,32 +7,66 @@ COPY .tools/deployment/php.ini /usr/local/etc/php/php.ini
 COPY .tools/deployment/sshd_config /etc/ssh/sshd_config
 COPY .tools/deployment/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Install required packages and configure PHP
+# Single RUN layer with organized sections for better caching and smaller image size
 RUN --mount=type=cache,target=/var/cache/apt \
+    # ========================================
+    # Package Installation & System Updates
+    # ========================================
     apt-get update \
     && apt-get install -y --no-install-recommends \
+    # Core utilities
     curl \
+    wget \
     dialog \
+    sed \
+    unzip \
+    vim \
+    # PHP dependencies
     libgmp-dev \
     libicu-dev \
     libssl-dev \
+    # SSH server
     openssh-server \
+    # Network utilities
     iputils-ping \
     dnsutils \
     redis-tools \
     net-tools \
     telnet \
-    curl \
-    wget \
-    sed \
-    unzip \
-    vim \
     && rm -rf /var/lib/apt/lists/* \
+    \
+    # ========================================
+    # PHP Extensions Configuration
+    # ========================================
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) intl pdo_mysql mysqli \
+    \
+    # ========================================
+    # Apache Configuration
+    # ========================================
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && echo "ServerSignature Off" >> /etc/apache2/apache2.conf \
     && echo "ServerTokens Prod" >> /etc/apache2/apache2.conf \
+    && a2enmod rewrite \
+    && a2enmod headers \
+    \
+    # ========================================
+    # SSH Server Configuration
+    # ========================================
+    && mkdir -p /var/run/sshd \
+    && chmod 600 /etc/ssh/sshd_config \
+    \
+    # ========================================
+    # Composer Installation
+    # ========================================
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && chmod +x /usr/local/bin/composer \
+    && composer install --no-dev --optimize-autoloader --no-interaction \
+    \
+    # ========================================
+    # File Permissions & Directory Setup
+    # ========================================
+    && chmod +x /usr/local/bin/entrypoint.sh \
     && touch /var/log/php_errors.log \
     && chown www-data:www-data /var/log/php_errors.log \
     && chmod 644 /var/log/php_errors.log \
@@ -41,23 +75,13 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && chown www-data:www-data /var/www/html/public/assets/images/profile \
     && chmod 755 /var/www/html \
     && chmod 1733 /var/tmp \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && chmod +x /usr/local/bin/composer \
-    && composer install --no-dev --optimize-autoloader --no-interaction \
-    && a2enmod rewrite \
-    && a2enmod headers
-
-# SSH-specific and final setup
-RUN mkdir /var/run/sshd \
-    && chmod 600 /etc/ssh/sshd_config \
-    && chmod +x /usr/local/bin/entrypoint.sh \
-    && rm -rf /var/lib/apt/lists/* \
     \
-    # Enable additional access log for logrotate
+    # ========================================
+    # Apache Custom Log Setup & Logrotate
+    # ========================================
     && touch /var/log/apache2/custom_access.log \
     && chown www-data:adm /var/log/apache2/custom_access.log \
     && chmod 644 /var/log/apache2/custom_access.log \
-    && chown www-data:www-data /var/log/apache2/custom_access.log \
     && echo "/var/log/apache2/custom_access.log {" > /etc/logrotate.d/apache2-custom \
     && echo "    daily" >> /etc/logrotate.d/apache2-custom \
     && echo "    rotate 7" >> /etc/logrotate.d/apache2-custom \
@@ -66,7 +90,10 @@ RUN mkdir /var/run/sshd \
     && echo "    notifempty" >> /etc/logrotate.d/apache2-custom \
     && echo "    create 0640 www-data adm" >> /etc/logrotate.d/apache2-custom \
     && echo "}" >> /etc/logrotate.d/apache2-custom \
-    && service apache2 restart \
+    \
+    # ========================================
+    # Cleanup
+    # ========================================
     && rm -rf /var/www/html/.tools/deployment \
     && rm -rf /var/www/html/.dockerignore
 

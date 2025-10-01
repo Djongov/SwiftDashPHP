@@ -35,6 +35,9 @@ class Menu
             if ($value === null) {
                 continue;
             }
+            if (isset($value['loggedIn']) && $value['loggedIn'] === true && !isset($usernameArray['username'])) {
+                continue;
+            }
             // If the link is an array, it must be a dropdown
             if (is_array($value['link'])) {
                 $html .= '<li class="min-w-fit mx-auto">';

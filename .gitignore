@@ -16,3 +16,6 @@ composer.lock
 
 .tools/*.db
 sync.ffs_db
+
+# VS Code
+.vscode/
