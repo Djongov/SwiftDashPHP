@@ -112,6 +112,15 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 // Sync across tabs/windows
 window.addEventListener('storage', (event) => {
     if (event.key === 'color-theme') {
+        const newTheme = event.newValue;
+        
+        // Update document class
+        if (newTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
         setButtonStateFromLocalStorage();
         updateChartThemes();
     }
