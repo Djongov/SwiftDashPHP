@@ -44,7 +44,6 @@ return function (RouteCollector $router) {
     // Include route groups
     require_once ROOT . '/resources/routes/system-routes.php';
     require_once ROOT . '/resources/routes/project-routes.php';
-    require_once ROOT . '/resources/routes/react-routes.php';
     // Call each route group initializer
     systemRoutes($router, $viewsFolder, $controllersFolder, $metadataArray);
     projectRoutes($router, $viewsFolder, $controllersFolder, $metadataArray);

@@ -8,6 +8,8 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
 {
 
     /* Views */
+    // React route
+    $router->addRoute('POST', '/api/auth/login', [$viewsFolder . '/auth/login.php', $metadataArray['main']]);
 
     // Login page
     $router->addRoute('GET', '/login', [$viewsFolder . '/landing/login.php', $metadataArray['main']]);
@@ -17,7 +19,9 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('GET', '/register', [$viewsFolder . '/landing/register.php', $metadataArray['main']]);
 
     // Auth
+    $router->addRoute('GET', '/auth/csrf', [$viewsFolder . '/auth/csrf.php']);
     $router->addRoute('POST', '/auth/local', [$viewsFolder . '/auth/local.php']);
+    $router->addRoute('GET', '/auth/check', [$viewsFolder . '/auth/check.php']);
     $router->addRoute('GET', '/auth/google', [$viewsFolder . '/auth/google.php']);
     $router->addRoute('POST', '/auth/azure-ad', [$viewsFolder . '/auth/azure-ad.php']);
     $router->addRoute(['POST', 'GET'], '/auth/azure-ad-access-token', [$viewsFolder . '/auth/azure-ad-access-token.php']);

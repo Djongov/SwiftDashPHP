@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useEffect, useContext, createContext, useMemo, useCallback, useRef } from 'react'
 import type { ReactNode } from 'react'
-import apiService from '../services/api'
 
 export interface User {
   username: string
@@ -44,110 +43,251 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAuthenticated = !!user
 
+  // Utility function to get CSRF token
+  const getCsrfToken = async (): Promise<string> => {
+    const response = await fetch('https://swiftdashphp.gamerz-bg.com/auth/csrf', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'include'
+    })
+    
+    const data = await response.json()
+    if (!data.success) {
+      throw new Error('Failed to get CSRF token')
+    }
+    
+    return data.csrf_token
+  }
+
   const checkAuth = useCallback(async () => {
-    // Prevent multiple simultaneous auth checks
     if (isCheckingAuth.current) {
-      console.log('🔄 Auth check already in progress, skipping...')
+      console.log('🔍 Auth check already in progress, skipping...')
       return
     }
 
     isCheckingAuth.current = true
-    setIsLoading(true)
-    
+    console.log('🔍 Checking authentication...')
+
     try {
-      console.log('🔍 Checking authentication...')
-      const response = await apiService.get('/auth/check')
-      if (response.success && response.data) {
-        setUser(response.data as User)
-        console.log('✅ User authenticated:', response.data)
+      // First check localStorage for cached user data
+      const cachedUserData = localStorage.getItem('user_data')
+      const authToken = localStorage.getItem('auth_token')
+      const sessionId = localStorage.getItem('session_id')
+      
+      if (cachedUserData && authToken) {
+        console.log('📱 Found cached user data and token, setting user...')
+        setUser(JSON.parse(cachedUserData))
+        console.log('✅ User authenticated from cache')
+        return
+      } else if (cachedUserData && !authToken) {
+        console.log('⚠️ Found cached user data but no token, clearing cache...')
+        localStorage.removeItem('user_data')
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('session_id')
+      }
+
+      // Fallback to server check with auth headers
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+      
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`
+      }
+      if (sessionId) {
+        headers['X-Session-ID'] = sessionId
+      }
+
+      const response = await fetch('https://swiftdashphp.gamerz-bg.com/auth/check', {
+        method: 'GET',
+        headers,
+        credentials: 'include'
+      })
+      
+      const data = await response.json()
+      console.log('📡 Auth check response:', data)
+      console.log('🔍 Auth check - Expected: data.success && data.authenticated')
+      console.log('🔍 Auth check - Got:', { success: data.success, authenticated: data.authenticated })
+      
+      if (data.success && data.authenticated) {
+        setUser(data.data)
+        localStorage.setItem('user_data', JSON.stringify(data.data))
+        console.log('✅ User is authenticated:', data.data)
       } else {
+        console.log('❌ Auth check failed - clearing localStorage and setting user to null')
+        console.log('❌ Reason: success=' + data.success + ', authenticated=' + data.authenticated)
         setUser(null)
-        console.log('❌ User not authenticated:', response.error)
+        // Clear localStorage if auth failed
+        localStorage.removeItem('user_data')
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('session_id')
+        console.log('❌ User is not authenticated')
       }
     } catch (error) {
-      console.error('🚨 Auth check error:', error)
+      console.error('❌ Auth check failed:', error)
       setUser(null)
+      // Clear localStorage on error
+      localStorage.removeItem('user_data')
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('session_id')
     } finally {
-      setIsLoading(false)
       isCheckingAuth.current = false
+      setIsLoading(false) // Always set loading to false when auth check completes
     }
   }, [])
 
-  const login = useCallback(async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<LoginResult> => {
+    setIsLoading(true)
+    
     try {
+      console.log('🔐 Attempting login with:', { username })
       console.log('🔐 Login API call starting...')
-      const response = await apiService.post('/auth/login', {
-        username,
-        password
+      
+      // Get CSRF token using utility function
+      console.log('🔒 Fetching CSRF token...')
+      const csrfToken = await getCsrfToken()
+      console.log('🔒 CSRF token received:', csrfToken)
+      
+      // Make login request with CSRF token
+      const response = await fetch('https://swiftdashphp.gamerz-bg.com/auth/local', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': csrfToken
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          username, 
+          password,
+          csrf_token: csrfToken
+        })
       })
       
-      console.log('📡 Raw API response:', response)
+      const data = await response.json()
+      console.log('📡 Raw API response:', data)
       
-      if (response.success && response.data) {
-        setUser(response.data as User)
-        return { 
+      // Handle new API response format with nested data structure
+      if (data.result === "success" && data.data?.success) {
+        // Store user data in state and localStorage
+        const userData = data.data.data || { username }
+        setUser(userData)
+        
+        // Store auth token from the nested response
+        if (data.data.token) {
+          localStorage.setItem('auth_token', data.data.token)
+          console.log('💾 Stored auth token in localStorage')
+        }
+        if (data.data.session_id) {
+          localStorage.setItem('session_id', data.data.session_id)
+          console.log('💾 Stored session ID in localStorage')
+        }
+        localStorage.setItem('user_data', JSON.stringify(userData))
+        
+        console.log('✅ Login successful, user data set:', userData)
+        
+        return {
           success: true,
-          apiResponse: response as ApiResponseDebug
+          apiResponse: {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            data: data
+          }
+        }
+      } else if (data.result === "error" && response.status > 400) {
+        // Handle error responses with status codes > 400
+        const errorMessage = data.data?.message || data.message || 'Login failed'
+        console.log('❌ Login failed with error response:', errorMessage)
+        return {
+          success: false,
+          error: errorMessage,
+          apiResponse: {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            data: data
+          }
         }
       } else {
-        return { 
-          success: false, 
-          error: response.error || 'Login failed',
-          apiResponse: response as ApiResponseDebug
+        // Handle other failure cases
+        const errorMessage = data.data?.message || data.message || data.error || 'Login failed'
+        console.log('❌ Login failed:', errorMessage)
+        return {
+          success: false,
+          error: errorMessage,
+          apiResponse: {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            data: data
+          }
         }
       }
     } catch (error) {
-      console.error('Login error:', error)
-      console.log('🔍 Full error object:', error)
+      console.error('❌ Login network error:', error)
       
-      // Check if it's an axios error with response data
-      const isAxiosError = error && typeof error === 'object' && 'response' in error
-      
-      if (isAxiosError) {
-        const axiosError = error as { response: { status: number, statusText: string, data: unknown, config: { url?: string }, headers?: unknown } }
-        const axiosResponse = axiosError.response
+      // Enhanced error handling for axios errors
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { data: unknown; status: number; statusText: string; config: { url?: string } } }
+        console.log('📡 Axios error response data:', axiosError.response.data)
         
-        console.log('📡 Detailed axios response:', {
-          status: axiosResponse.status,
-          statusText: axiosResponse.statusText,
-          url: axiosResponse.config?.url,
-          data: axiosResponse.data,
-          fullResponse: axiosResponse
-        })
-        
-        // This is a server response (like 401, 400, etc.)
-        return { 
-          success: false, 
-          error: (axiosResponse.data as { error?: string })?.error || axiosResponse.statusText || 'Server error',
-          apiResponse: {
-            status: axiosResponse.status,
-            statusText: axiosResponse.statusText,
-            url: axiosResponse.config?.url,
-            data: axiosResponse.data
-          },
-          networkError: error instanceof Error ? error.message : 'Unknown error'
-        }
-      } else {
-        // This is a network error (no response from server)
-        console.log('🚨 Network error (no response):', error)
-        return { 
-          success: false, 
-          error: 'Network error occurred',
-          apiResponse: null,
-          networkError: error instanceof Error ? error : String(error)
+        return {
+          success: false,
+          error: (axiosError.response.data as { error?: string })?.error || 'Authentication failed',
+          apiResponse: axiosError.response.data,
+          networkError: error
         }
       }
+      
+      return {
+        success: false,
+        error: 'Network error occurred',
+        apiResponse: null,
+        networkError: error
+      }
+    } finally {
+      setIsLoading(false)
     }
-  }, [])
+  }
 
   const logout = useCallback(async () => {
     try {
       console.log('🚪 Logging out...')
-      await apiService.post('/auth/logout')
+      
+      // Send logout request with auth headers
+      const authToken = localStorage.getItem('auth_token')
+      const sessionId = localStorage.getItem('session_id')
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+      
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`
+      }
+      if (sessionId) {
+        headers['X-Session-ID'] = sessionId
+      }
+
+      await fetch('https://swiftdashphp.gamerz-bg.com/auth/logout', {
+        method: 'POST',
+        headers,
+        credentials: 'include'
+      })
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
       setUser(null)
+      // Clear all auth data from localStorage
+      localStorage.removeItem('user_data')
+      localStorage.removeItem('auth_token') 
+      localStorage.removeItem('session_id')
       console.log('✅ Logout successful, redirecting to login...')
       // Use window.location.href to ensure a full page reload and clear any cached state
       window.location.href = '/login'

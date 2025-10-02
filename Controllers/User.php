@@ -286,7 +286,7 @@ class User
     private function handleUserErrorsApiResponse(\Exception $e, string $verboseError, string $publicError): never
     {
         if (ERROR_VERBOSE) {
-            Response::output($verboseError . '. Error: ' . $e->getMessage());
+            Response::output($verboseError . '. Error: ' . $e->getMessage(), 400);
         } else {
             Response::output($publicError, 404);
         }

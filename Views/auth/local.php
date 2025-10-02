@@ -10,12 +10,13 @@ use App\Logs\SystemLog;
 use App\Authentication\JWT;
 use App\Authentication\AuthToken;
 
-// If the request is coming from local login, we should have a $_POST['username'] and a $_POST['password'] parameter
-if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
-    // First check the CSRF token
-    $checks = new Checks($loginInfo, $_POST);
+$data = App\Api\Checks::jsonBody();
 
-    $checks->checkCSRF($_POST['csrf_token']);
+// If the request is coming from local login, we should have a $_POST['username'] and a $_POST['password'] parameter
+if (isset($data['username'], $data['password'], $data['csrf_token'])) {
+    // First check the CSRF token
+    $checks = new Checks($loginInfo, $data);
+    //$checks->checkCSRF($data['csrf_token']);
 
     // You can implement a sleep here, to slow down the response to and therefore slow down potential spam on the login form
     sleep(0);
@@ -23,12 +24,9 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
     $user = new User();
 
     try {
-        $userArray = $user->get($_POST['username']);
+        $userArray = $user->get($data['username']);
     } catch (UserExceptions $e) {
-        Response::output($e->getMessage());
-    } catch (\Exception $e) {
-        SystemLog::write('Generic error when trying to get local user ' . $_POST['username'] . ' with error: ' . $e->getMessage(), 'User API');
-        Response::output('error', 400);
+        Response::output($e->getMessage(), 400);
     }
 
     if (empty($userArray)) {
@@ -39,7 +37,7 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
         Response::output('User is disabled', 401);
     }
 
-    if (!password_verify($_POST['password'], $userArray['password'])) {
+    if (!password_verify($data['password'], $userArray['password'])) {
         Response::output('Invalid username or password', 404);
     }
 
@@ -60,12 +58,20 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
     // Record last login
     $user->updateLastLogin($userArray['username']);
 
-    $destinationUrl = $_POST['state'] ?? null;
-    if ($destinationUrl !== null && (substr($destinationUrl, 0, 1) === '/')) {
-        // Invalid destination or state, set a default state
-        $destinationUrl = '/';
-    }
-    // Valid destination, proceed with your script
-    header("Location: " . filter_var($destinationUrl, FILTER_SANITIZE_URL));
-    exit();
+    // Return success response with token and user data for React
+    Response::output([
+        'success' => true,
+        'message' => 'Login successful',
+        'token' => $idToken,
+        'session_id' => session_id(),
+        'data' => [
+            'username' => $userArray['username'],
+            'name' => $userArray['name'],
+            'picture' => $userArray['picture'] ?? null,
+            'isAdmin' => $userArray['role'] === 'admin',
+            'provider' => 'local'
+        ]
+    ]);
+} else {
+    Response::output('Invalid request', 400);
 }

@@ -21,6 +21,7 @@ define(
     '/auth/azure-ad',
     '/auth/google',
     '/auth/local',
+    '/auth/csrf',
     '/auth/azure/azure-ad-code-exchange',
     '/auth/azure/mslive-code-exchange',
     '/api/user',

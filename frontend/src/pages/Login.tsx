@@ -42,73 +42,15 @@ const LoginPage = () => {
         window.location.href = '/dashboard'
       }, 1500)
     } else {
-      // Enhanced error handling with detailed HTTP response info
-      console.error('❌ Login failed - Full Details:', {
-        error: result.error,
-        networkError: result.networkError,
-        apiResponse: result.apiResponse,
-        fullResult: result
-      })
-
-      // Extract detailed response information from the actual error response
-      const networkErrorResponse = (result.networkError && typeof result.networkError === 'object' && 'response' in result.networkError) 
-        ? (result.networkError as { response: unknown }).response 
-        : null
-      const actualResponse = networkErrorResponse || result.apiResponse
+      console.log('❌ Login failed:', result);
       
-      // Type guard for response objects
-      const typedResponse = actualResponse as { status?: number, statusText?: string, config?: { url?: string }, url?: string, data?: unknown } | null
-      
-      const httpStatus = typedResponse?.status || 'Unknown'
-      const statusText = typedResponse?.statusText || 'Unknown' 
-      const responseUrl = typedResponse?.config?.url || typedResponse?.url || 'Unknown'
-      
-      // Create comprehensive error message
-      const errorDetails = result.error || 'Login failed'
-      const debugInfo = {
-        httpStatus: `${httpStatus} ${statusText}`,
-        url: responseUrl,
-        networkError: result.networkError || 'None',
-        timestamp: new Date().toISOString(),
-        rawResponse: result.apiResponse || 'No response data'
-      }
-      
-      let networkErrorStr = 'None'
-      if (result.networkError) {
-        networkErrorStr = typeof result.networkError === 'string' 
-          ? result.networkError 
-          : result.networkError.toString()
-      }
-
-      // Extract server debug info if available
-      const responseData = typedResponse?.data || (result.apiResponse as { data?: unknown })?.data
-      const serverDebugInfo = (responseData as { debug?: unknown })?.debug
-      
-      const fullError = `${errorDetails}
-
-🔍 HTTP Status: ${httpStatus} ${statusText}
-🌐 Request URL: ${responseUrl}
-⚠️ Network Error: ${networkErrorStr}
-⏰ Timestamp: ${debugInfo.timestamp}
-
-${serverDebugInfo ? `🐛 Server Debug Info:
-${JSON.stringify(serverDebugInfo, null, 2)}
-
-` : ''}📋 Full Debug Data:
-${JSON.stringify(debugInfo, null, 2)}
-
-🔧 Raw API Response:
-${JSON.stringify(result.apiResponse, null, 2)}
-
-📡 Complete Server Response:
-${JSON.stringify(typedResponse?.data || (result.apiResponse as { data?: unknown })?.data, null, 2)}`
+      // Display a clean error message to the user
+      const errorMessage = result.error || 'Login failed. Please check your credentials and try again.'
       
       setMessage({ 
         type: 'error', 
-        text: fullError
+        text: errorMessage
       })
-
-      // DO NOT redirect on error - keep user on login page to see the error
     }
   }
 
@@ -155,7 +97,7 @@ ${JSON.stringify(typedResponse?.data || (result.apiResponse as { data?: unknown 
           <Form
             config={{
               fields: loginFields,
-              action: '/api/auth/login',
+              action: '/auth/local', //'/api/auth/login',
               theme: 'blue',
               onSubmit: handleLogin,
               submitButton: {
