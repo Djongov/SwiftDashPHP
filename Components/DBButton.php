@@ -8,15 +8,20 @@ use App\Security\CSRF;
 
 class DBButton
 {
-    public static function editButton(string $dbTable, array $columns, int|string $id, string $text = 'Edit', int $width = 14, int $height = 14): string
+    public static function editButton(string $dbTable, array $columns, int|string $id, string $text = 'Edit'): string
     {
         $csrfToken = CSRF::create();
         if ($text === 'Edit') {
-            return '<button data-table="' . $dbTable . '" data-columns="' . implode(',', $columns) . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" type="button" class="edit-button ml-2 my-2 block border dark:border-gray-400 text-white dark:text-gray-100 bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-400">' . $text . '</button>';
+            return '<button data-table="' . $dbTable . '" data-columns="' . implode(',', $columns) . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" type="button" class="edit-button inline-flex items-center gap-1.5 px-3 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                ' . $text . '
+            </button>';
         } else {
-            return '<button title="' . $text . '" data-table="' . $dbTable . '" data-columns="' . implode(',', $columns) . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" type="button" class="edit-button p-1 ml-2 my-2 block border dark:border-gray-400 text-white dark:text-gray-100 bg-gray-500 hover:bg-gray-600 focus:outline-none font-medium rounded-lg text-sm text-center dark:bg-gray-600 dark:hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" width="' . $width . '" height="' . $height . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-edit">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            return '<button title="' . $text . '" data-table="' . $dbTable . '" data-columns="' . implode(',', $columns) . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" type="button" class="edit-button inline-flex items-center justify-center w-8 h-8 text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
             </button>';
         }
@@ -28,9 +33,18 @@ class DBButton
         }
         $csrfToken = CSRF::create();
         if ($text === 'Delete') {
-            return '<button data-table="' . $dbTable . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" data-confirm-message="' . $confirmTextint . '" type="button" class="delete-button ml-2 my-2 block border dark:border-gray-400 text-white dark:text-gray-100 bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-gray-400">' . $text . '</button>';
+            return '<button data-table="' . $dbTable . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" data-confirm-message="' . $confirmTextint . '" type="button" class="delete-button inline-flex items-center gap-1.5 px-3 py-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                ' . $text . '
+            </button>';
         } else {
-            return '<button title="' . $text . '" data-table="' . $dbTable . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" data-confirm-message="' . $confirmTextint . '" type="button" class="delete-button p-1 ml-2 my-2 block focus:outline-none font-medium text-sm text-center">❌</button>';
+            return '<button title="' . $text . '" data-table="' . $dbTable . '" data-csrf="' . $csrfToken . '" data-id="' . $id . '" data-confirm-message="' . $confirmTextint . '" type="button" class="delete-button inline-flex items-center justify-center w-8 h-8 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>';
         }
     }
 }
