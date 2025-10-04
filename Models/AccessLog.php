@@ -84,11 +84,19 @@ class AccessLog extends BasicModel
                 throw (new AccessLogException())->genericError('access log ' . $param . ' does not exist', 404);
             }
             $stmt = $pdo->prepare("SELECT * FROM $this->_table WHERE $this->_mainColumn = ?");
-            $stmt->execute([$param]);
+            try {
+                $stmt->execute([$param]);
+            } catch (\Exception $e) {
+                // Skip throwing exception if the error is database unknown
+                if ($e->getCode() === 'HY000') {
+                    return [];
+                }
+                throw (new AccessLogException())->genericError($e->getMessage(), 400);
+            }
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         }
     }
-    public function add(array $data): void
+    public function add(array $data): int
     {
         $pdo = $this->_db->getConnection();
         $dataValues = array_values($data);
@@ -96,7 +104,12 @@ class AccessLog extends BasicModel
         $stmt = $pdo->prepare($query);
         try {
             $stmt->execute($dataValues);
+            return (int) $pdo->lastInsertId();
         } catch (\Exception $e) {
+            // Skip throwing exception if the error is database unknown
+            if ($e->getCode() === 'HY000') {
+                return 0;
+            }
             throw (new AccessLogException())->genericError($e->getMessage(), 400);
         }
     }
@@ -108,11 +121,19 @@ class AccessLog extends BasicModel
         }
         $pdo = $this->_db->getConnection();
         $stmt = $pdo->prepare("DELETE FROM $this->_table WHERE id = ?");
-        $stmt->execute([$id]);
-        if ($stmt->rowCount() === 1) {
-            SystemLog::write('API access log with id ' . $id . ' deleted', 'API Access Log');
-            return true;
-        } else {
+        try {
+            $stmt->execute([$id]);
+            if ($stmt->rowCount() > 0) {
+                SystemLog::write("API access log $id deleted by $deletedBy", 'API Access Log');
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            // Skip throwing exception if the error is database unknown
+            if ($e->getCode() === 'HY000') {
+                return false;
+            }
             throw (new AccessLogException())->notDeleted();
         }
     }
@@ -120,11 +141,19 @@ class AccessLog extends BasicModel
     {
         $pdo = $this->_db->getConnection();
         $stmt = $pdo->prepare("DELETE FROM $this->_table");
-        $stmt->execute();
-        if ($stmt->rowCount() > 0) {
-            SystemLog::write('All API access logs deleted', 'API Access Log');
-            return true;
-        } else {
+        try {
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                SystemLog::write("All API access logs deleted", 'API Access Log');
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            // Skip throwing exception if the error is database unknown
+            if ($e->getCode() === 'HY000') {
+                return false;
+            }
             throw (new AccessLogException())->notDeleted();
         }
     }
