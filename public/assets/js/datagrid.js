@@ -21,11 +21,15 @@ Main functions:
 
 // Utility functions
 const countAllCheckedCheckboxes = (tableId) => {
-    return document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type="checkbox"]:checked`).length;
+    const table = document.getElementById(tableId);
+    if (!table) return 0;
+    return table.querySelectorAll('tbody > tr > td > input[type="checkbox"]:checked').length;
 }
 
 const countVisibleRows = (tableId) => {
-    return document.querySelectorAll(`#${tableId} > tbody > tr:not([style*="display: none;"])`).length;
+    const table = document.getElementById(tableId);
+    if (!table) return 0;
+    return table.querySelectorAll('tbody > tr:not([style*="display: none;"])').length;
 }
 
 const updateSelectedResults = (tableId, newValue) => {
@@ -44,7 +48,9 @@ const updateFilteredResults = (tableId, newValue) => {
 
 // Main function to initialize edit button functionality
 const initializeEditButtons = (tableId) => {
-    const editButtons = document.querySelectorAll(`#${tableId} button.edit`);
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    const editButtons = table.querySelectorAll('button.edit');
 
     if (editButtons.length > 0) {
         editButtons.forEach(button => {
@@ -206,7 +212,9 @@ const initializeCheckboxes = (tableId, theme = 'blue') => {
     }
 
     // Get all the checkboxes in the table
-    const allTableCheckboxes = document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type=checkbox]`);
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    const allTableCheckboxes = table.querySelectorAll('tbody > tr > td > input[type=checkbox]');
     if (allTableCheckboxes.length > 0) {
         allTableCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', () => {
@@ -279,7 +287,9 @@ const initializeMassDelete = (tableId) => {
 // Initialize individual delete buttons
 const initializeDeleteButtons = (tableId) => {
     let totalResults = document.getElementById(tableId + '-total');
-    const deleteButtons = document.querySelectorAll(`#${tableId} > tbody > tr > td > button.delete`);
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    const deleteButtons = table.querySelectorAll('tbody > tr > td > button.delete');
 
     if (deleteButtons.length > 0) {
         deleteButtons.forEach(button => {

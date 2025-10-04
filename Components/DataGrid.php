@@ -354,11 +354,11 @@ class DataGrid
                                 <div class="flex items-center justify-center">';
                 if ($edit) {
                     //$html .= '<button data-table="' . $originalDBTable . '" data-id="' . $currentId . '" data-columns="' . implode(',', $totalColumns) . '" data-csrf="' . $csrfToken . '" type="button" class="edit ml-2 my-2 block border dark:border-gray-400 text-white dark:text-gray-100 bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-400">Edit</button>';
-                    $html .= DBButton::editButton($originalDBTable, $totalColumns, $currentId, 'Edit id ' . $currentId);
+                    $html .= '<span class="m-1">' . DBButton::editButton($originalDBTable, $totalColumns, $currentId, 'Edit id ' . $currentId) . '</span>';
                 }
                 if ($delete) {
                     //$html .= '<button data-table="' . $originalDBTable . '" data-id="' . $currentId . '" type="button" data-csrf="' . $csrfToken . '" class="delete ml-2 my-2 block text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Delete</button>';
-                    $html .= DBButton::deleteButton($originalDBTable, $currentId, 'Delete this entry', 'Are you sure you want to delete entry with id <b>' . $currentId . '</b> from table <b>' . $originalDBTable . '</b>?');
+                    $html .= '<span class="m-1">' . DBButton::deleteButton($originalDBTable, $currentId, 'Delete this entry', 'Are you sure you want to delete entry with id <b>' . $currentId . '</b> from table <b>' . $originalDBTable . '</b>?') . '</span>';
                 }
                             $html .= '</div>
                             </td>';
