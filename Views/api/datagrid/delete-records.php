@@ -29,7 +29,6 @@ if (isset($_POST['table'], $_POST['id'])) {
         $rowsAffected = $stmt->rowCount(); // Check how many rows were deleted
 
         if ($rowsAffected > 0) {
-            SystemLog::write('Record with id ' . $_POST['id'] . ' deleted from ' . $_POST['table'], 'DataGrid Delete');
             Response::output('Successfully deleted the record with id ' . $_POST['id'] . ' from ' . $_POST['table']);
         } else {
             SystemLog::write('No record found with id ' . $_POST['id'] . ' in ' . $_POST['table'], 'DataGrid Delete');
@@ -48,7 +47,6 @@ if (isset($_POST['table'], $_POST['id'])) {
 
     try {
         $stmt->execute($_POST['row']);
-        SystemLog::write('Records with ids ' . implode(',', $_POST['row']) . ' deleted from ' . $_POST['deleteRecords'], 'DataGrid Delete');
         Response::output('Successfully deleted the records');
     } catch (\PDOException $e) {
         Response::output('Failed to delete the records', 400);

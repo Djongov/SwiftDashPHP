@@ -442,33 +442,22 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
         id: 'centerText',
         beforeDraw: function (chart) {
             let { width, height, ctx } = chart;
-            let centerX = width / 2;
+            
+            // Get the chart area (excludes title, legend, padding)
+            const chartArea = chart.chartArea;
+            const centerX = (chartArea.left + chartArea.right) / 2;
+            const centerY = (chartArea.top + chartArea.bottom) / 2;
     
-            // Dynamically adjust font size based on chart height
-            let fontSize = Math.floor(height / 15);
+            // Dynamically adjust font size based on chart area size
+            const chartAreaHeight = chartArea.bottom - chartArea.top;
+            let fontSize = Math.floor(chartAreaHeight / 8); // More proportional sizing
             ctx.font = `bold ${fontSize}px Arial`;
-    
-            // Measure text height to improve centering
-            let textMetrics = ctx.measureText(total);
-            let textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
-    
-            // Adaptive shift factor based on height ranges
-            let shiftFactor;
-            if (height >= 600) {
-                shiftFactor = height * 0.14; // Larger charts need a smaller relative shift
-            } else if (height >= 400) {
-                shiftFactor = height * 0.190;
-            } else {
-                shiftFactor = height * 0.281; // Smaller charts need a slightly bigger push down
-            }
-    
-            let centerY = height / 2 + shiftFactor - textHeight / 2;
     
             ctx.save();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = chart.options.plugins.title.color || '#111827';
-            ctx.fillText(total, centerX, centerY);
+            ctx.fillText(total.toLocaleString(), centerX, centerY); // Added number formatting
             ctx.restore();
         }
     };
