@@ -137,6 +137,9 @@ class SystemConfig
         
         // Authentication constants
         self::defineAuthConstants();
+
+        // WAF settings constants
+        self::configureJsonSettings();
     }
     
     private static function defineDatabaseConstants(): void
@@ -211,6 +214,30 @@ class SystemConfig
         
         // QuickChart settings
         define("QUICKCHART_HOST", "quickchart.io");
+    }
+
+    private static function configureJsonSettings() : void
+    {
+        // Load WAF settings from JSON file
+        $jsonSettingsPath = ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'settings.json';
+        if (!file_exists($jsonSettingsPath)) {
+            die('JSON settings file is missing. Please create config/settings.json');
+        }
+
+        $jsonSettingsContent = file_get_contents($jsonSettingsPath);
+        $jsonSettings = json_decode($jsonSettingsContent, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            die('Error parsing JSON settings: ' . json_last_error_msg());
+        }
+
+        // Define WAF-related constants with defaults if not set
+        // define('FRONT_DOOR_MAX_RESULTS', $wafSettings['front-door-max-results']['value'] ?? die('front-door-max-results must be set in config/waf-settings.json'));
+        // define('FRONT_DOOR_MEMORY_LIMIT', $wafSettings['front-door-memory-limit']['value'] ?? die('front-door-memory-limit must be set in config/waf-settings.json'));
+        // define('FRONT_DOOR_QUERY_TIMEOUT', $wafSettings['front-door-query-timeout']['value'] ?? die('front-door-query-timeout must be set in config/waf-settings.json'));
+        // define('FRONT_DOOR_DEFAULT_BOTS_ON', $wafSettings['front-door-default-bots-on']['value'] ?? die('front-door-default-bots-on must be set in config/waf-settings.json'));
+        // define('FRONT_DOOR_DEFAULT_ENRICH_ON', $wafSettings['front-door-default-enriching-on']['value'] ?? die('front-door-default-enriching-on must be set in config/waf-settings.json'));
+        // define('FRONT_DOOR_DEFAULT_UNIQUE_ON', $wafSettings['front-door-default-unique-on']['value'] ?? die('front-door-default-unique-on must be set in config/waf-settings.json'));
     }
     
     private static function defineAuthConstants(): void

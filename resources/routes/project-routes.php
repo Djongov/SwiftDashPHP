@@ -10,9 +10,7 @@ function projectRoutes(RouteCollector $router, string $viewsFolder, string $cont
 
     /* Views */
     $router->addRoute('GET', '/', [$viewsFolder . '/landing/main.php', $metadataArray['main']]);
-    #$router->addRoute('GET', '/adminx/products', [$viewsFolder . '/admin/products.php', $metadataArray['admin']]);
-    #$router->addRoute('GET', '/adminx/product-prices', [$viewsFolder . '/admin/product-prices.php', $metadataArray['admin']]);
-    #$router->addRoute('POST', '/api/fetch-product', [$viewsFolder . '/api/price-watcher/fetch-product.php']);
+    $router->addRoute('GET', '/settings', [$viewsFolder . '/landing/settings.php', $metadataArray['main']]);
 
     // Example
     $router->addRoute('GET', '/charts', [$viewsFolder . '/example/charts.php', $metadataArray['main']]);

@@ -32,10 +32,10 @@ class Table
             foreach ($data as $a => $b) {
                 $html .= '<tr>';
                 if (is_string($b)) {
-                            $html .= '<td class="max-w-lg border px-4 py-2 break-words">' . $a . '</td>';
+                            $html .= '<td class="bg-white dark:bg-gray-800 max-w-lg border px-4 py-2 break-words">' . $a . '</td>';
                 }
                 if (is_string($b)) {
-                                $html .= '<td class="max-w-lg border px-4 py-2 break-words">' . $b . '</td>';
+                                $html .= '<td class="bg-white dark:bg-gray-800 max-w-lg border px-4 py-2 break-words">' . $b . '</td>';
                 }
                                         $html .= '</tr>';
             }
@@ -43,7 +43,7 @@ class Table
             foreach ($data as $index => $array) {
                 $html .= '<tr>';
                 foreach ($array as $key => $value) {
-                            $html .= '<td class="max-w-lg border px-4 py-2 break-words">' . $value . '</td>';
+                            $html .= '<td class="bg-white dark:bg-gray-800 max-w-lg border px-4 py-2 break-words">' . $value . '</td>';
                 }
                             $html .= '</tr>';
             }
@@ -51,7 +51,7 @@ class Table
             foreach ($data as $row) {
                 $html .= '<tr>';
                 if (is_string($row)) {
-                            $html .= '<td class="max-w-lg border px-4 py-2 break-words">' . $row . '</td>';
+                            $html .= '<td class="bg-white dark:bg-gray-800 max-w-lg border px-4 py-2 break-words">' . $row . '</td>';
                 }
                             $html .= '</tr>';
             }
@@ -82,6 +82,7 @@ class Table
                 }
             }
         }
+        $columnArray = array_unique($columnArray);
         return self::simple($columnArray, $data);
     }
 }

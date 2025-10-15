@@ -61,10 +61,7 @@ $html = '';
 $html .= '<div class="mb-6">';
 foreach ($dataArray as $key => $value) {
     $html .= '<div class="ml-4 my-2">';
-        // First sanitize the value
-    if ($value !== null && is_string($value)) {
-        $value = htmlentities($value);
-    }
+        // No need to sanitize here - form inputs will handle proper escaping
         // Decide whether a field is disabled or not
         $readOnlyColumns = ['date_created', 'id', 'invited_on', 'created_at', 'created_by', 'client_ip', 'last_updated'];
     if (in_array($key, $readOnlyColumns)) {
@@ -128,7 +125,7 @@ foreach ($dataArray as $key => $value) {
         }
     }
     if ($dataTypes[$key] === 'json') {
-        $html .= Html::textArea(null, $key, html_entity_decode($value), '', $key, '', '', $theme, false, false, false, 10, 50);
+        $html .= Html::textArea(null, $key, $value, '', $key, '', '', $theme, false, false, false, 10, 50);
     }
         $html .= '</div>';
 }

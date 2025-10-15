@@ -77,7 +77,7 @@ class Menu
                 $html .= '<div class="flex flex-row items-center">';
                 if (isset($value['icon'])) {
                     if ($value['icon']['type'] === 'image') {
-                        $html .= '<img class="w-6 h-4" src="' . $value['icon']['src'] . '" alt="' . $name . '" />';
+                        $html .= '<img class="w-8 h-6" src="' . $value['icon']['src'] . '" alt="' . $name . '" />';
                     } else {
                         $html .= '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mx-2 w-6 h-6 stroke-' . $theme . '-500">' . $value['icon']['src'] . '</svg>';
                     }

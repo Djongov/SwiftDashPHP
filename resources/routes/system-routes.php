@@ -57,6 +57,9 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('POST', '/api/tools/base64', [$viewsFolder . '/api/tools/base64.php']);
     $router->addRoute('POST', '/api/tools/php-info-parser', [$viewsFolder . '/api/tools/php-info-parser.php']);
 
+    // JSON Settings API
+    $router->addRoute('POST', '/api/edit-json-settings', [$viewsFolder . '/api/edit-json-settings.php']);
+
     /* API Routes */
     $router->addRoute(['GET','PUT','DELETE','POST'], '/api/user[/{id:[^/]+}]', [$viewsFolder . '/api/user.php']);
     $router->addRoute(['GET','PUT','DELETE','POST'], '/api/firewall[/{id:\d+}]', [$viewsFolder . '/api/firewall.php']);
@@ -66,6 +69,7 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
 
     /* DataGrid Api */
     $router->addRoute('POST', '/api/datagrid/get-records', [$viewsFolder . '/api/datagrid/get-records.php']);
+    $router->addRoute('POST', '/api/datagrid/create-records', [$viewsFolder . '/api/datagrid/create-records.php']);
     $router->addRoute('POST', '/api/datagrid/update-records', [$viewsFolder . '/api/datagrid/update-records.php']);
     $router->addRoute('POST', '/api/datagrid/delete-records', [$viewsFolder . '/api/datagrid/delete-records.php']);
 }

@@ -23,6 +23,8 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
     containerDiv.style.width = width + "px";
     containerDiv.style.height = height + "px";
     containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+    // Also make sure that overflox-x is handled if needed
+    containerDiv.classList.add('overflow-x-auto', 'm-4');
 
     let canvas = document.createElement('canvas');
 
@@ -177,9 +179,77 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
     return chart;
 }
 
-// Line chart
-
-const createLineChart = (title, parentDiv, width, height, labels, data) => {
+/**
+ * Flexible Line Chart Creator
+ * 
+ * @param {string} title - Chart title
+ * @param {string} parentDiv - ID of parent container element
+ * @param {number} width - Chart width in pixels
+ * @param {number} height - Chart height in pixels
+ * @param {Array} labels - Array of x-axis labels
+ * @param {Array} data - Array of dataset objects with 'label' and 'data' properties
+ * @param {Object} options - Configuration options (optional)
+ * 
+ * Available options:
+ * ==================
+ * Chart Appearance:
+ * - tension: number (0-1, default: 0.4) - Line curve smoothness
+ * - pointRadius: number (default: 5) - Size of data points
+ * - pointHoverRadius: number (default: 8) - Size of data points on hover
+ * - borderWidth: number (default: 3) - Line thickness
+ * - fill: boolean (default: false) - Fill area under line
+ * - backgroundOpacity: string (default: '20') - Hex opacity for backgrounds
+ * 
+ * Animation:
+ * - animationDuration: number (default: 1500) - Animation duration in ms
+ * - animationEasing: string (default: 'easeInOutCubic') - Animation easing function
+ * 
+ * Axes:
+ * - xAxisTitle: string (default: 'Time') - X-axis title (set to '' to hide)
+ * - yAxisTitle: string (default: 'Value') - Y-axis title (set to '' to hide)
+ * - xAxisRotation: object (default: {min: 0, max: 45}) - X-axis label rotation
+ * - yAxisBeginAtZero: boolean (default: true) - Start Y-axis at zero
+ * - yAxisPrecision: number (default: 0) - Decimal precision for Y-axis ticks
+ * 
+ * Legend:
+ * - showLegend: boolean (default: true) - Show/hide legend
+ * - legendPosition: string (default: 'top') - Legend position: 'top', 'bottom', 'left', 'right'
+ * - usePointStyle: boolean (default: true) - Use point style in legend
+ * 
+ * Title:
+ * - showTitle: boolean (default: true) - Show/hide chart title
+ * - titlePadding: number (default: 20) - Title padding
+ * 
+ * Tooltip & Interaction:
+ * - tooltipMode: string (default: 'index') - Tooltip mode: 'index', 'point', 'nearest'
+ * - tooltipIntersect: boolean (default: false) - Tooltip intersection behavior
+ * 
+ * Grid:
+ * - showGrid: boolean (default: true) - Show/hide grid lines
+ * 
+ * Colors:
+ * - useCustomColors: boolean (default: false) - Use custom color palette
+ * - customColors: Array (default: []) - Custom color array (if useCustomColors is true)
+ * 
+ * Point Styling:
+ * - pointBorderColor: string (default: '#ffffff') - Point border color
+ * - pointBorderWidth: number (default: 2) - Point border width
+ * - pointHoverBorderWidth: number (default: 3) - Point border width on hover
+ * 
+ * Example usage:
+ * ==============
+ * createLineChart('My Chart', 'container', 800, 400, ['Jan', 'Feb'], 
+ *   [{label: 'Sales', data: [100, 200]}], {
+ *     xAxisTitle: 'Months',
+ *     yAxisTitle: 'Revenue ($)',
+ *     tension: 0.5,
+ *     borderWidth: 4,
+ *     useCustomColors: true,
+ *     customColors: ['#ff6b6b', '#4ecdc4', '#45b7d1']
+ *   }
+ * );
+ */
+const createLineChart = (title, parentDiv, width, height, labels, data, options = {}) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     parent.appendChild(containerDiv);
@@ -188,6 +258,8 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
     containerDiv.style.width = width + "px";
     containerDiv.style.height = height + "px";
     containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+    // Also make sure that overflox-x is handled if needed
+    containerDiv.classList.add('overflow-x-auto', 'm-4');
 
     let canvas = document.createElement('canvas');
     canvas.id = title.replace(' ', '-').toLowerCase() + generateUniqueId(4);
@@ -198,24 +270,91 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
 
     containerDiv.appendChild(canvas);
 
+    // Default configuration options
+    const defaultOptions = {
+        // Chart appearance
+        tension: 0.4,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        borderWidth: 3,
+        fill: false,
+        
+        // Animation
+        animationDuration: 1500,
+        animationEasing: 'easeInOutCubic',
+        
+        // Axes
+        xAxisTitle: 'Time',
+        yAxisTitle: 'Value',
+        xAxisRotation: { min: 0, max: 45 },
+        yAxisBeginAtZero: true,
+        yAxisPrecision: 0,
+        
+        // Legend
+        showLegend: true,
+        legendPosition: 'top',
+        usePointStyle: true,
+        
+        // Title
+        showTitle: true,
+        titlePadding: 20,
+        
+        // Tooltip
+        tooltipMode: 'index',
+        tooltipIntersect: false,
+        
+        // Grid
+        showGrid: true,
+        
+        // Colors
+        useCustomColors: false,
+        customColors: [],
+        
+        // Point styling
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointHoverBorderWidth: 3,
+        
+        // Background
+        backgroundOpacity: '20' // Hex opacity for semi-transparent backgrounds
+    };
+    
+    // Merge user options with defaults
+    const config = { ...defaultOptions, ...options };
+
     let lineDataSets = [];
 
     const textColor = getCurrentChartColors().textColor;
     const gridColor = getCurrentChartColors().gridColor;
     
-    data.forEach((array, index) => {
-        let calculatedTarget = Object.entries(array)[0][1];
+    data.forEach((dataset, index) => {
+        // Use the label property directly from the dataset
+        let label = dataset.label || `Dataset ${index + 1}`;
 
-        // Get the color from the colors array based on the index. Uses the remainder operator (%) to cycle through the colors array and assign a color based on the index value.
-        let color = colors[index % colors.length];
+        // Determine color to use
+        let color;
+        if (config.useCustomColors && config.customColors.length > 0) {
+            color = config.customColors[index % config.customColors.length];
+        } else {
+            color = colors[index % colors.length];
+        }
 
         lineDataSets.push({
-            label: calculatedTarget,
-            data: array['data'],
+            label: label,
+            data: dataset.data,
             borderColor: color,
-            backgroundColor: color,
-            fill: false,
-            tension: 0.1
+            backgroundColor: color + config.backgroundOpacity,
+            fill: config.fill,
+            tension: config.tension,
+            pointRadius: config.pointRadius,
+            pointHoverRadius: config.pointHoverRadius,
+            pointBackgroundColor: color,
+            pointBorderColor: config.pointBorderColor,
+            pointBorderWidth: config.pointBorderWidth,
+            pointHoverBackgroundColor: color,
+            pointHoverBorderColor: config.pointBorderColor,
+            pointHoverBorderWidth: config.pointHoverBorderWidth,
+            borderWidth: config.borderWidth
         });
     });
 
@@ -228,50 +367,79 @@ const createLineChart = (title, parentDiv, width, height, labels, data) => {
         options: {
             responsive: false, // ✅ Disable responsiveness for fixed size
             maintainAspectRatio: false, // ✅ Allow custom height
+            animation: {
+                duration: config.animationDuration,
+                easing: config.animationEasing
+            },
             plugins: {
                 legend: {
-                    position: 'top',
-                    display: true,
+                    position: config.legendPosition,
+                    display: config.showLegend,
                     labels: {
                         padding: 20,
                         color: textColor,
                         fontSize: 12,
                         borderWidth: 1,
+                        usePointStyle: config.usePointStyle,
+                        pointStyle: 'circle'
                     }
                 },
                 title: {
-                    display: true,
+                    display: config.showTitle,
                     text: title,
                     color: textColor,
-                    fontSize: 16
+                    fontSize: 16,
+                    padding: config.titlePadding
                 },
                 tooltip: {
-                    mode: 'index', // Show tooltip for all datasets at the same x-value
-                    intersect: false // Ensures tooltip shows for all datasets, not just the hovered one
+                    mode: config.tooltipMode,
+                    intersect: config.tooltipIntersect,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
                 }
             },
             interaction: {
-                mode: 'index', // Ensures all dataset values for the same x-axis label are shown
-                intersect: false
+                mode: config.tooltipMode,
+                intersect: config.tooltipIntersect
             },
             scales: {
                 x: {
+                    title: {
+                        display: !!config.xAxisTitle,
+                        text: config.xAxisTitle,
+                        color: textColor
+                    },
                     ticks: {
-                        color: textColor, // Color for x-axis labels
-                        margin: 10
-
+                        color: textColor,
+                        margin: 10,
+                        maxRotation: config.xAxisRotation.max,
+                        minRotation: config.xAxisRotation.min
                     },
                     grid: {
-                        color: gridColor, // Color for y-axis grid lines
+                        color: config.showGrid ? gridColor : 'transparent',
+                        drawOnChartArea: config.showGrid,
+                        drawTicks: config.showGrid
                     },
                 },
                 y: {
+                    title: {
+                        display: !!config.yAxisTitle,
+                        text: config.yAxisTitle,
+                        color: textColor
+                    },
                     ticks: {
-                        color: textColor, // Color for y-axis labels
-                        margin: 10
+                        color: textColor,
+                        margin: 10,
+                        beginAtZero: config.yAxisBeginAtZero,
+                        precision: config.yAxisPrecision
                     },
                     grid: {
-                        color: gridColor, // Color for y-axis grid lines
+                        color: config.showGrid ? gridColor : 'transparent',
+                        drawOnChartArea: config.showGrid,
+                        drawTicks: config.showGrid
                     },
                 },
             },
@@ -450,7 +618,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
     
             // Dynamically adjust font size based on chart area size
             const chartAreaHeight = chartArea.bottom - chartArea.top;
-            let fontSize = Math.floor(chartAreaHeight / 8); // More proportional sizing
+            let fontSize = Math.floor(chartAreaHeight / 14); // More proportional sizing
             ctx.font = `bold ${fontSize}px Arial`;
     
             ctx.save();
@@ -483,12 +651,12 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
             maintainAspectRatio: false, // ✅ Allow custom height
             plugins: {
                 legend: {
-                    display: true,
+                    display: false,
                     position: 'top',
                     labels: {
-                        padding: 20,
+                        padding: 8,
                         color: textColor,
-                        fontSize: 12,
+                        fontSize: 8,
                         borderWidth: 1,
                     }
                 },
@@ -497,8 +665,11 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                     display: true,
                     text: title,
                     padding: {
-                        top: 15,
+                        top: 12,
                         bottom: 10
+                    },
+                    margin : {
+                        bottom: 20
                     },
                     color: textColor,
                     align: 'center',
@@ -523,20 +694,6 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                         weight: 'normal',
                         size: 12,
                     }
-                },
-                doughnutlabel: {
-                    labels: [
-                        {
-                            text: `Total - ${data.reduce((a, b) => a + b, 0)}`,
-                            font: {
-                                size: 30,
-                                family: 'Arial, Helvetica, sans-serif',
-                                weight: 'bold'
-                            },
-                            backgroundColor: 'green',
-                            color: textColor
-                        }
-                    ]
                 }
             },
         }
@@ -554,6 +711,8 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
     containerDiv.style.width = width + "px";
     containerDiv.style.height = height + "px";
     containerDiv.classList.add('relative'); // Prevent Tailwind conflict
+    // Also make sure that overflox-x is handled if needed
+    containerDiv.classList.add('overflow-x-auto', 'm-4');
 
     let canvas = document.createElement('canvas');
     canvas.id = title.replace(' ', '-').toLowerCase() + generateUniqueId(4);

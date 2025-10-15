@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Editor JavaScript Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">JSON Editor JavaScript Debug Test</h1>
+        
+        <!-- Simulate the exact form structure -->
+        <form method="POST" action="/api/edit-json-settings" class="bg-white p-6 rounded-lg shadow">
+            <input type="hidden" name="csrf_token" value="test-token">
+            <input type="hidden" name="json_file_path" value="/test/path.json">
+            
+            <div class="mb-4">
+                <label class="block mb-2">Test Field</label>
+                <input type="text" name="test_field" value="test value" class="w-full p-2 border rounded">
+            </div>
+            
+            <div class="flex gap-4">
+                <button type="button" id="json-editor-reset-btn" class="px-4 py-2 bg-gray-500 text-white rounded">
+                    Reset
+                </button>
+                <button type="submit" name="save_json" value="1" class="px-4 py-2 bg-blue-600 text-white rounded">
+                    Save Configuration
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-6 p-4 bg-yellow-50 rounded">
+            <h3 class="font-bold">Debug Output:</h3>
+            <div id="debug-output"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Add debug output function
+        function addDebug(message) {
+            const output = document.getElementById('debug-output');
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            output.appendChild(div);
+        }
+        
+        addDebug('Page loaded');
+        
+        // Include the exact JSON editor JavaScript code
+        document.addEventListener("DOMContentLoaded", function() {
+            addDebug('DOM Content Loaded event fired');
+            
+            // Capture original form values on page load - be more specific with form selector
+            const form = document.querySelector('form[action="/api/edit-json-settings"]');
+            
+            if (!form) {
+                addDebug('ERROR: Form not found');
+                return;
+            } else {
+                addDebug('SUCCESS: Form found');
+            }
+            
+            const originalValues = {};
+            const submitButton = form.querySelector('button[type=submit][name="save_json"]');
+            const resetButton = document.getElementById("json-editor-reset-btn");
+            
+            if (!submitButton) {
+                addDebug('ERROR: Submit button not found');
+                return;
+            } else {
+                addDebug('SUCCESS: Submit button found');
+            }
+            
+            addDebug('Form and submit button found successfully');
+            
+            // Store original values for all form elements
+            if (form) {
+                const inputs = form.querySelectorAll("input, textarea, select");
+                inputs.forEach(function(input) {
+                    if (input.type === "hidden" || input.name === "csrf_token" || input.name === "save_json" || input.name === "json_file_path") {
+                        return; // Skip hidden fields, CSRF token, and submit button
+                    }
+                    
+                    if (input.type === "checkbox") {
+                        originalValues[input.name] = input.checked;
+                    } else {
+                        originalValues[input.name] = input.value;
+                    }
+                });
+                addDebug('Stored original values for ' + Object.keys(originalValues).length + ' fields');
+            }
+            
+            // AJAX form submission
+            if (form && submitButton) {
+                addDebug('Setting up form submit handler');
+                
+                form.addEventListener("submit", function(e) {
+                    addDebug('Form submit event triggered');
+                    e.preventDefault();
+                    
+                    // Disable submit button and show loading
+                    submitButton.disabled = true;
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = "Saving...";
+                    
+                    addDebug('Form submission prevented and button disabled');
+                    
+                    // For this test, just simulate success after 2 seconds
+                    setTimeout(function() {
+                        addDebug('Simulated API response received');
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonText;
+                        addDebug('Button re-enabled');
+                    }, 2000);
+                });
+            } else {
+                addDebug('ERROR: Could not set up form submit handler');
+            }
+        });
+    </script>
+</body>
+</html>

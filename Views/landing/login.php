@@ -71,7 +71,7 @@ if (GOOGLE_LOGIN) {
         // Local login
 if (LOCAL_USER_LOGIN) {
     if (ENTRA_ID_LOGIN || GOOGLE_LOGIN || MICROSOFT_LIVE_LOGIN) {
-        echo Html::p(translate('login_with_local_text'), ['text-center', 'mb-4']);
+        echo Html::p(translate('login_with_local_text_or'), ['text-center', 'mb-4']);
     } elseif (!ENTRA_ID_LOGIN && !GOOGLE_LOGIN && !MICROSOFT_LIVE_LOGIN) {
         echo Html::h3(translate('login_with_local_text'), true, ['my-6']);
     }

@@ -231,7 +231,7 @@ class DataGrid
         }
         $totalCount = count($data);
         if ($totalCount < 1) {
-            $noResultsText = ($title) ? 'No results for "' . $title . '"' : 'No results found';
+            $noResultsText = ($title) ? 'No results for "' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '"' : 'No results found';
             $html .= Alerts::danger($noResultsText);
             return $html;
         }
@@ -280,7 +280,7 @@ class DataGrid
         // All encompassing div
         $html .= '<div class="my-4">';
         $html .= '<div class="ml-2 mt-4">';
-        $html .= ($title) ? Html::h2($title, true) : null;
+        $html .= ($title) ? Html::h2(htmlspecialchars($title, ENT_QUOTES, 'UTF-8'), true) : null;
         $html .= ($tableOptions['info'] === true) ? '<p class="text-sm">Results: <span id="' . $id . '-total">' . $totalCount . '</span></p>' : null;
         if ($delete || $edit) {
             $html .= '<p class="text-sm">Filtered: <span id="' . $id . '-filtered">' . $totalCount . '</span></p>';
@@ -311,38 +311,71 @@ class DataGrid
         foreach ($data as $indexes => $arrays) {
             $counter++;
             $currentId = $arrays['id'] ?? $counter;
+            // Ensure currentId is safe for use in HTML attributes
+            $safeCurrentId = htmlspecialchars((string)$currentId, ENT_QUOTES, 'UTF-8');
+            $safeIndexes = htmlspecialchars((string)$indexes, ENT_QUOTES, 'UTF-8');
+            
             $evenBackgroundColor = BODY_COLOR_SCHEME_CLASS;
             $oddBackgroundColor = LIGHT_COLOR_SCHEME_CLASS;
             $evenDarkBackgroundColor = DARK_COLOR_SCHEME_CLASS;
             $oddDarkBackgroundColor = BODY_DARK_COLOR_SCHEME_CLASS;
-            $html .= '<tr tabindex="' . $indexes . '" data-row-id="' . $currentId . '" class="even:' . $evenBackgroundColor  . ' odd:' . $oddBackgroundColor . ' dark:even:' . $evenDarkBackgroundColor . ' dark:odd:' . $oddDarkBackgroundColor . ' focus:bg-' . $theme . '-500 dark:focus:' . DATAGRID_TBODY_DARK_COLOR_SCHEME . '">';
+            $html .= '<tr tabindex="' . $safeIndexes . '" data-row-id="' . $safeCurrentId . '" class="even:' . $evenBackgroundColor  . ' odd:' . $oddBackgroundColor . ' dark:even:' . $evenDarkBackgroundColor . ' dark:odd:' . $oddDarkBackgroundColor . ' focus:bg-' . $theme . '-500 dark:focus:' . DATAGRID_TBODY_DARK_COLOR_SCHEME . '">';
                 $tdClassArray = ['px-4', 'py-2', 'text-sm', 'max-w-xs', 'break-words', 'focus-within:text-white', 'dark:focus-within:text-white'];
             foreach ($arrays as $column => $value) {
+                // Store original value for processing before any modifications
+                $originalValue = $value;
+                
                 if ($column === 'id' && $delete) {
-                    $html .= '<td class="' . implode(' ', $tdClassArray) . '"><input type="checkbox" value="' . $currentId . '" name="row[]"></td>';
+                    $html .= '<td class="' . implode(' ', $tdClassArray) . '"><input type="checkbox" value="' . $safeCurrentId . '" name="row[]"></td>';
                 }
                     // Convert nulls or empty strings to (Empty) so it's easier to filter
                 if ($value === null || $value === '') {
                     $value = '(Empty)';
                 }
+                
+                // Additional security: handle other data types safely
+                if (is_bool($originalValue)) {
+                    $value = $originalValue ? 'true' : 'false';
+                } elseif (is_numeric($originalValue) && !is_string($originalValue)) {
+                    $value = htmlspecialchars((string)$originalValue, ENT_QUOTES, 'UTF-8');
+                } elseif (is_object($originalValue)) {
+                    // Handle objects by converting to string representation safely
+                    if (method_exists($originalValue, '__toString')) {
+                        $value = htmlspecialchars((string)$originalValue, ENT_QUOTES, 'UTF-8');
+                    } else {
+                        $value = htmlspecialchars('[Object: ' . get_class($originalValue) . ']', ENT_QUOTES, 'UTF-8');
+                    }
+                }
                 if ($column === 'id') {
-                    $html .= '<td class="' . implode(' ', $tdClassArray) . '" data-row-id="' . $value . '">' . $value . '</td>';
+                    // Ensure ID values are safe for data attributes and display
+                    $safeId = htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+                    $html .= '<td class="' . implode(' ', $tdClassArray) . '" data-row-id="' . $safeId . '">' . $safeId . '</td>';
                 } else {
                     $tdTitle = '';
+                    
                     if (is_string($value)) {
                         if (strlen($value) > 100) {
                             $tdClassArray[] = 'break-words';
-                            // Also add the full untruncated value as a title
-                            $tdTitle = ' title="' . $value . '"';
+                            // Properly escape the full value for the title attribute
+                            $tdTitle = ' title="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
                         }
-                        $value = htmlspecialchars($value);
+                        // Escape the value for safe HTML display
+                        $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
                     }
-                    if (is_array($value)) {
-                        $value = json_encode($value, JSON_PRETTY_PRINT);
-                        if (strlen($value) > 100) {
-                            $tdClassArray[] = 'break-words';
-                            // Also add the full untruncated value as a title
-                            $tdTitle = ' title="' . $value . '"';
+                    if (is_array($originalValue)) {
+                        // Convert array to JSON and escape for safe display
+                        $jsonValue = json_encode($originalValue, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                        if ($jsonValue === false) {
+                            // If JSON encoding fails, show safe fallback
+                            $value = htmlspecialchars('[Invalid JSON Data]', ENT_QUOTES, 'UTF-8');
+                        } else {
+                            if (strlen($jsonValue) > 100) {
+                                $tdClassArray[] = 'break-words';
+                                // Properly escape the full JSON value for the title attribute
+                                $tdTitle = ' title="' . htmlspecialchars($jsonValue, ENT_QUOTES, 'UTF-8') . '"';
+                            }
+                            // Escape the JSON value for safe HTML display
+                            $value = htmlspecialchars($jsonValue, ENT_QUOTES, 'UTF-8');
                         }
                     }
                     $html .= '<td class="' . implode(' ', $tdClassArray) . '"' . $tdTitle . '>' . $value . '</td>';

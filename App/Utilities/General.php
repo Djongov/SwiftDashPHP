@@ -37,30 +37,16 @@ class General
     }
     public static function isAssocArray(array $array): bool
     {
-        // If the array is empty, treat it as not associative
-        if (empty($array)) {
-            return false;
-        }
-
-        // Check the first key to determine if it's an associative array
-        $firstKey = array_key_first($array);
-
-        // If the first key is not an integer, it's an associative array
-        if (!is_int($firstKey)) {
-            return true;
-        }
-
-        // If the keys are sequential numeric keys starting from 0
         return array_keys($array) !== range(0, count($array) - 1);
     }
     public static function isMultiDimensionalArray(array $array): bool
     {
         foreach ($array as $element) {
             if (is_array($element)) {
-                return true; // If any element is an array, it's multidimensional
+                return true;
             }
         }
-        return false; // No element is an array, it's not multidimensional
+        return false;
     }
     public static function parsePhpInfo(): array
     {

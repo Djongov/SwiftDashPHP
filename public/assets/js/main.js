@@ -283,7 +283,7 @@ const initializeAutoLoadedComponents = () => {
                 break;
 
             case 'linechart':
-                createLineChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.datasets);
+                createLineChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.datasets, data.options || {});
                 break;
 
             case 'barchart':
@@ -981,6 +981,161 @@ const initializeModal = (modal, uniqueId) => {
     // Add Escape key listener
     document.addEventListener('keydown', handleEscapeKey);
 };
+
+// Create/Add button functionality
+
+const createButtons = document.querySelectorAll(`button.create-button`);
+
+if (createButtons.length > 0) {
+    createButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const uniqueId = generateUniqueId(4);
+            const table = button.dataset.table;
+            const columns = button.dataset.columns.split(',');
+            
+            // Generate the modal with "Add New" title
+            let modal = createModal(
+                uniqueId, 
+                `Add New Entry to ${table}`, 
+                'Save', 
+                document.body, 
+                '/api/datagrid/create-records'
+            );
+            
+            // Insert modal into DOM
+            document.body.insertBefore(modal, document.body.firstChild);
+            
+            // Initialize modal (show it, blur background, etc.)
+            initializeModal(modal, uniqueId);
+            
+            // Get modal elements
+            const modalResult = document.getElementById(`${uniqueId}-result`);
+            const modalBody = document.getElementById(`${uniqueId}-body`);
+            const saveButton = document.getElementById(`${uniqueId}-edit`);
+            const modalForm = document.getElementById(`${uniqueId}-form`);
+
+            // Create form fields for each column
+            let formFieldsHtml = '';
+            columns.forEach(column => {
+                // Skip auto-increment fields like 'id', 'created_at', 'updated_at'
+                if (['id', 'created_at', 'updated_at'].includes(column.toLowerCase())) {
+                    return;
+                }
+                
+                // Determine input type based on column name
+                let inputType = 'text';
+                let placeholder = `Enter ${column.replace('_', ' ')}`;
+                
+                if (column.toLowerCase().includes('email')) {
+                    inputType = 'email';
+                } else if (column.toLowerCase().includes('password')) {
+                    inputType = 'password';
+                } else if (column.toLowerCase().includes('date')) {
+                    inputType = 'date';
+                } else if (column.toLowerCase().includes('url') || column.toLowerCase().includes('link')) {
+                    inputType = 'url';
+                }
+                
+                // Handle special cases for textarea
+                const isTextArea = ['description', 'content', 'query', 'note', 'comment'].includes(column.toLowerCase());
+                
+                if (isTextArea) {
+                    formFieldsHtml += `
+                        <div class="mb-4">
+                            <label for="${uniqueId}-${column}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                ${column.replace('_', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}
+                            </label>
+                            <textarea id="${uniqueId}-${column}" name="${column}" rows="4" 
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-${theme}-500 focus:border-${theme}-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-${theme}-500 dark:focus:border-${theme}-500" 
+                                placeholder="${placeholder}"></textarea>
+                        </div>
+                    `;
+                } else {
+                    formFieldsHtml += `
+                        <div class="mb-4">
+                            <label for="${uniqueId}-${column}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                ${column.replace('_', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}
+                            </label>
+                            <input type="${inputType}" id="${uniqueId}-${column}" name="${column}" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-${theme}-500 focus:border-${theme}-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-${theme}-500 dark:focus:border-${theme}-500" 
+                                placeholder="${placeholder}">
+                        </div>
+                    `;
+                }
+            });
+            
+            // Add hidden fields for table and CSRF token
+            formFieldsHtml += `
+                <input type="hidden" name="table" value="${table}">
+                <input type="hidden" name="csrf_token" value="${button.dataset.csrf}">
+            `;
+            
+            // Populate modal body with form fields
+            modalBody.innerHTML = formFieldsHtml;
+            
+            // Handle form submission
+            let initialButtonText = saveButton.innerText;
+            saveButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                // Show loading state
+                saveButton.innerHTML = '';
+                createLoader(saveButton, `${uniqueId}-save-button-create-loader`);
+                
+                // Collect form data
+                const formData = new FormData(modalForm);
+                
+                // API endpoint for creating records
+                const createApi = button.dataset.createApi || '/api/datagrid/create-records';
+                let responseStatus = 0;
+                
+                // Submit the form
+                fetch(createApi, {
+                    method: 'POST',
+                    headers: {
+                        'secretHeader': 'badass',
+                        'X-CSRF-TOKEN': formData.get('csrf_token')
+                    },
+                    body: formData
+                }).then(response => {
+                    responseStatus = response.status;
+                    if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
+                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                        location.reload();
+                    } else {
+                        // Check if the response is JSON or text/HTML
+                        if (response.headers.get('content-type')?.includes('application/json')) {
+                            return response.json().then(data => ({ data, isJson: true }));
+                        } else {
+                            return response.text().then(data => ({ data, isJson: false }));
+                        }
+                    }
+                }).then(({ data, isJson }) => {
+                    // Handle response
+                    if (responseStatus >= 400) {
+                        saveButton.innerText = 'Retry';
+                        let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
+                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
+                    } else {
+                        saveButton.innerText = initialButtonText;
+                        
+                        if (isJson) {
+                            modalResult.innerHTML = `<p class="text-green-500 font-semibold">${data.data || 'Record created successfully!'}</p>`;
+                            // Reload page to show new record
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            modalResult.innerHTML = data;
+                        }
+                    }
+                }).catch(error => {
+                    console.error('Error during fetch:', error);
+                    saveButton.innerText = 'Retry';
+                    modalResult.innerHTML = `<p class="text-red-500 font-semibold">Network error occurred</p>`;
+                });
+            });
+        });
+    });
+}
 
 // Cookie Consent modal
 const cookieConsentLink = document.getElementById('cookie-consent-link');

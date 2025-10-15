@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Database\DB;
 use Components\Html;
 use Components\DataGrid;
+use Google\Service\CCAIPlatform\Component;
 
 echo Html::h1('DataGrid', true);
 
@@ -133,3 +134,56 @@ foreach ($autoloadArray as $array) {
 }
 
 echo '<div id="dataGridDataLoader" class="max-w-full mx-2 my-12 flex flex-wrap flex-row justify-center items-center"></div>';
+
+echo Html::h2('AG Grid - Multiple Tables Example');
+
+echo Html::p('This example shows two AG Grid tables rendered side by side with proper isolation and unique identifiers.');
+
+// Sample data for demonstrations
+$userData = $users;
+$carData = [
+    ['Make' => 'Toyota', 'Model' => 'Celica', 'Price' => 35000],
+    ['Make' => 'Ford', 'Model' => 'Mondeo', 'Price' => 32000],
+    ['Make' => 'Porsche', 'Model' => 'Boxster', 'Price' => 72000],
+    ['Make' => 'BMW', 'Model' => 'M3', 'Price' => 55000],
+    ['Make' => 'Audi', 'Model' => 'A4', 'Price' => 45000]
+];
+
+// Option 1: Side by Side Layout with renderMultiple()
+echo '<div class="mb-8">';
+echo '<h3 class="text-lg font-semibold mb-4">Option 1: Side by Side Layout</h3>';
+
+$agGrid1_option1 = new Components\AGGrid('usersGrid_option1');
+$agGrid1_option1->setColumns(array_keys($userData[0]));
+$agGrid1_option1->setData($userData);
+
+$agGrid2_option1 = new Components\AGGrid('carsGrid_option1');
+$agGrid2_option1->setColumns(['Make', 'Model', 'Price']);
+$agGrid2_option1->setData($carData);
+
+echo Components\AGGrid::renderMultiple([$agGrid1_option1, $agGrid2_option1], 'grid grid-cols-1 lg:grid-cols-2 gap-6');
+echo '</div>';
+
+// Option 2: Stacked Layout with individual rendering
+echo '<div class="mb-8">';
+echo '<h3 class="text-lg font-semibold mb-4">Option 2: Stacked Layout</h3>';
+echo '<div class="space-y-6">';
+
+$agGrid1_option2 = new Components\AGGrid('usersGrid_option2');
+$agGrid1_option2->setColumns(array_keys($userData[0]));
+$agGrid1_option2->setData($userData);
+
+$agGrid2_option2 = new Components\AGGrid('carsGrid_option2');
+$agGrid2_option2->setColumns(['Make', 'Model', 'Price']);
+$agGrid2_option2->setData($carData);
+
+echo '<div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">';
+echo '<h4 class="text-md font-medium mb-3 text-gray-800 dark:text-gray-200">Users Table</h4>';
+echo $agGrid1_option2->render();
+echo '</div>';
+echo '<div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">';
+echo '<h4 class="text-md font-medium mb-3 text-gray-800 dark:text-gray-200">Cars Table</h4>';
+echo $agGrid2_option2->render();
+echo '</div>';
+echo '</div>';
+echo '</div>';
