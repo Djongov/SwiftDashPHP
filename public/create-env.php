@@ -14,9 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') :
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Environment Configuration Setup</title>
-    <!-- Note: Tailwind CDN is used here for the setup form only. Production uses compiled CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/main.css">
+    <!-- Note: Tailwind CSS compiled file is used here -->
+    <link rel="stylesheet" href="/assets/css/tailwind.css">
     <style>
         .form-section {
             background-color: white;

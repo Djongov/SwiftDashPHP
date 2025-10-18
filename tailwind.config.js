@@ -19,10 +19,10 @@ module.exports = {
     },
     variants: {
         extend: {
-            backgroundColor: ['odd', 'even'],
-            textColor: ['odd', 'even'],
-            borderColor: ['odd', 'even'],
-            stroke: ['odd', 'even', 'hover', 'focus', 'dark'],
+            backgroundColor: ['odd', 'even', 'peer-focus'],
+            textColor: ['odd', 'even', 'peer-focus'],
+            borderColor: ['odd', 'even', 'peer-focus'],
+            stroke: ['odd', 'even', 'hover', 'focus', 'dark', 'peer-focus'],
         }
     },
     safelist: [
@@ -83,7 +83,19 @@ module.exports = {
                 // Dark focus states
                 `dark:focus:ring-${color}-${shade}`,
                 `dark:focus:border-${color}-${shade}`,
-                `dark:focus:stroke-${color}-${shade}`
+                `dark:focus:stroke-${color}-${shade}`,
+                // Peer focus states
+                `peer-focus:bg-${color}-${shade}`,
+                `peer-focus:text-${color}-${shade}`,
+                `peer-focus:border-${color}-${shade}`,
+                `peer-focus:ring-${color}-${shade}`,
+                `peer-focus:stroke-${color}-${shade}`,
+                // Dark peer focus states
+                `dark:peer-focus:bg-${color}-${shade}`,
+                `dark:peer-focus:text-${color}-${shade}`,
+                `dark:peer-focus:border-${color}-${shade}`,
+                `dark:peer-focus:ring-${color}-${shade}`,
+                `dark:peer-focus:stroke-${color}-${shade}`
             ])
         )
     ],

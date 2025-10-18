@@ -40,6 +40,10 @@ npm install
 npm run build-css-prod
 ```
 
+```bash
+npx update-browserslist-db@latest
+```
+
 ## PHP CodeSniffer checks
 
 Checks
