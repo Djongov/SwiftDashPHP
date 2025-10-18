@@ -19,10 +19,10 @@ module.exports = {
     },
     variants: {
         extend: {
-            backgroundColor: ['odd', 'even', 'peer-focus'],
-            textColor: ['odd', 'even', 'peer-focus'],
-            borderColor: ['odd', 'even', 'peer-focus'],
-            stroke: ['odd', 'even', 'hover', 'focus', 'dark', 'peer-focus'],
+            backgroundColor: ['odd', 'even', 'peer-focus', 'peer-checked'],
+            textColor: ['odd', 'even', 'peer-focus', 'peer-checked'],
+            borderColor: ['odd', 'even', 'peer-focus', 'peer-checked'],
+            stroke: ['odd', 'even', 'hover', 'focus', 'dark', 'peer-focus', 'peer-checked'],
         }
     },
     safelist: [
@@ -35,6 +35,11 @@ module.exports = {
         'dark:even:bg-gray-700', 'dark:odd:bg-gray-800', 'dark:even:bg-gray-600', 'dark:odd:bg-gray-700',
         'hover:bg-gray-100', 'dark:hover:bg-gray-600', 'transition-colors', 'duration-150',
         
+        // Toggle switch essential classes
+        'peer', 'peer-focus:ring-4', 'peer-checked:after:translate-x-full', 'peer-checked:after:border-white',
+        'after:content-[""]', 'after:absolute', 'after:top-0.5', 'after:left-[2px]', 'after:bg-white',
+        'after:border-gray-300', 'after:border', 'after:rounded-full', 'after:h-5', 'after:w-5', 'after:transition-all',
+        
         // Checkbox selection state classes - generated for all theme colors
         ...['sky', 'cyan', 'emerald', 'teal', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'green', 'pink', 'red', 'rose', 'orange', 'yellow', 'amber', 'lime', 'gray', 'slate', 'stone'].flatMap(color => [
             `has-[:checked]:bg-${color}-500`,
@@ -44,7 +49,16 @@ module.exports = {
             `focus:bg-${color}-500`,
             `focus:text-white`,
             `dark:focus:bg-${color}-600`,
-            `dark:focus:text-white`
+            `dark:focus:text-white`,
+            // Toggle/peer-checked classes
+            `peer-checked:bg-${color}-500`,
+            `peer-checked:bg-${color}-600`,
+            `dark:peer-checked:bg-${color}-500`,
+            `dark:peer-checked:bg-${color}-600`,
+            `peer-focus:ring-${color}-300`,
+            `peer-focus:ring-${color}-400`,
+            `dark:peer-focus:ring-${color}-800`,
+            `dark:peer-focus:ring-${color}-900`
         ]),
         
         // Generate all theme colors - this approach ensures all dynamic classes are included

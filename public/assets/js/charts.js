@@ -14,7 +14,7 @@ const colors = [
 ];
 
 
-const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) => {
+const createPieChart = (name, parentDiv, canvasId, height, width, labels, data, customColors = null) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     parent.appendChild(containerDiv);
@@ -41,33 +41,38 @@ const createPieChart = (name, parentDiv, canvasId, height, width, labels, data) 
 
     let backgroundColorArray = [];
 
-    let colorScheme = [];
-    labels.forEach(label => {
-        let item = colorScheme[Math.floor(Math.random() * colorScheme.length)];
-        // For Malicious confidences let's draw red orange green for the good and bad malicious confidences
-        if (name === 'maliciousConfidences') {
-            let color = '';
-            if (label === "0") {
-                color = 'lime';
-            } else if (label > 0 && label < 50) {
-                color = 'green';
-            } else if (label >= 50 && label < 75) {
-                color = 'orange';
-            } else if (label >= 75 && label <= 80) {
-                color = 'crimson';
-            } else if (label > 80 && label <= 100) {
-                color = 'red';
+    // Use custom colors if provided, otherwise fall back to default logic
+    if (customColors && Array.isArray(customColors) && customColors.length > 0) {
+        console.log('Pie chart using custom colors:', customColors);
+        backgroundColorArray = customColors;
+    } else {
+        let colorScheme = [];
+        labels.forEach(label => {
+            let item = colorScheme[Math.floor(Math.random() * colorScheme.length)];
+            // For Malicious confidences let's draw red orange green for the good and bad malicious confidences
+            if (name === 'maliciousConfidences') {
+                let color = '';
+                if (label === "0") {
+                    color = 'lime';
+                } else if (label > 0 && label < 50) {
+                    color = 'green';
+                } else if (label >= 50 && label < 75) {
+                    color = 'orange';
+                } else if (label >= 75 && label <= 80) {
+                    color = 'crimson';
+                } else if (label > 80 && label <= 100) {
+                    color = 'red';
+                } else {
+                    color = 'purple';
+                }
+                backgroundColorArray.push(color);
+                // For the rest - push from the random array of colors
             } else {
-                color = 'purple';
+                backgroundColorArray = colors
             }
-            backgroundColorArray.push(color);
-            // For the rest - push from the random array of colors
-        } else {
-            backgroundColorArray = colors
-
-        }
-        colorScheme = colorScheme.filter(element => element !== item);
-    })
+            colorScheme = colorScheme.filter(element => element !== item);
+        });
+    }
 
     const chart = new Chart(canvas, {
         type: 'pie',
@@ -599,6 +604,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data, customC
     
     // Use custom colors if provided, otherwise use default colors
     if (customColors && Array.isArray(customColors) && customColors.length > 0) {
+        console.log('Donut chart using custom colors:', customColors);
         backgroundColorArray = customColors;
     } else {
         backgroundColorArray = colors;
@@ -617,9 +623,9 @@ const createDonutChart = (title, parentDiv, width, height, labels, data, customC
             const centerX = (chartArea.left + chartArea.right) / 2;
             const centerY = (chartArea.top + chartArea.bottom) / 2;
     
-            // Dynamically adjust font size based on chart area size
+            // Dynamically adjust font size based on chart area size - made smaller
             const chartAreaHeight = chartArea.bottom - chartArea.top;
-            let fontSize = Math.floor(chartAreaHeight / 7); // More proportional sizing
+            let fontSize = Math.floor(chartAreaHeight / 12); // Reduced from 7 to 12 for smaller text
             ctx.font = `bold ${fontSize}px Arial`;
     
             ctx.save();
@@ -714,7 +720,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data, customC
 }
 
 // Bar chart
-const createBarChart = (title, parentDiv, width, height, labels, data) => {
+const createBarChart = (title, parentDiv, width, height, labels, data, customColors = null) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     parent.appendChild(containerDiv);
@@ -739,6 +745,14 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
     const textColor = getCurrentChartColors().textColor;
     const gridColor = getCurrentChartColors().gridColor;
 
+    // Use custom colors if provided, otherwise use default colors
+    let backgroundColorArray = [];
+    if (customColors && Array.isArray(customColors) && customColors.length > 0) {
+        backgroundColorArray = customColors;
+    } else {
+        backgroundColorArray = colors.slice(0, data.length);
+    }
+
     let ctx = canvas.getContext('2d');
     let myChart = new Chart(ctx, {
         type: 'bar',
@@ -747,8 +761,8 @@ const createBarChart = (title, parentDiv, width, height, labels, data) => {
             datasets: [{
                 label: title,
                 data: data,
-                backgroundColor: colors.slice(0, data.length),
-                borderColor: colors.slice(0, data.length),
+                backgroundColor: backgroundColorArray,
+                borderColor: backgroundColorArray,
                 borderWidth: 1
             }]
         },

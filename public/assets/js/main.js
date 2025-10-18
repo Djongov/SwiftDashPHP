@@ -280,11 +280,13 @@ const initializeAutoLoadedComponents = () => {
                 break;
 
             case 'donutchart':
-                createDonutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
+                console.log('Creating donut chart with colors:', data.colors);
+                createDonutChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data, data.colors);
                 break;
 
             case 'piechart':
-                createPieChart(data.title, data.parentDiv, data.title, data.height, data.width, data.labels, data.data);
+                console.log('Creating pie chart with colors:', data.colors);
+                createPieChart(data.title, data.parentDiv, data.title, data.height, data.width, data.labels, data.data, data.colors);
                 break;
 
             case 'linechart':
@@ -292,7 +294,7 @@ const initializeAutoLoadedComponents = () => {
                 break;
 
             case 'barchart':
-                createBarChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data);
+                createBarChart(data.title, data.parentDiv, data.width, data.height, data.labels, data.data, data.colors);
                 break;
 
             case 'table':
