@@ -10,7 +10,6 @@ function projectRoutes(RouteCollector $router, string $viewsFolder, string $cont
 
     /* Views */
     $router->addRoute('GET', '/', [$viewsFolder . '/landing/main.php', $metadataArray['main']]);
-    $router->addRoute('GET', '/settings', [$viewsFolder . '/landing/settings.php', $metadataArray['main']]);
 
     // Example
     $router->addRoute('GET', '/charts', [$viewsFolder . '/example/charts.php', $metadataArray['main']]);

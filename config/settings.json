@@ -1,38 +1,8 @@
 {
-    "front-door-max-results": {
+    "auth_expiry": {
         "value": 150020,
-        "label": "Front Door Max Results",
-        "description": "Maximum number of results to return from Front Door WAF log queries",
+        "label": "Auth Expiry",
+        "description": "Duration in seconds for which the authentication is valid",
         "type": "number"
-    },
-    "front-door-memory-limit": {
-        "value": "2048M",
-        "label": "Memory Limit",
-        "description": "Memory limit for Front Door query processing (e.g., 1024M, 2G)",
-        "type": "text"
-    },
-    "front-door-query-timeout": {
-        "value": 250,
-        "label": "Query Timeout",
-        "description": "Timeout in seconds for Front Door queries",
-        "type": "number"
-    },
-    "front-door-default-bots-on": {
-        "value": true,
-        "label": "Default Bots Detection",
-        "description": "Enable bot detection by default in Front Door queries",
-        "type": "boolean"
-    },
-    "front-door-default-enriching-on": {
-        "value": false,
-        "label": "Default Log Enrichment",
-        "description": "Enable log enrichment by default in Front Door queries",
-        "type": "boolean"
-    },
-    "front-door-default-unique-on": {
-        "value": false,
-        "label": "Default Unique Records",
-        "description": "Return only unique records by default in Front Door queries, this can significantly reduce the number of results.",
-        "type": "boolean"
     }
 }

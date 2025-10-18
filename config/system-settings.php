@@ -135,11 +135,11 @@ class SystemConfig
         // Service constants
         self::defineServiceConstants();
         
+        // WAF settings constants (must be before auth constants)
+        self::configureJsonSettings();
+
         // Authentication constants
         self::defineAuthConstants();
-
-        // WAF settings constants
-        self::configureJsonSettings();
     }
     
     private static function defineDatabaseConstants(): void
@@ -232,12 +232,7 @@ class SystemConfig
         }
 
         // Define WAF-related constants with defaults if not set
-        // define('FRONT_DOOR_MAX_RESULTS', $wafSettings['front-door-max-results']['value'] ?? die('front-door-max-results must be set in config/waf-settings.json'));
-        // define('FRONT_DOOR_MEMORY_LIMIT', $wafSettings['front-door-memory-limit']['value'] ?? die('front-door-memory-limit must be set in config/waf-settings.json'));
-        // define('FRONT_DOOR_QUERY_TIMEOUT', $wafSettings['front-door-query-timeout']['value'] ?? die('front-door-query-timeout must be set in config/waf-settings.json'));
-        // define('FRONT_DOOR_DEFAULT_BOTS_ON', $wafSettings['front-door-default-bots-on']['value'] ?? die('front-door-default-bots-on must be set in config/waf-settings.json'));
-        // define('FRONT_DOOR_DEFAULT_ENRICH_ON', $wafSettings['front-door-default-enriching-on']['value'] ?? die('front-door-default-enriching-on must be set in config/waf-settings.json'));
-        // define('FRONT_DOOR_DEFAULT_UNIQUE_ON', $wafSettings['front-door-default-unique-on']['value'] ?? die('front-door-default-unique-on must be set in config/waf-settings.json'));
+        define('AUTH_EXPIRY', $jsonSettings['auth_expiry']['value'] ?? die('auth_expiry must be set in config/settings.json'));
     }
     
     private static function defineAuthConstants(): void
@@ -245,9 +240,9 @@ class SystemConfig
         // Authentication handler configuration
         define('AUTH_HANDLER', 'session'); // cookie/session
         define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
-        define('JWT_TOKEN_EXPIRY', 86400);
+        define('JWT_TOKEN_EXPIRY', AUTH_EXPIRY);
         define('USE_REMOTE_ID_TOKEN', false);
-        define('AUTH_COOKIE_EXPIRY', 86400);
+        define('AUTH_COOKIE_EXPIRY', AUTH_EXPIRY);
         define('SUPPORTED_AUTH_PROVIDERS', ['azure', 'mslive', 'google', 'local']);
 
         if (AUTH_HANDLER === 'cookie') {

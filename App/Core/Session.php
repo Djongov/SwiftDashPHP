@@ -21,7 +21,7 @@ class Session
             // Set session cookie parameters
             session_set_cookie_params(
                 [
-                'lifetime' => 86400,  // 1 day
+                'lifetime' => \AUTH_EXPIRY,
                 'path' => '/',  // Available throughout the site
                 'domain' => $domain,  // Ensure correct domain
                 'secure' => $secure,  // Only secure on HTTPS

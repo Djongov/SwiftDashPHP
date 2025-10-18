@@ -42,6 +42,7 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/db-table', [$viewsFolder . '/admin/db-table.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/apim', [$viewsFolder . '/admin/apim.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/settings', [$viewsFolder . '/admin/settings.php', $metadataArray['admin']]);
 
     // Admin API
     $router->addRoute('POST', '/api/admin/csp/add', [$viewsFolder . '/api/admin/csp/add.php']);

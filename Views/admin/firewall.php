@@ -16,7 +16,7 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-echo Html::p('Here you can control the firewall. You can add IPs to the firewall, remove them, or view the current list of IPs in the firewall. To put controllers under the firewall, you need to call Firewall::activate(), preferrably at the start of the controller');
+echo Html::p('Here you can control the firewall. You can add IPs to the firewall, remove them, or view the current list of IPs in the firewall. To put controllers under the firewall, you need to call Firewall::activate(), preferrably at the start of the controller. If you want to disable the firewall, add an entry for <strong>0.0.0.0/32</strong>');
 // Provide a form that will allow the user to add a new domain to the CSP approved domains list
 $firewallAddForm = [
     'inputs' => [

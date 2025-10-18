@@ -11,17 +11,18 @@ class App
 {
     public function init(): void
     {
-        // Start session
-        \App\Core\Session::start();
-
-        // Create a nonce for the session, that can be used for Azure AD authentication. It's important this stays above calling the site-settings.php file, as it's used there
-        if (!isset($_SESSION['nonce'])) {
-            $_SESSION['nonce'] = \App\Utilities\General::randomString(24);
-        }
-
+        // Load system settings first (required for AUTH_EXPIRY in Session)
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
+
+        // Start session (now AUTH_EXPIRY is available)
+        \App\Core\Session::start();
+
+        // Create a nonce for the session, that can be used for Azure AD authentication
+        if (!isset($_SESSION['nonce'])) {
+            $_SESSION['nonce'] = \App\Utilities\General::randomString(24);
+        }
 
         // Insert required files
         foreach ($pathsToIncludeInAppApp as $path) {

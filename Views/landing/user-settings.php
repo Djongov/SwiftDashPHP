@@ -164,6 +164,10 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                                 }
                             echo '</div>';
                         }
+                        echo '<div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">';
+                            echo '<span class="font-medium text-gray-700 dark:text-gray-300">' . translate('token_expiry') . '</span>';
+                            echo '<span class="text-gray-600 dark:text-gray-400">' . $fmt->format(strtotime(date("Y-m-d H:i:s", (int)substr((string) JWT::parseTokenPayLoad(AuthToken::get())['exp'], 0, 10)))) . '</span>';
+                        echo '</div>';
                     echo '</div>';
                 echo '</div>';
             echo '</div>';
@@ -353,10 +357,6 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                 echo '<div class="' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700 p-6">';
                     echo Html::h3(translate('session_info'));
                     echo '<div class="space-y-4">';
-                        echo '<div class="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">';
-                            echo '<span class="font-medium text-gray-700 dark:text-gray-300">' . translate('token_expiry') . '</span>';
-                            echo '<span class="text-gray-600 dark:text-gray-400">' . $fmt->format(strtotime(date("Y-m-d H:i:s", (int)substr((string) JWT::parseTokenPayLoad(AuthToken::get())['exp'], 0, 10)))) . '</span>';
-                        echo '</div>';
                         echo '<div class="py-2">';
                             echo '<span class="font-medium text-gray-700 dark:text-gray-300 block mb-2">' . translate('token') . '</span>';
                             echo '<textarea readonly class="w-full h-32 p-3 text-xs font-mono bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md resize-none">' . AuthToken::get() . '</textarea>';
