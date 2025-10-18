@@ -1,0 +1,39 @@
+{
+  "name": "swiftdashphp",
+  "version": "1.0.0",
+  "description": "A PHP-based dashboard application using Tailwind CSS",
+  "main": "index.js",
+  "scripts": {
+    "build-css": "tailwindcss -i ./public/assets/css/main.css -o ./public/assets/css/tailwind.css --watch",
+    "build-css-prod": "tailwindcss -i ./public/assets/css/main.css -o ./public/assets/css/tailwind.css --minify",
+    "dev": "npm run build-css",
+    "build": "npm run build-css-prod"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18"
+  },
+  "keywords": [
+    "tailwindcss",
+    "css",
+    "finance",
+    "php"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cssesc": "^3.0.0",
+    "postcss-selector-parser": "^6.0.10",
+    "util-deprecate": "^1.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Djongov/SwiftDashPHP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Djongov/SwiftDashPHP/issues"
+  },
+  "homepage": "https://github.com/Djongov/SwiftDashPHP#readme"
+}

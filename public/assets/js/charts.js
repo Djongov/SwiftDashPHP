@@ -574,7 +574,7 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
 
 
 /* Donought Chart */
-const createDonutChart = (title, parentDiv, width, height, labels, data) => {
+const createDonutChart = (title, parentDiv, width, height, labels, data, customColors = null) => {
     let parent = document.getElementById(parentDiv);
     let containerDiv = document.createElement('div');
     parent.appendChild(containerDiv);
@@ -596,12 +596,13 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
     const textColor = getCurrentChartColors().textColor;
 
     let backgroundColorArray = [];
-    let colorScheme = [];
-    labels.forEach(label => {
+    
+    // Use custom colors if provided, otherwise use default colors
+    if (customColors && Array.isArray(customColors) && customColors.length > 0) {
+        backgroundColorArray = customColors;
+    } else {
         backgroundColorArray = colors;
-        //console.log('Assigning color ' + item + ' to chart ' + name);
-        colorScheme = colorScheme.filter(element => element !== item);
-    })
+    }
 
     let total = data.reduce((a, b) => a + b, 0);
 
@@ -618,7 +619,7 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
     
             // Dynamically adjust font size based on chart area size
             const chartAreaHeight = chartArea.bottom - chartArea.top;
-            let fontSize = Math.floor(chartAreaHeight / 14); // More proportional sizing
+            let fontSize = Math.floor(chartAreaHeight / 7); // More proportional sizing
             ctx.font = `bold ${fontSize}px Arial`;
     
             ctx.save();
@@ -651,12 +652,12 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
             maintainAspectRatio: false, // ✅ Allow custom height
             plugins: {
                 legend: {
-                    display: false,
+                    display: true,
                     position: 'top',
                     labels: {
-                        padding: 8,
+                        padding: 20,
                         color: textColor,
-                        fontSize: 8,
+                        fontSize: 12,
                         borderWidth: 1,
                     }
                 },
@@ -665,11 +666,8 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                     display: true,
                     text: title,
                     padding: {
-                        top: 12,
+                        top: 15,
                         bottom: 10
-                    },
-                    margin : {
-                        bottom: 20
                     },
                     color: textColor,
                     align: 'center',
@@ -694,6 +692,20 @@ const createDonutChart = (title, parentDiv, width, height, labels, data) => {
                         weight: 'normal',
                         size: 12,
                     }
+                },
+                doughnutlabel: {
+                    labels: [
+                        {
+                            text: `Total - ${data.reduce((a, b) => a + b, 0)}`,
+                            font: {
+                                size: 30,
+                                family: 'Arial, Helvetica, sans-serif',
+                                weight: 'bold'
+                            },
+                            backgroundColor: 'green',
+                            color: textColor
+                        }
+                    ]
                 }
             },
         }

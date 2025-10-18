@@ -7,10 +7,8 @@ form.addEventListener('submit', (event) => {
     
     // Client-side validation for required Azure Service Principal fields
     const requiredFields = [
-        { id: 'AZURE_SERVICE_PRINCIPAL_CLIENT_ID', name: 'Azure Service Principal Client ID' },
-        { id: 'AZURE_SERVICE_PRINCIPAL_TENANT_ID', name: 'Azure Service Principal Tenant ID' },
-        { id: 'AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET', name: 'Azure Service Principal Client Secret' },
-        { id: 'AZURE_WORKSPACE_ID', name: 'Azure Log Analytics Workspace ID' }
+        { id: 'DB_DRIVER', name: 'Database Driver' },
+        { id: 'DB_NAME', name: 'Database Name' }
     ];
     
     const missingFields = [];

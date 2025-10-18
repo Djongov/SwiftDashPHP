@@ -31,7 +31,7 @@ try {
 }
 
 if ($usernameArray && DB_DRIVER !== 'sqlite') {
-    echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe');
+    echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe', $theme);
     echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
 
   // Let's try to connect to SQLite DB while the main connection is to a MySQL DB

@@ -203,43 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') :
                 </div>
             </div>
 
-            <!-- Azure Service Principal Configuration -->
-            <div class="form-section">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                    </svg>
-                    Azure Service Principal (Required)
-                </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Configure Azure Service Principal credentials for accessing Azure resources.
-                </p>
-
-                <div class="form-group">
-                    <label for="AZURE_SERVICE_PRINCIPAL_CLIENT_ID" class="form-label required-field">Client ID</label>
-                    <input type="text" id="AZURE_SERVICE_PRINCIPAL_CLIENT_ID" name="AZURE_SERVICE_PRINCIPAL_CLIENT_ID" class="form-input" required placeholder="00000000-0000-0000-0000-000000000000">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">The Application (client) ID of your Azure service principal</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="AZURE_SERVICE_PRINCIPAL_TENANT_ID" class="form-label required-field">Tenant ID</label>
-                    <input type="text" id="AZURE_SERVICE_PRINCIPAL_TENANT_ID" name="AZURE_SERVICE_PRINCIPAL_TENANT_ID" class="form-input" required placeholder="00000000-0000-0000-0000-000000000000">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">The Directory (tenant) ID of your Azure AD tenant</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET" class="form-label required-field">Client Secret</label>
-                    <input type="password" id="AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET" name="AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET" class="form-input" required>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">The client secret value (not the secret ID)</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="AZURE_WORKSPACE_ID" class="form-label required-field">Azure Log Analytics Workspace ID</label>
-                    <input type="text" id="AZURE_WORKSPACE_ID" name="AZURE_WORKSPACE_ID" class="form-input" required placeholder="00000000-0000-0000-0000-000000000000">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">The Workspace ID where your WAF logs are stored in Azure Log Analytics</p>
-                </div>
-            </div>
-
             <!-- Authentication Options -->
             <div class="form-section">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
@@ -332,10 +295,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate required Azure Service Principal fields
     $requiredFields = [
-        'AZURE_SERVICE_PRINCIPAL_CLIENT_ID',
-        'AZURE_SERVICE_PRINCIPAL_TENANT_ID', 
-        'AZURE_SERVICE_PRINCIPAL_CLIENT_SECRET',
-        'AZURE_WORKSPACE_ID'
+        'DB_DRIVER',
+        'DB_NAME',
     ];
     
     $missingFields = [];

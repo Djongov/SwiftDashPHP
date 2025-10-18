@@ -19,3 +19,4 @@ sync.ffs_db
 
 # VS Code
 .vscode/
+package-lock.json

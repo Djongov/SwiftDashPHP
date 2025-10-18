@@ -315,11 +315,8 @@ class DataGrid
             $safeCurrentId = htmlspecialchars((string)$currentId, ENT_QUOTES, 'UTF-8');
             $safeIndexes = htmlspecialchars((string)$indexes, ENT_QUOTES, 'UTF-8');
             
-            $evenBackgroundColor = BODY_COLOR_SCHEME_CLASS;
-            $oddBackgroundColor = LIGHT_COLOR_SCHEME_CLASS;
-            $evenDarkBackgroundColor = DARK_COLOR_SCHEME_CLASS;
-            $oddDarkBackgroundColor = BODY_DARK_COLOR_SCHEME_CLASS;
-            $html .= '<tr tabindex="' . $safeIndexes . '" data-row-id="' . $safeCurrentId . '" class="even:' . $evenBackgroundColor  . ' odd:' . $oddBackgroundColor . ' dark:even:' . $evenDarkBackgroundColor . ' dark:odd:' . $oddDarkBackgroundColor . ' focus:bg-' . $theme . '-500 dark:focus:' . DATAGRID_TBODY_DARK_COLOR_SCHEME . '">';
+            // Create proper odd/even classes for table rows with selection support
+            $html .= '<tr tabindex="' . $safeIndexes . '" data-row-id="' . $safeCurrentId . '" class="even:bg-gray-50 odd:bg-white dark:even:bg-gray-700 dark:odd:bg-gray-800 focus:bg-' . $theme . '-500 focus:text-white dark:focus:bg-' . $theme . '-600 dark:focus:text-white hover:bg-gray-100 dark:hover:bg-gray-600 has-[:checked]:bg-' . $theme . '-500 has-[:checked]:text-white dark:has-[:checked]:bg-' . $theme . '-600 dark:has-[:checked]:text-white transition-colors duration-150">';
                 $tdClassArray = ['px-4', 'py-2', 'text-sm', 'max-w-xs', 'break-words', 'focus-within:text-white', 'dark:focus-within:text-white'];
             foreach ($arrays as $column => $value) {
                 // Store original value for processing before any modifications
@@ -387,7 +384,7 @@ class DataGrid
                                 <div class="flex items-center justify-center">';
                 if ($edit) {
                     //$html .= '<button data-table="' . $originalDBTable . '" data-id="' . $currentId . '" data-columns="' . implode(',', $totalColumns) . '" data-csrf="' . $csrfToken . '" type="button" class="edit ml-2 my-2 block border dark:border-gray-400 text-white dark:text-gray-100 bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-400">Edit</button>';
-                    $html .= '<span class="m-1">' . DBButton::editButton($originalDBTable, $totalColumns, $currentId, 'Edit id ' . $currentId) . '</span>';
+                    $html .= '<span class="m-1">' . DBButton::editButton($originalDBTable, $totalColumns, $currentId, $theme, 'Edit id ' . $currentId) . '</span>';
                 }
                 if ($delete) {
                     //$html .= '<button data-table="' . $originalDBTable . '" data-id="' . $currentId . '" type="button" data-csrf="' . $csrfToken . '" class="delete ml-2 my-2 block text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Delete</button>';

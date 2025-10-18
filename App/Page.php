@@ -46,9 +46,6 @@ class Page
             'https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js' => [
                 'cache' => true
             ],
-            'https://cdn.tailwindcss.com?plugins=typography' => [
-                'cache' => true
-            ],
             '/assets/js/lang.js' => [
                 'defer' => 'true'
             ],
@@ -67,7 +64,10 @@ class Page
         $cssArray = [
             '/assets/css/main.css' => [
                 'cache' => false
-            ]
+            ],
+            '/assets/css/tailwind.css' => [
+                'cache' => true
+            ],
         ];
         return Head::render($title, $description, $keywords, $thumbimage, $scriptsArray, $cssArray);
     }

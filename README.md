@@ -30,6 +30,16 @@ SwiftDashPHP comes with a built-in authentication system that is easy to use and
 
 ---
 
+## Tailwind setup on clone
+
+```bash
+npm install
+```
+
+```bash
+npm run build-css-prod
+```
+
 ## PHP CodeSniffer checks
 
 Checks

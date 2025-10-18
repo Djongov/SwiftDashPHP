@@ -19,42 +19,13 @@ Main functions:
 
 */
 
-// Performance timing helper function
-const logPerformanceTime = (functionName, startTime) => {
-    const endTime = performance.now();
-    const executionTime = (endTime - startTime).toFixed(2);
-    
-    // Console log the timing
-    console.log(`${functionName} executed in ${executionTime}ms`);
-    
-    // Update the display span if it exists
-    const displaySpan = document.getElementById('javascript-grid-display-time');
-    if (displaySpan) {
-        // Get existing content and append new timing
-        const currentContent = displaySpan.textContent || '';
-        const newTiming = `${executionTime}ms (${functionName})`;
-        
-        if (currentContent === '') {
-            displaySpan.textContent = newTiming;
-        } else {
-            displaySpan.textContent = currentContent + ' | ' + newTiming;
-        }
-    }
-    
-    return executionTime;
-};
-
 // Utility functions
 const countAllCheckedCheckboxes = (tableId) => {
-    const table = document.getElementById(tableId);
-    if (!table) return 0;
-    return table.querySelectorAll('tbody > tr > td > input[type="checkbox"]:checked').length;
+    return document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type="checkbox"]:checked`).length;
 }
 
 const countVisibleRows = (tableId) => {
-    const table = document.getElementById(tableId);
-    if (!table) return 0;
-    return table.querySelectorAll('tbody > tr:not([style*="display: none;"])').length;
+    return document.querySelectorAll(`#${tableId} > tbody > tr:not([style*="display: none;"])`).length;
 }
 
 const updateSelectedResults = (tableId, newValue) => {
@@ -73,9 +44,7 @@ const updateFilteredResults = (tableId, newValue) => {
 
 // Main function to initialize edit button functionality
 const initializeEditButtons = (tableId) => {
-    const table = document.getElementById(tableId);
-    if (!table) return;
-    const editButtons = table.querySelectorAll('button.edit');
+    const editButtons = document.querySelectorAll(`#${tableId} button.edit`);
 
     if (editButtons.length > 0) {
         editButtons.forEach(button => {
@@ -237,9 +206,7 @@ const initializeCheckboxes = (tableId, theme = 'blue') => {
     }
 
     // Get all the checkboxes in the table
-    const table = document.getElementById(tableId);
-    if (!table) return;
-    const allTableCheckboxes = table.querySelectorAll('tbody > tr > td > input[type=checkbox]');
+    const allTableCheckboxes = document.querySelectorAll(`#${tableId} > tbody > tr > td > input[type=checkbox]`);
     if (allTableCheckboxes.length > 0) {
         allTableCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', () => {
@@ -272,7 +239,6 @@ const initializeMassDelete = (tableId) => {
 
     // Find the mass delete form, which is in the container and has a class of delete-selected-form
     const deleteForms = document.querySelectorAll(`#${tableId}-container > form.delete-selected-form`);
-    console.log(`Found ${deleteForms.length} mass delete forms for table ${tableId}.`);
     if (deleteForms.length > 0) {
         deleteForms.forEach(form => {
             form.addEventListener('submit', (event) => {
@@ -312,9 +278,7 @@ const initializeMassDelete = (tableId) => {
 // Initialize individual delete buttons
 const initializeDeleteButtons = (tableId) => {
     let totalResults = document.getElementById(tableId + '-total');
-    const table = document.getElementById(tableId);
-    if (!table) return;
-    const deleteButtons = table.querySelectorAll('tbody > tr > td > button.delete');
+    const deleteButtons = document.querySelectorAll(`#${tableId} > tbody > tr > td > button.delete`);
 
     if (deleteButtons.length > 0) {
         deleteButtons.forEach(button => {
@@ -454,7 +418,6 @@ const initializeAllDataGrids = () => {
     const tables = document.querySelectorAll(`table.datagrid`);
     
     if (tables.length > 0) {
-        console.log(`Found ${tables.length} DataGrid tables to initialize.`);
         tables.forEach(table => {
             // Try to extract theme from table row classes or use default
             const firstRow = table.querySelector('tbody tr');
@@ -467,7 +430,6 @@ const initializeAllDataGrids = () => {
                 }
             }
             initializeDataGridActions(table.id, theme);
-            console.log(`Initialized DataGrid actions for table: ${table.id} with theme: ${theme}`);
         });
     }
 }
@@ -529,8 +491,6 @@ const constructOptions = (dataLength, options) => {
     return options;
 }
 const drawDataGrid = (id, options = null, theme = 'blue') => {
-    const startTime = performance.now();
-    
     // Let's analyze the options passed to the function
     options = constructOptions(0, options);
 
@@ -565,9 +525,6 @@ const drawDataGrid = (id, options = null, theme = 'blue') => {
             
             // Initialize all actions for this table after DataTable is ready
             initializeDataGridActions(id, theme);
-            
-            // Log performance timing
-            logPerformanceTime('drawDataGrid', startTime);
         },
     });
     return table;
@@ -575,7 +532,6 @@ const drawDataGrid = (id, options = null, theme = 'blue') => {
 
 
 const drawDataGridFromData = (json, skeletonId, options = null, theme = 'blue') => {
-    const startTime = performance.now();
 
     options = constructOptions(json.length, options);
 
@@ -649,9 +605,6 @@ const drawDataGridFromData = (json, skeletonId, options = null, theme = 'blue') 
             document.getElementById(loadingScreen.id).remove();
             // Initialize all actions for this table after DataTable is ready
             initializeDataGridActions(skeletonId, theme);
-            
-            // Log performance timing
-            logPerformanceTime('drawDataGridFromData', startTime);
         }
     });
     // Example of adding Tailwind CSS classes to style the thead
@@ -781,9 +734,7 @@ const drawDataGridFromData = (json, skeletonId, options = null, theme = 'blue') 
  * @param {Array} columnSkipArray - An optional array of column indexes to skip.
  * @returns {void} - Creates the DataTable filters. Does not return a value.
  */
-const buildDataGridFilters = (table, tableId, columnSkipArray = [], enabled = true, theme = 'blue') => {
-    const startTime = performance.now();
-    
+const buildDataGridFilters = (table, tableId, columnSkipArray = [], enabled = true) => {
     if (!enabled) {
         return;
     }
@@ -794,8 +745,8 @@ const buildDataGridFilters = (table, tableId, columnSkipArray = [], enabled = tr
         }
         const column = table.column(this, { search: 'applied' }); // Get the DataTable column object
 
-        // Create a select element with improved width constraints
-        const select = $(`<select class="text-center m-1 p-1 text-gray-900 border border-${theme}-300 rounded bg-gray-50 focus:ring-${theme}-500 focus:border-${theme}-500 dark:bg-gray-700 dark:border-${theme}-600 dark:placeholder-gray-400 dark:text-white outline-none dark:focus:ring-${theme}-500 dark:focus:border-${theme}-500 max-w-xs w-full min-w-0 truncate"><option value="">No filter</option></select>`)
+        // Create a select element and append it to the appropriate table header cell. (1) in this case is the 2nd thead so it doesn't do it on the first where the column names are
+        const select = $(`<select class="text-center m-1 p-1 text-gray-900 border border-${theme}-300 rounded bg-gray-50 focus:ring-${theme}-500 focus:border-${theme}-500 dark:bg-gray-700 dark:border-${theme}-600 dark:placeholder-gray-400 dark:text-white outline-none dark:focus:ring-${theme}-500 dark:focus:border-${theme}-500"><option value="">No filter</option></select>`)
             .appendTo($(`#${tableId} thead tr:eq(1) th`).eq(column.index()).empty())
             .on('change', function () {
                 const val = $.fn.dataTable.util.escapeRegex(
@@ -807,45 +758,29 @@ const buildDataGridFilters = (table, tableId, columnSkipArray = [], enabled = tr
                     .draw();
             });
 
-        // Set maximum width constraints for the select element
-        select.css({
-            'max-width': '200px',
-            'min-width': '120px',
-            'width': '100%',
-            'overflow': 'hidden',
-            'text-overflow': 'ellipsis',
-            'white-space': 'nowrap'
-        });
-
-        // Define maximum characters for option text display
-        const maxDisplayChars = 30;
-        const maxValueChars = 50; // For very long values, we'll still truncate the value attribute
+        // Calculate the maximum width for the select options
+        let maxOptionWidth = Math.min(
+            $(column.header()).outerWidth() || select.width(),
+            150
+        ); // You can adjust the maximum width as needed
+        if (maxOptionWidth < 150) {
+            maxOptionWidth = 150;
+        }
 
         // Iterate through the unique values in the column, create options for the select element
         column.data().unique().sort().each(function (d, j) {
-            if (d !== null && d !== undefined) {
-                // Convert to string and clean up the data
-                let originalValue = String(d).trim();
-                let displayText = originalValue;
-                let optionValue = originalValue;
-                
-                // Truncate very long values for the option value attribute to prevent DOM bloat
-                if (optionValue.length > maxValueChars) {
-                    optionValue = optionValue.substring(0, maxValueChars);
+            if (d !== null) {
+                let optionText = d;
+                if (optionText.length > maxOptionWidth / 2)  {
+                    if (optionText.length > maxOptionWidth / 2) {
+                        // Truncate the option text if it's longer than the maxOptionWidth
+                        optionText = optionText.substring(0, maxOptionWidth / 2) + '...';
+                    } else {
+                        optionText = optionText + '...';
+                    }
                 }
-                
-                // Truncate display text for readability
-                if (displayText.length > maxDisplayChars) {
-                    displayText = displayText.substring(0, maxDisplayChars) + '...';
-                }
-                
-                // Create option with truncated display text but keep original value for filtering
-                const option = $(`<option></option>`)
-                    .val(optionValue)
-                    .text(displayText)
-                    .attr('title', originalValue); // Full text on hover
-                
-                select.append(option);
+                // Append the option with the selected attribute if necessary
+                select.append(`<option value="${d}" title="${d}">${optionText}</option>`);
             }
         });
 
@@ -858,25 +793,22 @@ const buildDataGridFilters = (table, tableId, columnSkipArray = [], enabled = tr
             // Loop through the options and set the 'selected' attribute explicitly for the matched option
             select.find('option').each(function () {
                 const optionValue = $(this).val();
-                // We need to replace the special characters from searchValue as searchValue comes with escaped special characters from column.search()
-                const cleanSearchValue = searchValue.replace(/\\/g, '');
-                if (optionValue === cleanSearchValue || optionValue.startsWith(cleanSearchValue)) {
+                // We need to replace the special characters from searchValue as searchValue comes with escaped special characters from column.search(). We want to apply the selected prop for the currently selected option so it's visible what has been filtered right now
+                if (optionValue === searchValue.replace(/\\/g, '')) {
                     $(this).prop('selected', true);
                 } else {
                     $(this).prop('selected', false);
                 }
             });
             // Mark the select as red to be seen as selected more easily
-            select.addClass('border-red-500 dark:border-red-500');
+            select.addClass('border-red-500');
+            select.addClass('dark:border-red-500');
         }
 
         // Target both rows in the thead and add the classes in one go
         $(`#${tableId} thead tr:eq(0), #${tableId} thead tr:eq(1) th`).addClass('px-4 py-2 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider');
 
     });
-    
-    // Log performance timing
-    logPerformanceTime('buildDataGridFilters', startTime);
 }
 
 const createSkeletonTable = () => {

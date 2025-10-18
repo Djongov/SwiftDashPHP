@@ -40,13 +40,6 @@ class Head
         $html .= self::twitterTags($title, $description, $thumbimage, '@Djongov', '@Djongov');
         // Scripts
         $html .= self::scriptLoad($scriptsArray);
-        // Inline scripts
-        $tailwindConfig = file_get_contents(ROOT . '/tailwind.config.js');
-        $html .= <<< InlineScript
-                <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
-                    $tailwindConfig
-                </script>
-                InlineScript . PHP_EOL;
         // CSS files
         $html .= self::cssLoad($cssArray);
         $html .= '</head>' . PHP_EOL;

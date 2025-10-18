@@ -11,10 +11,13 @@ class LanguageSwitcher
 {
     public static function render($theme): string
     {
+        // Generate unique ID to prevent conflicts when multiple instances are rendered
+        $uniqueId = 'lang-' . uniqid();
+        
         // Start the form HTML
         $html = '';
         $html .= '<form class="select-submitter" data-reload="true" method="POST" action="/api/set-lang">';
-            $html .= '<select id="lang" name="lang" class="' . Html::selectInputClasses($theme) . '">';
+            $html .= '<select id="' . $uniqueId . '" name="lang" class="' . Html::selectInputClasses($theme) . '">';
 
             // Define language options
             $languages = [
