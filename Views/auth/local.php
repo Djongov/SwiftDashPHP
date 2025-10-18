@@ -44,6 +44,20 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
     }
 
     // By now we assume the user is valid, so let's generate a JWT token
+    $jwtExpiry = JWT_TOKEN_EXPIRY;
+    $cookieExpiry = AUTH_COOKIE_EXPIRY;
+    
+    // Check if "Remember Me" was selected
+    if (isset($_POST['remember']) && $_POST['remember'] === '1') {
+        // Extend both JWT and cookie/session expiry to 1 year
+        // This works for both cookie-based and session-based authentication:
+        // - Cookie mode: extends the auth cookie lifetime
+        // - Session mode: extends the session cookie lifetime
+        $oneYear = 365 * 24 * 60 * 60; // 1 year in seconds
+        $jwtExpiry = JWT_TOKEN_EXPIRY + $oneYear;
+        $cookieExpiry = AUTH_COOKIE_EXPIRY + $oneYear;
+    }
+    
     $idToken = JWT::generateToken(
         [
         'provider' => 'local',
@@ -53,10 +67,11 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
             $userArray['role'],
         ],
         'last_ip' => currentIP()
-        ], JWT_TOKEN_EXPIRY
+        ], $jwtExpiry
     );
 
-    AuthToken::set($idToken);
+    // Set the auth token with the appropriate expiry duration
+    AuthToken::set($idToken, $cookieExpiry);
     // Record last login
     $user->updateLastLogin($userArray['username']);
 

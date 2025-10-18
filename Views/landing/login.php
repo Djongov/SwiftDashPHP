@@ -99,7 +99,7 @@ if (LOCAL_USER_LOGIN) {
             'checkbox' => [
                 [
                     'label' => translate('remember_me'),
-                    'name' => 'remember',
+                    'name' => 'remember'
                 ]
             ],
             'hidden' => [
