@@ -94,6 +94,18 @@ module.exports = {
         'inset-0', 'inset-x-0', 'inset-y-0', 'start-0', 'end-0', 'top-0', 'right-0', 'bottom-0', 'left-0',
         'inset-px', 'inset-x-px', 'inset-y-px', 'start-px', 'end-px', 'top-px', 'right-px', 'bottom-px', 'left-px',
         'inset-0.5', 'inset-1.5', 'inset-2.5', 'inset-3.5', 'inset-1', 'inset-2', 'inset-3', 'inset-4', 'inset-5', 'inset-6', 'inset-8', 'inset-10', 'inset-12', 'inset-16', 'inset-20', 'inset-24',
+        // Negative positioning values
+        '-inset-0', '-inset-x-0', '-inset-y-0', '-start-0', '-end-0', '-top-0', '-right-0', '-bottom-0', '-left-0',
+        '-inset-px', '-inset-x-px', '-inset-y-px', '-start-px', '-end-px', '-top-px', '-right-px', '-bottom-px', '-left-px',
+        '-inset-0.5', '-inset-1.5', '-inset-2.5', '-inset-3.5', '-inset-1', '-inset-2', '-inset-3', '-inset-4', '-inset-5', '-inset-6', '-inset-8', '-inset-10', '-inset-12', '-inset-16', '-inset-20', '-inset-24',
+        '-top-1', '-top-2', '-top-3', '-top-4', '-top-5', '-top-6', '-top-8', '-top-10', '-top-12', '-top-16', '-top-20', '-top-24',
+        '-right-1', '-right-2', '-right-3', '-right-4', '-right-5', '-right-6', '-right-8', '-right-10', '-right-12', '-right-16', '-right-20', '-right-24',
+        '-bottom-1', '-bottom-2', '-bottom-3', '-bottom-4', '-bottom-5', '-bottom-6', '-bottom-8', '-bottom-10', '-bottom-12', '-bottom-16', '-bottom-20', '-bottom-24',
+        '-left-1', '-left-2', '-left-3', '-left-4', '-left-5', '-left-6', '-left-8', '-left-10', '-left-12', '-left-16', '-left-20', '-left-24',
+        'top-1', 'top-2', 'top-3', 'top-4', 'top-5', 'top-6', 'top-8', 'top-10', 'top-12', 'top-16', 'top-20', 'top-24',
+        'right-1', 'right-2', 'right-3', 'right-4', 'right-5', 'right-6', 'right-8', 'right-10', 'right-12', 'right-16', 'right-20', 'right-24',
+        'bottom-1', 'bottom-2', 'bottom-3', 'bottom-4', 'bottom-5', 'bottom-6', 'bottom-8', 'bottom-10', 'bottom-12', 'bottom-16', 'bottom-20', 'bottom-24',
+        'left-1', 'left-2', 'left-3', 'left-4', 'left-5', 'left-6', 'left-8', 'left-10', 'left-12', 'left-16', 'left-20', 'left-24',
         'z-0', 'z-10', 'z-20', 'z-30', 'z-40', 'z-50', 'z-auto', '-z-10', '-z-20', '-z-30', '-z-40', '-z-50',
         
         // Borders and Rounded
@@ -111,6 +123,13 @@ module.exports = {
         // Shadows and Effects
         'shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl', 'shadow-inner', 'shadow-none',
         'opacity-0', 'opacity-5', 'opacity-10', 'opacity-20', 'opacity-25', 'opacity-30', 'opacity-40', 'opacity-50', 'opacity-60', 'opacity-70', 'opacity-75', 'opacity-80', 'opacity-90', 'opacity-95', 'opacity-100',
+        
+        // Background, text, border, and ring opacity classes
+        'bg-opacity-0', 'bg-opacity-5', 'bg-opacity-10', 'bg-opacity-20', 'bg-opacity-25', 'bg-opacity-30', 'bg-opacity-40', 'bg-opacity-50', 'bg-opacity-60', 'bg-opacity-70', 'bg-opacity-75', 'bg-opacity-80', 'bg-opacity-90', 'bg-opacity-95', 'bg-opacity-100',
+        'text-opacity-0', 'text-opacity-5', 'text-opacity-10', 'text-opacity-20', 'text-opacity-25', 'text-opacity-30', 'text-opacity-40', 'text-opacity-50', 'text-opacity-60', 'text-opacity-70', 'text-opacity-75', 'text-opacity-80', 'text-opacity-90', 'text-opacity-95', 'text-opacity-100',
+        'border-opacity-0', 'border-opacity-5', 'border-opacity-10', 'border-opacity-20', 'border-opacity-25', 'border-opacity-30', 'border-opacity-40', 'border-opacity-50', 'border-opacity-60', 'border-opacity-70', 'border-opacity-75', 'border-opacity-80', 'border-opacity-90', 'border-opacity-95', 'border-opacity-100',
+        'ring-opacity-0', 'ring-opacity-5', 'ring-opacity-10', 'ring-opacity-20', 'ring-opacity-25', 'ring-opacity-30', 'ring-opacity-40', 'ring-opacity-50', 'ring-opacity-60', 'ring-opacity-70', 'ring-opacity-75', 'ring-opacity-80', 'ring-opacity-90', 'ring-opacity-95', 'ring-opacity-100',
+        'divide-opacity-0', 'divide-opacity-5', 'divide-opacity-10', 'divide-opacity-20', 'divide-opacity-25', 'divide-opacity-30', 'divide-opacity-40', 'divide-opacity-50', 'divide-opacity-60', 'divide-opacity-70', 'divide-opacity-75', 'divide-opacity-80', 'divide-opacity-90', 'divide-opacity-95', 'divide-opacity-100',
         
         // Outline
         'outline-none', 'outline', 'outline-dashed', 'outline-dotted', 'outline-double', 'outline-hidden',
@@ -149,6 +168,24 @@ module.exports = {
         'overflow-x-auto', 'overflow-x-hidden', 'overflow-x-clip', 'overflow-x-visible', 'overflow-x-scroll',
         'overflow-y-auto', 'overflow-y-hidden', 'overflow-y-clip', 'overflow-y-visible', 'overflow-y-scroll',
         'visible', 'invisible', 'collapse',
+        
+        // Additional layout utilities
+        'container', 'box-border', 'box-content',
+        'float-right', 'float-left', 'float-none', 'clear-left', 'clear-right', 'clear-both', 'clear-none',
+        
+        // Additional flexbox utilities
+        'flex-1', 'flex-auto', 'flex-initial', 'flex-none', 'flex-shrink-0', 'flex-shrink', 'flex-grow-0', 'flex-grow',
+        'basis-0', 'basis-1', 'basis-2', 'basis-3', 'basis-4', 'basis-5', 'basis-6', 'basis-8', 'basis-10', 'basis-11', 'basis-12', 'basis-14', 'basis-16', 'basis-20', 'basis-24', 'basis-28', 'basis-32', 'basis-36', 'basis-40', 'basis-44', 'basis-48', 'basis-52', 'basis-56', 'basis-60', 'basis-64', 'basis-72', 'basis-80', 'basis-96',
+        'basis-auto', 'basis-px', 'basis-0.5', 'basis-1.5', 'basis-2.5', 'basis-3.5', 'basis-full',
+        'basis-1/2', 'basis-1/3', 'basis-2/3', 'basis-1/4', 'basis-2/4', 'basis-3/4', 'basis-1/5', 'basis-2/5', 'basis-3/5', 'basis-4/5', 'basis-1/6', 'basis-2/6', 'basis-3/6', 'basis-4/6', 'basis-5/6',
+        
+        // Min/Max width and height
+        'min-w-0', 'min-w-full', 'min-w-min', 'min-w-max', 'min-w-fit',
+        'max-w-0', 'max-w-none', 'max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'max-w-xl', 'max-w-2xl', 'max-w-3xl', 'max-w-4xl', 'max-w-5xl', 'max-w-6xl', 'max-w-7xl',
+        'max-w-full', 'max-w-min', 'max-w-max', 'max-w-fit', 'max-w-prose',
+        'min-h-0', 'min-h-full', 'min-h-screen', 'min-h-min', 'min-h-max', 'min-h-fit',
+        'max-h-0', 'max-h-1', 'max-h-2', 'max-h-3', 'max-h-4', 'max-h-5', 'max-h-6', 'max-h-8', 'max-h-10', 'max-h-11', 'max-h-12', 'max-h-14', 'max-h-16', 'max-h-20', 'max-h-24', 'max-h-28', 'max-h-32', 'max-h-36', 'max-h-40', 'max-h-44', 'max-h-48', 'max-h-52', 'max-h-56', 'max-h-60', 'max-h-64', 'max-h-72', 'max-h-80', 'max-h-96',
+        'max-h-px', 'max-h-0.5', 'max-h-1.5', 'max-h-2.5', 'max-h-3.5', 'max-h-full', 'max-h-screen', 'max-h-min', 'max-h-max', 'max-h-fit',
         
         // Object Fit and Position
         'object-contain', 'object-cover', 'object-fill', 'object-none', 'object-scale-down',
@@ -209,6 +246,39 @@ module.exports = {
         // Transform and Scale
         'transform', 'transform-cpu', 'transform-gpu', 'transform-none',
         'scale-0', 'scale-50', 'scale-75', 'scale-90', 'scale-95', 'scale-100', 'scale-105', 'scale-110', 'scale-125', 'scale-150',
+        // Group utilities
+        'group', 'group-hover:scale-105', 'group-hover:scale-110', 'group-hover:scale-125', 'group-hover:opacity-75', 'group-hover:opacity-50',
+        // Transform translate classes (including negative values)
+        'translate-x-0', 'translate-x-1', 'translate-x-2', 'translate-x-3', 'translate-x-4', 'translate-x-5', 'translate-x-6', 'translate-x-8', 'translate-x-10', 'translate-x-12', 'translate-x-16', 'translate-x-20', 'translate-x-24',
+        '-translate-x-1', '-translate-x-2', '-translate-x-3', '-translate-x-4', '-translate-x-5', '-translate-x-6', '-translate-x-8', '-translate-x-10', '-translate-x-12', '-translate-x-16', '-translate-x-20', '-translate-x-24',
+        'translate-y-0', 'translate-y-1', 'translate-y-2', 'translate-y-3', 'translate-y-4', 'translate-y-5', 'translate-y-6', 'translate-y-8', 'translate-y-10', 'translate-y-12', 'translate-y-16', 'translate-y-20', 'translate-y-24',
+        '-translate-y-1', '-translate-y-2', '-translate-y-3', '-translate-y-4', '-translate-y-5', '-translate-y-6', '-translate-y-8', '-translate-y-10', '-translate-y-12', '-translate-y-16', '-translate-y-20', '-translate-y-24',
+        // Hover transforms
+        'hover:-translate-y-1', 'hover:-translate-y-2', 'hover:-translate-y-3', 'hover:translate-y-1', 'hover:translate-y-2', 'hover:translate-y-3',
+        'hover:-translate-x-1', 'hover:-translate-x-2', 'hover:-translate-x-3', 'hover:translate-x-1', 'hover:translate-x-2', 'hover:translate-x-3',
+        'hover:scale-105', 'hover:scale-110', 'hover:scale-125', 'hover:scale-95', 'hover:scale-90',
+        
+        // Space between utilities (critical missing classes!)
+        'space-x-0', 'space-x-1', 'space-x-2', 'space-x-3', 'space-x-4', 'space-x-5', 'space-x-6', 'space-x-8', 'space-x-10', 'space-x-12', 'space-x-16', 'space-x-20', 'space-x-24',
+        'space-y-0', 'space-y-1', 'space-y-2', 'space-y-3', 'space-y-4', 'space-y-5', 'space-y-6', 'space-y-8', 'space-y-10', 'space-y-12', 'space-y-16', 'space-y-20', 'space-y-24',
+        '-space-x-1', '-space-x-2', '-space-x-3', '-space-x-4', '-space-x-5', '-space-x-6', '-space-x-8', '-space-x-10', '-space-x-12', '-space-x-16', '-space-x-20', '-space-x-24',
+        '-space-y-1', '-space-y-2', '-space-y-3', '-space-y-4', '-space-y-5', '-space-y-6', '-space-y-8', '-space-y-10', '-space-y-12', '-space-y-16', '-space-y-20', '-space-y-24',
+        'space-x-reverse', 'space-y-reverse',
+        
+        // Divide utilities  
+        'divide-x-0', 'divide-x-2', 'divide-x-4', 'divide-x-8', 'divide-x', 'divide-y-0', 'divide-y-2', 'divide-y-4', 'divide-y-8', 'divide-y',
+        'divide-solid', 'divide-dashed', 'divide-dotted', 'divide-double', 'divide-none',
+        'divide-x-reverse', 'divide-y-reverse',
+        
+        // Additional responsive transforms and effects
+        'sm:transform', 'sm:hover:scale-105', 'sm:hover:-translate-y-1',
+        'md:transform', 'md:hover:scale-105', 'md:hover:-translate-y-1', 
+        'lg:transform', 'lg:hover:scale-105', 'lg:hover:-translate-y-1',
+        
+        // Additional hover and focus states for shadows
+        'hover:shadow-sm', 'hover:shadow', 'hover:shadow-md', 'hover:shadow-lg', 'hover:shadow-xl', 'hover:shadow-2xl', 'hover:shadow-none',
+        'focus:shadow-sm', 'focus:shadow', 'focus:shadow-md', 'focus:shadow-lg', 'focus:shadow-xl', 'focus:shadow-2xl', 'focus:shadow-none',
+        'dark:hover:shadow-sm', 'dark:hover:shadow', 'dark:hover:shadow-md', 'dark:hover:shadow-lg', 'dark:hover:shadow-xl', 'dark:hover:shadow-2xl',
         'rotate-0', 'rotate-1', 'rotate-2', 'rotate-3', 'rotate-6', 'rotate-12', 'rotate-45', 'rotate-90', 'rotate-180', '-rotate-180', '-rotate-90', '-rotate-45', '-rotate-12', '-rotate-6', '-rotate-3', '-rotate-2', '-rotate-1',
         'translate-x-0', 'translate-x-1', 'translate-x-2', 'translate-x-3', 'translate-x-4', 'translate-x-5', 'translate-x-6', 'translate-x-8', 'translate-x-10', 'translate-x-12', 'translate-x-16', 'translate-x-20', 'translate-x-24',
         'translate-y-0', 'translate-y-1', 'translate-y-2', 'translate-y-3', 'translate-y-4', 'translate-y-5', 'translate-y-6', 'translate-y-8', 'translate-y-10', 'translate-y-12', 'translate-y-16', 'translate-y-20', 'translate-y-24',
@@ -230,13 +300,21 @@ module.exports = {
         '2xl:max-w-full', '2xl:max-w-fit', '2xl:max-w-min', '2xl:max-w-max', '2xl:max-w-prose', '2xl:max-w-screen-sm', '2xl:max-w-screen-md', '2xl:max-w-screen-lg', '2xl:max-w-screen-xl', '2xl:max-w-screen-2xl',
         
         // Responsive display and flexbox classes
-        'sm:flex', 'sm:inline-flex', 'sm:block', 'sm:inline-block', 'sm:hidden',
-        'md:flex', 'md:inline-flex', 'md:block', 'md:inline-block', 'md:hidden',
-        'lg:flex', 'lg:inline-flex', 'lg:block', 'lg:inline-block', 'lg:hidden',
-        'xl:flex', 'xl:inline-flex', 'xl:block', 'xl:inline-block', 'xl:hidden',
+        'sm:flex', 'sm:inline-flex', 'sm:block', 'sm:inline-block', 'sm:hidden', 'sm:grid',
+        'md:flex', 'md:inline-flex', 'md:block', 'md:inline-block', 'md:hidden', 'md:grid',
+        'lg:flex', 'lg:inline-flex', 'lg:block', 'lg:inline-block', 'lg:hidden', 'lg:grid',
+        'xl:flex', 'xl:inline-flex', 'xl:block', 'xl:inline-block', 'xl:hidden', 'xl:grid',
+        '2xl:flex', '2xl:inline-flex', '2xl:block', '2xl:inline-block', '2xl:hidden', '2xl:grid',
         'sm:flex-row', 'sm:flex-col', 'sm:justify-center', 'sm:justify-between', 'sm:items-center',
         'md:flex-row', 'md:flex-col', 'md:justify-center', 'md:justify-between', 'md:items-center',
         'lg:flex-row', 'lg:flex-col', 'lg:justify-center', 'lg:justify-between', 'lg:items-center',
+        
+        // Responsive grid classes
+        'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3', 'sm:grid-cols-4', 'sm:grid-cols-5', 'sm:grid-cols-6', 'sm:grid-cols-7', 'sm:grid-cols-8', 'sm:grid-cols-9', 'sm:grid-cols-10', 'sm:grid-cols-11', 'sm:grid-cols-12',
+        'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3', 'md:grid-cols-4', 'md:grid-cols-5', 'md:grid-cols-6', 'md:grid-cols-7', 'md:grid-cols-8', 'md:grid-cols-9', 'md:grid-cols-10', 'md:grid-cols-11', 'md:grid-cols-12',
+        'lg:grid-cols-1', 'lg:grid-cols-2', 'lg:grid-cols-3', 'lg:grid-cols-4', 'lg:grid-cols-5', 'lg:grid-cols-6', 'lg:grid-cols-7', 'lg:grid-cols-8', 'lg:grid-cols-9', 'lg:grid-cols-10', 'lg:grid-cols-11', 'lg:grid-cols-12',
+        'xl:grid-cols-1', 'xl:grid-cols-2', 'xl:grid-cols-3', 'xl:grid-cols-4', 'xl:grid-cols-5', 'xl:grid-cols-6', 'xl:grid-cols-7', 'xl:grid-cols-8', 'xl:grid-cols-9', 'xl:grid-cols-10', 'xl:grid-cols-11', 'xl:grid-cols-12',
+        '2xl:grid-cols-1', '2xl:grid-cols-2', '2xl:grid-cols-3', '2xl:grid-cols-4', '2xl:grid-cols-5', '2xl:grid-cols-6', '2xl:grid-cols-7', '2xl:grid-cols-8', '2xl:grid-cols-9', '2xl:grid-cols-10', '2xl:grid-cols-11', '2xl:grid-cols-12',
         
         // Responsive typography
         'sm:text-xs', 'sm:text-sm', 'sm:text-base', 'sm:text-lg', 'sm:text-xl', 'sm:text-2xl', 'sm:text-3xl', 'sm:text-4xl',
@@ -252,6 +330,33 @@ module.exports = {
         'sm:w-full', 'sm:w-auto', 'sm:w-1/2', 'sm:w-1/3', 'sm:w-2/3', 'sm:w-1/4', 'sm:w-3/4',
         'md:w-full', 'md:w-auto', 'md:w-1/2', 'md:w-1/3', 'md:w-2/3', 'md:w-1/4', 'md:w-3/4',
         'lg:w-full', 'lg:w-auto', 'lg:w-1/2', 'lg:w-1/3', 'lg:w-2/3', 'lg:w-1/4', 'lg:w-3/4',
+        
+        // Comprehensive responsive utilities
+        'sm:space-x-0', 'sm:space-x-1', 'sm:space-x-2', 'sm:space-x-3', 'sm:space-x-4', 'sm:space-x-6', 'sm:space-x-8',
+        'md:space-x-0', 'md:space-x-1', 'md:space-x-2', 'md:space-x-3', 'md:space-x-4', 'md:space-x-6', 'md:space-x-8',
+        'lg:space-x-0', 'lg:space-x-1', 'lg:space-x-2', 'lg:space-x-3', 'lg:space-x-4', 'lg:space-x-6', 'lg:space-x-8',
+        'sm:space-y-0', 'sm:space-y-1', 'sm:space-y-2', 'sm:space-y-3', 'sm:space-y-4', 'sm:space-y-6', 'sm:space-y-8',
+        'md:space-y-0', 'md:space-y-1', 'md:space-y-2', 'md:space-y-3', 'md:space-y-4', 'md:space-y-6', 'md:space-y-8',
+        'lg:space-y-0', 'lg:space-y-1', 'lg:space-y-2', 'lg:space-y-3', 'lg:space-y-4', 'lg:space-y-6', 'lg:space-y-8',
+        
+        // Responsive gap utilities
+        'sm:gap-0', 'sm:gap-1', 'sm:gap-2', 'sm:gap-3', 'sm:gap-4', 'sm:gap-5', 'sm:gap-6', 'sm:gap-8', 'sm:gap-10', 'sm:gap-12',
+        'md:gap-0', 'md:gap-1', 'md:gap-2', 'md:gap-3', 'md:gap-4', 'md:gap-5', 'md:gap-6', 'md:gap-8', 'md:gap-10', 'md:gap-12',
+        'lg:gap-0', 'lg:gap-1', 'lg:gap-2', 'lg:gap-3', 'lg:gap-4', 'lg:gap-5', 'lg:gap-6', 'lg:gap-8', 'lg:gap-10', 'lg:gap-12',
+        
+        // Responsive positioning
+        'sm:relative', 'sm:absolute', 'sm:fixed', 'sm:sticky', 'sm:static',
+        'md:relative', 'md:absolute', 'md:fixed', 'md:sticky', 'md:static',
+        'lg:relative', 'lg:absolute', 'lg:fixed', 'lg:sticky', 'lg:static',
+        
+        // Responsive overflow
+        'sm:overflow-hidden', 'sm:overflow-visible', 'sm:overflow-auto', 'sm:overflow-scroll',
+        'md:overflow-hidden', 'md:overflow-visible', 'md:overflow-auto', 'md:overflow-scroll',
+        'lg:overflow-hidden', 'lg:overflow-visible', 'lg:overflow-auto', 'lg:overflow-scroll',
+        
+        // All aspect ratio utilities
+        'aspect-auto', 'aspect-square', 'aspect-video',
+        'aspect-[1/1]', 'aspect-[16/9]', 'aspect-[4/3]', 'aspect-[3/2]', 'aspect-[2/3]', 'aspect-[9/16]',
         
         // Odd/even table row classes
         'even:bg-gray-50', 'odd:bg-white', 'even:bg-gray-100', 'odd:bg-gray-50',
