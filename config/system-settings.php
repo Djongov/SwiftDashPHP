@@ -219,7 +219,7 @@ class SystemConfig
     private static function configureJsonSettings() : void
     {
         // Load WAF settings from JSON file
-        $jsonSettingsPath = ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'settings.json';
+        $jsonSettingsPath = ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'system-settings.json';
         if (!file_exists($jsonSettingsPath)) {
             die('JSON settings file is missing. Please create config/settings.json');
         }

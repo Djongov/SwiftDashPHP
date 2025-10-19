@@ -202,3 +202,18 @@ define("DATAGRID_THEAD_DARK_COLOR_SCHEME", "dark:bg-$defaultDataGridColor-900");
 define("DATAGRID_TEXT_COLOR_SCHEME", "text-gray-900");
 // This is the table text color while in the dark mode
 define("DATAGRID_TEXT_DARK_COLOR_SCHEME", "dark:text-gray-100");
+
+$jsonSettingsPath = ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'site-settings.json';
+if (!file_exists($jsonSettingsPath)) {
+    die('JSON settings file is missing. Please create config/site-settings.json');
+}
+
+$jsonSettingsContent = file_get_contents($jsonSettingsPath);
+$jsonSettings = json_decode($jsonSettingsContent, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    die('Error parsing JSON settings: ' . json_last_error_msg());
+}
+
+// Define WAF-related constants with defaults if not set
+define('USE_TAILWIND_CDN', $jsonSettings['useTailwindCDN']['value'] ?? die('useTailwindCDN must be set in config/site-settings.json'));

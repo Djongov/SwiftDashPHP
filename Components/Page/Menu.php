@@ -24,7 +24,7 @@ class Menu
                 </button>';
         // Menu itself
         $html .= '<div class="hidden w-full md:block md:w-auto" id="mobile-menu">';
-        $html .= '<ul class="' . BODY_COLOR_SCHEME_CLASS . ' md:bg-transparent mx-auto flex md:flex-row flex-col flex-wrap justify-center items-center p-4 mt-4 rounded-lg border border-gray-100 md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 ' . DARK_COLOR_SCHEME_CLASS . ' md:' . BODY_DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">';
+        $html .= '<ul class="' . BODY_COLOR_SCHEME_CLASS . ' md:bg-transparent mx-auto flex md:flex-row flex-col flex-wrap justify-center items-center p-4 mt-4 rounded-lg border border-gray-100 md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 ' . BODY_DARK_COLOR_SCHEME_CLASS . ' ' . BODY_DARK_COLOR_SCHEME_CLASS . ' md:' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">';
         $uniqueIdCounter = 0;
         foreach ($array as $name => $value) {
             // Mechanism to skip entries that should be under login only

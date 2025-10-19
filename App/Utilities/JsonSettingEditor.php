@@ -74,6 +74,9 @@ class JsonSettingEditor
             return \Components\Alerts::warning('JSON file does not contain an object/array structure');
         }
 
+        // Generate unique identifier for this form based on filename
+        $uniqueId = 'json-editor-' . preg_replace('/[^a-zA-Z0-9]/', '-', basename($filePath, '.json'));
+
         // Start building the form
         $html = '';
         
@@ -92,29 +95,31 @@ class JsonSettingEditor
         $html .= '</div>';
         $html .= '</div>';
 
-        // Start form
-        $html .= '<form method="POST" action="/api/edit-json-settings" class="space-y-6">';
+        // Start form with unique data attribute
+        $html .= '<form method="POST" action="/api/edit-json-settings" class="space-y-6 json-editor-form" data-editor-id="' . $uniqueId . '">';
         $html .= \App\Security\CSRF::createTag();
         $html .= '<input type="hidden" name="json_file_path" value="' . htmlspecialchars($filePath) . '">';
         
         // Generate fields
-        $html .= self::renderJsonFields($data, $fieldConfig, $theme);
+        $html .= self::renderJsonFields($data, $fieldConfig, $theme, '', $uniqueId);
         
         // Action buttons
         $html .= '<div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-600">';
         
-        // Reset button
-        $html .= '<button type="button" id="json-editor-reset-btn" ';
-        $html .= 'class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">';
+        // Reset button with unique ID
+        $html .= '<button type="button" id="' . $uniqueId . '-reset-btn" ';
+        $html .= 'data-editor-id="' . $uniqueId . '" ';
+        $html .= 'class="json-editor-reset-btn px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">';
         $html .= '<svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
         $html .= '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>';
         $html .= '</svg>';
         $html .= 'Reset to Original';
         $html .= '</button>';
         
-        // Save button
+        // Save button with unique ID
         $html .= '<button type="submit" name="save_json" value="1" ';
-        $html .= 'class="px-6 py-2 text-sm font-medium text-white bg-' . $theme . '-600 hover:bg-' . $theme . '-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-' . $theme . '-500 rounded-lg transition-colors duration-200">';
+        $html .= 'data-editor-id="' . $uniqueId . '" ';
+        $html .= 'class="json-editor-submit-btn px-6 py-2 text-sm font-medium text-white bg-' . $theme . '-600 hover:bg-' . $theme . '-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-' . $theme . '-500 rounded-lg transition-colors duration-200">';
         $html .= '<svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
         $html .= '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>';
         $html .= '</svg>';
@@ -124,8 +129,12 @@ class JsonSettingEditor
         $html .= '</div>';
         $html .= '</form>';
         
-        // Link external JavaScript file
-        $html .= '<script src="/assets/js/json-editor.js"></script>';
+        // Link external JavaScript file only once per page
+        static $jsIncluded = false;
+        if (!$jsIncluded) {
+            $html .= '<script src="/assets/js/json-editor.js"></script>';
+            $jsIncluded = true;
+        }
         
         $html .= '</div>';
 
@@ -139,15 +148,16 @@ class JsonSettingEditor
      * @param array $fieldConfig Configuration for field types (deprecated - use self-describing JSON)
      * @param string $theme Theme for styling
      * @param string $prefix Field name prefix for nested objects
+     * @param string $uniqueId Unique identifier for this form instance
      * @return string HTML for the fields
      */
-    private static function renderJsonFields(array $data, array $fieldConfig, string $theme, string $prefix = ''): string
+    private static function renderJsonFields(array $data, array $fieldConfig, string $theme, string $prefix = '', string $uniqueId = ''): string
     {
         $html = '';
         
         foreach ($data as $key => $value) {
             $fieldName = $prefix ? $prefix . '[' . $key . ']' : $key;
-            $fieldId = str_replace(['[', ']'], ['_', ''], $fieldName);
+            $fieldId = $uniqueId . '-' . str_replace(['[', ']'], ['_', ''], $fieldName);
             
             $html .= '<div class="mb-6">';
             
@@ -171,7 +181,7 @@ class JsonSettingEditor
                 if ($description) {
                     $html .= '<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">' . htmlspecialchars($description) . '</p>';
                 }
-                $html .= self::renderJsonFields($value, $fieldConfig[$key]['fields'] ?? [], $theme, $fieldName);
+                $html .= self::renderJsonFields($value, $fieldConfig[$key]['fields'] ?? [], $theme, $fieldName, $uniqueId);
                 $html .= '</div>';
                 continue;
             } else {

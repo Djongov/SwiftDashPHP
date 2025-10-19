@@ -40,6 +40,18 @@ class Head
         $html .= self::twitterTags($title, $description, $thumbimage, '@Djongov', '@Djongov');
         // Scripts
         $html .= self::scriptLoad($scriptsArray);
+        // Tailwind config for CDN usage
+        if (USE_TAILWIND_CDN) {
+            $tailwindConfig = "tailwind.config = {
+                content: [],
+                darkMode: 'class'
+            };";
+            $html .= <<< InlineScript
+                    <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+                        $tailwindConfig
+                    </script>
+                InlineScript . PHP_EOL;
+        }
         // CSS files
         $html .= self::cssLoad($cssArray);
         $html .= '</head>' . PHP_EOL;

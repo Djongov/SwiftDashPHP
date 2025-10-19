@@ -14,8 +14,14 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-// Define WAF settings configuration
-$wafSettingsPath = ROOT . '/config/settings.json';
+// Define system settings configuration
+$systemSettingsPath = ROOT . '/config/system-settings.json';
 
-// Render the WAF settings editor (now uses self-describing JSON structure)
-echo JsonSettingEditor::renderJsonEditor($wafSettingsPath, $theme);
+// Render the system settings editor (now uses self-describing JSON structure)
+echo JsonSettingEditor::renderJsonEditor($systemSettingsPath, $theme);
+
+// Define site settings configuration
+$siteSettingsPath = ROOT . '/config/site-settings.json';
+
+// Render the site settings editor (now uses self-describing JSON structure)
+echo JsonSettingEditor::renderJsonEditor($siteSettingsPath, $theme);

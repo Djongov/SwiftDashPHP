@@ -53,6 +53,11 @@ class Page
                 'defer' => 'true'
             ],
         ];
+        if (USE_TAILWIND_CDN) {
+            $scriptsArray['https://cdn.tailwindcss.com?plugins=typography'] = [
+                'cache' => true
+            ];
+        }
         // If loading screen is enabled, add the loading screen js with defer and cache
         if (SHOW_LOADING_SCREEN) {
             $scriptsArray['/assets/js/loading-screen.js'] = [
@@ -64,11 +69,13 @@ class Page
         $cssArray = [
             '/assets/css/main.css' => [
                 'cache' => false
-            ],
-            '/assets/css/tailwind.css' => [
-                'cache' => true
-            ],
+            ]
         ];
+        if (!USE_TAILWIND_CDN) {
+            $cssArray['/assets/css/tailwind.css'] = [
+                'cache' => true
+            ];
+        }
         return Head::render($title, $description, $keywords, $thumbimage, $scriptsArray, $cssArray);
     }
     public function header($usernameArray, $menuArray, $isAdmin, $theme): string

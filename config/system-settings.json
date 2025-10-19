@@ -1,6 +1,6 @@
 {
     "auth_expiry": {
-        "value": 150020,
+        "value": 150029,
         "label": "Auth Expiry",
         "description": "Duration in seconds for which the authentication is valid",
         "type": "number"

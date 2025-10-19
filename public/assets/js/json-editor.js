@@ -1,23 +1,44 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Capture original form values on page load - be more specific with form selector
-    const form = document.querySelector('form[action="/api/edit-json-settings"]');
     
-    if (!form) {
-        console.error('JSON Editor: Form not found');
+    // Initialize all JSON editor forms on the page
+    const forms = document.querySelectorAll('form.json-editor-form[data-editor-id]');
+    
+    if (forms.length === 0) {
+        console.error('JSON Editor: No forms found');
         return;
     }
     
-    const originalValues = {};
-    const submitButton = form.querySelector('button[type=submit][name="save_json"]');
-    const resetButton = document.getElementById("json-editor-reset-btn");
+    console.log(`JSON Editor: Found ${forms.length} form(s)`);
     
-    if (!submitButton) {
-        console.error('JSON Editor: Submit button not found');
-        return;
-    }
+    // Initialize each form separately
+    forms.forEach(function(form) {
+        initializeJsonEditor(form);
+    });
     
-    // Store original values for all form elements
-    if (form) {
+    function initializeJsonEditor(form) {
+        const editorId = form.getAttribute('data-editor-id');
+        if (!editorId) {
+            console.error('JSON Editor: Form missing data-editor-id attribute');
+            return;
+        }
+        
+        console.log(`JSON Editor: Initializing form with ID: ${editorId}`);
+        
+        const originalValues = {};
+        const submitButton = form.querySelector('button[type=submit][name="save_json"]');
+        const resetButton = form.querySelector(`#${editorId}-reset-btn`);
+        
+        if (!submitButton) {
+            console.error(`JSON Editor: Submit button not found for form ${editorId}`);
+            return;
+        }
+        
+        if (!resetButton) {
+            console.error(`JSON Editor: Reset button not found for form ${editorId}`);
+            return;
+        }
+        
+        // Store original values for all form elements in this specific form
         const inputs = form.querySelectorAll("input, textarea, select");
         inputs.forEach(function(input) {
             if (input.type === "hidden" || input.name === "csrf_token" || input.name === "save_json" || input.name === "json_file_path") {
@@ -30,34 +51,32 @@ document.addEventListener("DOMContentLoaded", function() {
                 originalValues[input.name] = input.value;
             }
         });
-    }
-    
-    // Create message container for feedback
-    function createMessageContainer() {
-        let messageContainer = document.getElementById("json-editor-messages");
-        if (!messageContainer) {
-            messageContainer = document.createElement("div");
-            messageContainer.id = "json-editor-messages";
-            messageContainer.className = "mb-4";
-            form.parentNode.insertBefore(messageContainer, form);
-        }
-        return messageContainer;
-    }
-    
-    // Show message function
-    function showMessage(message, type = "success") {
-        const messageContainer = createMessageContainer();
-        const bgColor = type === "success" ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-200" : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-800 dark:text-red-200";
-        const icon = type === "success" ? "✅" : "❌";
-        messageContainer.innerHTML = "<div class=\"p-3 " + bgColor + " border rounded-lg text-sm\">" + icon + " " + message + "</div>";
-        setTimeout(function() { messageContainer.innerHTML = ""; }, 5000);
-    }
-    
-    // AJAX form submission
-    if (form && submitButton) {
         
+        // Create message container for feedback (unique per form)
+        function createMessageContainer() {
+            let messageContainer = form.querySelector(".json-editor-messages");
+            if (!messageContainer) {
+                messageContainer = document.createElement("div");
+                messageContainer.className = "json-editor-messages mb-4";
+                form.parentNode.insertBefore(messageContainer, form);
+            }
+            return messageContainer;
+        }
+        
+        // Show message function
+        function showMessage(message, type = "success") {
+            const messageContainer = createMessageContainer();
+            const bgColor = type === "success" ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-200" : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-800 dark:text-red-200";
+            const icon = type === "success" ? "✅" : "❌";
+            messageContainer.innerHTML = "<div class=\"p-3 " + bgColor + " border rounded-lg text-sm\">" + icon + " " + message + "</div>";
+            setTimeout(function() { messageContainer.innerHTML = ""; }, 5000);
+        }
+        
+        // AJAX form submission for this specific form
         form.addEventListener("submit", function(e) {
             e.preventDefault();
+            
+            console.log(`JSON Editor: Form ${editorId} submitted`);
             
             // Disable submit button and show loading
             submitButton.disabled = true;
@@ -70,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Explicitly add the save_json field since the button might not be included when disabled
             formData.append('save_json', '1');
             
-            // Get CSRF token from session or form
+            // Get CSRF token from form
             const csrfToken = form.querySelector('input[name="csrf_token"]')?.value;
             
             // Send fetch request
@@ -89,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }));
             })
             .then(result => {
-                console.log('JSON Editor: Response received', result);
+                console.log(`JSON Editor: Response received for form ${editorId}`, result);
                 if (result.status === 200) {
                     showMessage(result.text, "success");
                 } else {
@@ -97,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             })
             .catch(error => {
-                console.error('JSON Editor: Fetch error', error);
+                console.error(`JSON Editor: Fetch error for form ${editorId}`, error);
                 showMessage("Network error: " + error.message, "error");
             })
             .finally(() => {
@@ -106,15 +125,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 submitButton.innerHTML = originalButtonText;
             });
         });
-    }
-    
-    // Reset button event listener
-    const resetBtn = document.getElementById("json-editor-reset-btn");
-    if (resetBtn) {
-        resetBtn.addEventListener("click", function() {
+        
+        // Reset button event listener for this specific form
+        resetButton.addEventListener("click", function() {
+            console.log(`JSON Editor: Reset button clicked for form ${editorId}`);
+            
             // Confirm reset action
             if (confirm("Are you sure you want to reset all fields to their original values? Any unsaved changes will be lost.")) {
-                // Reset all form elements to original values
+                // Reset all form elements to original values in this specific form
                 const inputs = form.querySelectorAll("input, textarea, select");
                 inputs.forEach(function(input) {
                     if (input.type === "hidden" || input.name === "csrf_token" || input.name === "save_json" || input.name === "json_file_path") {
@@ -146,5 +164,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }, 3000);
             }
         });
+        
+        console.log(`JSON Editor: Form ${editorId} initialized successfully`);
     }
 });

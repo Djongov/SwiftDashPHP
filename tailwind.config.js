@@ -27,428 +27,190 @@ module.exports = {
         }
     },
     safelist: [
-        // Essential classes always needed
-        'bg-clip-text',
-        'text-transparent',
-        
-        // Flexbox and layout classes
-        'flex', 'inline-flex', 'block', 'inline-block', 'inline', 'hidden',
-        'flex-row', 'flex-row-reverse', 'flex-col', 'flex-col-reverse',
-        'flex-wrap', 'flex-wrap-reverse', 'flex-nowrap',
-        'justify-start', 'justify-end', 'justify-center', 'justify-between', 'justify-around', 'justify-evenly', 'justify-stretch',
-        'items-start', 'items-end', 'items-center', 'items-baseline', 'items-stretch',
-        'content-start', 'content-end', 'content-center', 'content-between', 'content-around', 'content-evenly', 'content-baseline', 'content-stretch',
-        'self-auto', 'self-start', 'self-end', 'self-center', 'self-stretch', 'self-baseline',
-        'flex-1', 'flex-auto', 'flex-initial', 'flex-none',
-        'grow', 'grow-0', 'shrink', 'shrink-0',
-        'order-1', 'order-2', 'order-3', 'order-4', 'order-5', 'order-6', 'order-7', 'order-8', 'order-9', 'order-10', 'order-11', 'order-12',
-        'order-first', 'order-last', 'order-none',
-        // Grid classes
-        'grid', 'inline-grid', 'grid-cols-1', 'grid-cols-2', 'grid-cols-3', 'grid-cols-4', 'grid-cols-5', 'grid-cols-6', 
-        'grid-cols-7', 'grid-cols-8', 'grid-cols-9', 'grid-cols-10', 'grid-cols-11', 'grid-cols-12', 'grid-cols-none',
-        'grid-rows-1', 'grid-rows-2', 'grid-rows-3', 'grid-rows-4', 'grid-rows-5', 'grid-rows-6', 'grid-rows-none',
-        'col-auto', 'col-span-1', 'col-span-2', 'col-span-3', 'col-span-4', 'col-span-5', 'col-span-6', 
-        'col-span-7', 'col-span-8', 'col-span-9', 'col-span-10', 'col-span-11', 'col-span-12', 'col-span-full',
-        'row-auto', 'row-span-1', 'row-span-2', 'row-span-3', 'row-span-4', 'row-span-5', 'row-span-6', 'row-span-full',
-        'gap-0', 'gap-1', 'gap-2', 'gap-3', 'gap-4', 'gap-5', 'gap-6', 'gap-7', 'gap-8', 'gap-9', 'gap-10', 'gap-11', 'gap-12',
-        'gap-x-0', 'gap-x-1', 'gap-x-2', 'gap-x-3', 'gap-x-4', 'gap-x-5', 'gap-x-6', 'gap-x-7', 'gap-x-8', 'gap-x-9', 'gap-x-10', 'gap-x-11', 'gap-x-12',
-        'gap-y-0', 'gap-y-1', 'gap-y-2', 'gap-y-3', 'gap-y-4', 'gap-y-5', 'gap-y-6', 'gap-y-7', 'gap-y-8', 'gap-y-9', 'gap-y-10', 'gap-y-11', 'gap-y-12',
-        
-        // Width and Height classes
-        'w-0', 'w-1', 'w-2', 'w-3', 'w-4', 'w-5', 'w-6', 'w-8', 'w-10', 'w-11', 'w-12', 'w-14', 'w-16', 'w-20', 'w-24', 'w-28', 'w-32', 'w-36', 'w-40', 'w-44', 'w-48', 'w-52', 'w-56', 'w-60', 'w-64', 'w-72', 'w-80', 'w-96',
-        'w-auto', 'w-px', 'w-0.5', 'w-1.5', 'w-2.5', 'w-3.5', 'w-full', 'w-screen', 'w-min', 'w-max', 'w-fit',
-        'w-1/2', 'w-1/3', 'w-2/3', 'w-1/4', 'w-2/4', 'w-3/4', 'w-1/5', 'w-2/5', 'w-3/5', 'w-4/5', 'w-1/6', 'w-2/6', 'w-3/6', 'w-4/6', 'w-5/6',
-        'h-0', 'h-1', 'h-2', 'h-3', 'h-4', 'h-5', 'h-6', 'h-8', 'h-10', 'h-11', 'h-12', 'h-14', 'h-16', 'h-20', 'h-24', 'h-28', 'h-32', 'h-36', 'h-40', 'h-44', 'h-48', 'h-52', 'h-56', 'h-60', 'h-64', 'h-72', 'h-80', 'h-96',
-        'h-auto', 'h-px', 'h-0.5', 'h-1.5', 'h-2.5', 'h-3.5', 'h-full', 'h-screen', 'h-min', 'h-max', 'h-fit',
-        'h-1/2', 'h-1/3', 'h-2/3', 'h-1/4', 'h-2/4', 'h-3/4', 'h-1/5', 'h-2/5', 'h-3/5', 'h-4/5', 'h-1/6', 'h-2/6', 'h-3/6', 'h-4/6', 'h-5/6',
-        
-        // Padding and Margin (all directions and sizes)
-        'p-0', 'p-1', 'p-2', 'p-3', 'p-4', 'p-5', 'p-6', 'p-7', 'p-8', 'p-9', 'p-10', 'p-11', 'p-12', 'p-14', 'p-16', 'p-20', 'p-24', 'p-28', 'p-32', 'p-36', 'p-40', 'p-44', 'p-48', 'p-52', 'p-56', 'p-60', 'p-64', 'p-72', 'p-80', 'p-96',
-        'px-0', 'px-1', 'px-2', 'px-3', 'px-4', 'px-5', 'px-6', 'px-7', 'px-8', 'px-9', 'px-10', 'px-11', 'px-12', 'px-14', 'px-16', 'px-20', 'px-24', 'px-28', 'px-32', 'px-36', 'px-40', 'px-44', 'px-48', 'px-52', 'px-56', 'px-60', 'px-64', 'px-72', 'px-80', 'px-96',
-        'py-0', 'py-1', 'py-2', 'py-3', 'py-4', 'py-5', 'py-6', 'py-7', 'py-8', 'py-9', 'py-10', 'py-11', 'py-12', 'py-14', 'py-16', 'py-20', 'py-24', 'py-28', 'py-32', 'py-36', 'py-40', 'py-44', 'py-48', 'py-52', 'py-56', 'py-60', 'py-64', 'py-72', 'py-80', 'py-96',
-        'pt-0', 'pt-1', 'pt-2', 'pt-3', 'pt-4', 'pt-5', 'pt-6', 'pt-7', 'pt-8', 'pt-9', 'pt-10', 'pt-11', 'pt-12', 'pt-14', 'pt-16', 'pt-20', 'pt-24', 'pt-28', 'pt-32', 'pt-36', 'pt-40', 'pt-44', 'pt-48', 'pt-52', 'pt-56', 'pt-60', 'pt-64', 'pt-72', 'pt-80', 'pt-96',
-        'pr-0', 'pr-1', 'pr-2', 'pr-3', 'pr-4', 'pr-5', 'pr-6', 'pr-7', 'pr-8', 'pr-9', 'pr-10', 'pr-11', 'pr-12', 'pr-14', 'pr-16', 'pr-20', 'pr-24', 'pr-28', 'pr-32', 'pr-36', 'pr-40', 'pr-44', 'pr-48', 'pr-52', 'pr-56', 'pr-60', 'pr-64', 'pr-72', 'pr-80', 'pr-96',
-        'pb-0', 'pb-1', 'pb-2', 'pb-3', 'pb-4', 'pb-5', 'pb-6', 'pb-7', 'pb-8', 'pb-9', 'pb-10', 'pb-11', 'pb-12', 'pb-14', 'pb-16', 'pb-20', 'pb-24', 'pb-28', 'pb-32', 'pb-36', 'pb-40', 'pb-44', 'pb-48', 'pb-52', 'pb-56', 'pb-60', 'pb-64', 'pb-72', 'pb-80', 'pb-96',
-        'pl-0', 'pl-1', 'pl-2', 'pl-3', 'pl-4', 'pl-5', 'pl-6', 'pl-7', 'pl-8', 'pl-9', 'pl-10', 'pl-11', 'pl-12', 'pl-14', 'pl-16', 'pl-20', 'pl-24', 'pl-28', 'pl-32', 'pl-36', 'pl-40', 'pl-44', 'pl-48', 'pl-52', 'pl-56', 'pl-60', 'pl-64', 'pl-72', 'pl-80', 'pl-96',
-        'm-0', 'm-1', 'm-2', 'm-3', 'm-4', 'm-5', 'm-6', 'm-7', 'm-8', 'm-9', 'm-10', 'm-11', 'm-12', 'm-14', 'm-16', 'm-20', 'm-24', 'm-28', 'm-32', 'm-36', 'm-40', 'm-44', 'm-48', 'm-52', 'm-56', 'm-60', 'm-64', 'm-72', 'm-80', 'm-96', 'm-auto',
-        'mx-0', 'mx-1', 'mx-2', 'mx-3', 'mx-4', 'mx-5', 'mx-6', 'mx-7', 'mx-8', 'mx-9', 'mx-10', 'mx-11', 'mx-12', 'mx-14', 'mx-16', 'mx-20', 'mx-24', 'mx-28', 'mx-32', 'mx-36', 'mx-40', 'mx-44', 'mx-48', 'mx-52', 'mx-56', 'mx-60', 'mx-64', 'mx-72', 'mx-80', 'mx-96', 'mx-auto',
-        'my-0', 'my-1', 'my-2', 'my-3', 'my-4', 'my-5', 'my-6', 'my-7', 'my-8', 'my-9', 'my-10', 'my-11', 'my-12', 'my-14', 'my-16', 'my-20', 'my-24', 'my-28', 'my-32', 'my-36', 'my-40', 'my-44', 'my-48', 'my-52', 'my-56', 'my-60', 'my-64', 'my-72', 'my-80', 'my-96', 'my-auto',
-        'mt-0', 'mt-1', 'mt-2', 'mt-3', 'mt-4', 'mt-5', 'mt-6', 'mt-7', 'mt-8', 'mt-9', 'mt-10', 'mt-11', 'mt-12', 'mt-14', 'mt-16', 'mt-20', 'mt-24', 'mt-28', 'mt-32', 'mt-36', 'mt-40', 'mt-44', 'mt-48', 'mt-52', 'mt-56', 'mt-60', 'mt-64', 'mt-72', 'mt-80', 'mt-96', 'mt-auto',
-        'mr-0', 'mr-1', 'mr-2', 'mr-3', 'mr-4', 'mr-5', 'mr-6', 'mr-7', 'mr-8', 'mr-9', 'mr-10', 'mr-11', 'mr-12', 'mr-14', 'mr-16', 'mr-20', 'mr-24', 'mr-28', 'mr-32', 'mr-36', 'mr-40', 'mr-44', 'mr-48', 'mr-52', 'mr-56', 'mr-60', 'mr-64', 'mr-72', 'mr-80', 'mr-96', 'mr-auto',
-        'mb-0', 'mb-1', 'mb-2', 'mb-3', 'mb-4', 'mb-5', 'mb-6', 'mb-7', 'mb-8', 'mb-9', 'mb-10', 'mb-11', 'mb-12', 'mb-14', 'mb-16', 'mb-20', 'mb-24', 'mb-28', 'mb-32', 'mb-36', 'mb-40', 'mb-44', 'mb-48', 'mb-52', 'mb-56', 'mb-60', 'mb-64', 'mb-72', 'mb-80', 'mb-96', 'mb-auto',
-        'ml-0', 'ml-1', 'ml-2', 'ml-3', 'ml-4', 'ml-5', 'ml-6', 'ml-7', 'ml-8', 'ml-9', 'ml-10', 'ml-11', 'ml-12', 'ml-14', 'ml-16', 'ml-20', 'ml-24', 'ml-28', 'ml-32', 'ml-36', 'ml-40', 'ml-44', 'ml-48', 'ml-52', 'ml-56', 'ml-60', 'ml-64', 'ml-72', 'ml-80', 'ml-96', 'ml-auto',
-        
-        // Typography
-        'text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl', 'text-5xl', 'text-6xl', 'text-7xl', 'text-8xl', 'text-9xl',
-        'font-thin', 'font-extralight', 'font-light', 'font-normal', 'font-medium', 'font-semibold', 'font-bold', 'font-extrabold', 'font-black',
-        'italic', 'not-italic', 'underline', 'overline', 'line-through', 'no-underline',
-        'uppercase', 'lowercase', 'capitalize', 'normal-case',
-        'text-left', 'text-center', 'text-right', 'text-justify', 'text-start', 'text-end',
-        'leading-3', 'leading-4', 'leading-5', 'leading-6', 'leading-7', 'leading-8', 'leading-9', 'leading-10',
-        'leading-none', 'leading-tight', 'leading-snug', 'leading-normal', 'leading-relaxed', 'leading-loose',
-        'tracking-tighter', 'tracking-tight', 'tracking-normal', 'tracking-wide', 'tracking-wider', 'tracking-widest',
-        'break-words', 'break-all', 'break-keep', 'whitespace-normal', 'whitespace-nowrap', 'whitespace-pre', 'whitespace-pre-line', 'whitespace-pre-wrap',
-        
-        // Positioning
-        'static', 'fixed', 'absolute', 'relative', 'sticky',
-        'inset-0', 'inset-x-0', 'inset-y-0', 'start-0', 'end-0', 'top-0', 'right-0', 'bottom-0', 'left-0',
-        'inset-px', 'inset-x-px', 'inset-y-px', 'start-px', 'end-px', 'top-px', 'right-px', 'bottom-px', 'left-px',
-        'inset-0.5', 'inset-1.5', 'inset-2.5', 'inset-3.5', 'inset-1', 'inset-2', 'inset-3', 'inset-4', 'inset-5', 'inset-6', 'inset-8', 'inset-10', 'inset-12', 'inset-16', 'inset-20', 'inset-24',
-        // Negative positioning values
-        '-inset-0', '-inset-x-0', '-inset-y-0', '-start-0', '-end-0', '-top-0', '-right-0', '-bottom-0', '-left-0',
-        '-inset-px', '-inset-x-px', '-inset-y-px', '-start-px', '-end-px', '-top-px', '-right-px', '-bottom-px', '-left-px',
-        '-inset-0.5', '-inset-1.5', '-inset-2.5', '-inset-3.5', '-inset-1', '-inset-2', '-inset-3', '-inset-4', '-inset-5', '-inset-6', '-inset-8', '-inset-10', '-inset-12', '-inset-16', '-inset-20', '-inset-24',
-        '-top-1', '-top-2', '-top-3', '-top-4', '-top-5', '-top-6', '-top-8', '-top-10', '-top-12', '-top-16', '-top-20', '-top-24',
-        '-right-1', '-right-2', '-right-3', '-right-4', '-right-5', '-right-6', '-right-8', '-right-10', '-right-12', '-right-16', '-right-20', '-right-24',
-        '-bottom-1', '-bottom-2', '-bottom-3', '-bottom-4', '-bottom-5', '-bottom-6', '-bottom-8', '-bottom-10', '-bottom-12', '-bottom-16', '-bottom-20', '-bottom-24',
-        '-left-1', '-left-2', '-left-3', '-left-4', '-left-5', '-left-6', '-left-8', '-left-10', '-left-12', '-left-16', '-left-20', '-left-24',
-        'top-1', 'top-2', 'top-3', 'top-4', 'top-5', 'top-6', 'top-8', 'top-10', 'top-12', 'top-16', 'top-20', 'top-24',
-        'right-1', 'right-2', 'right-3', 'right-4', 'right-5', 'right-6', 'right-8', 'right-10', 'right-12', 'right-16', 'right-20', 'right-24',
-        'bottom-1', 'bottom-2', 'bottom-3', 'bottom-4', 'bottom-5', 'bottom-6', 'bottom-8', 'bottom-10', 'bottom-12', 'bottom-16', 'bottom-20', 'bottom-24',
-        'left-1', 'left-2', 'left-3', 'left-4', 'left-5', 'left-6', 'left-8', 'left-10', 'left-12', 'left-16', 'left-20', 'left-24',
-        'z-0', 'z-10', 'z-20', 'z-30', 'z-40', 'z-50', 'z-auto', '-z-10', '-z-20', '-z-30', '-z-40', '-z-50',
-        
-        // Borders and Rounded
-        'rounded-none', 'rounded-sm', 'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-3xl', 'rounded-full',
-        'rounded-t-none', 'rounded-t-sm', 'rounded-t', 'rounded-t-md', 'rounded-t-lg', 'rounded-t-xl', 'rounded-t-2xl', 'rounded-t-3xl',
-        'rounded-r-none', 'rounded-r-sm', 'rounded-r', 'rounded-r-md', 'rounded-r-lg', 'rounded-r-xl', 'rounded-r-2xl', 'rounded-r-3xl',
-        'rounded-b-none', 'rounded-b-sm', 'rounded-b', 'rounded-b-md', 'rounded-b-lg', 'rounded-b-xl', 'rounded-b-2xl', 'rounded-b-3xl',
-        'rounded-l-none', 'rounded-l-sm', 'rounded-l', 'rounded-l-md', 'rounded-l-lg', 'rounded-l-xl', 'rounded-l-2xl', 'rounded-l-3xl',
-        'border-0', 'border-2', 'border-4', 'border-8', 'border', 'border-x-0', 'border-x-2', 'border-x-4', 'border-x-8', 'border-x',
-        'border-y-0', 'border-y-2', 'border-y-4', 'border-y-8', 'border-y', 'border-t-0', 'border-t-2', 'border-t-4', 'border-t-8', 'border-t',
-        'border-r-0', 'border-r-2', 'border-r-4', 'border-r-8', 'border-r', 'border-b-0', 'border-b-2', 'border-b-4', 'border-b-8', 'border-b',
-        'border-l-0', 'border-l-2', 'border-l-4', 'border-l-8', 'border-l',
-        'border-solid', 'border-dashed', 'border-dotted', 'border-double', 'border-hidden', 'border-none',
-        
-        // Shadows and Effects
-        'shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl', 'shadow-inner', 'shadow-none',
-        'opacity-0', 'opacity-5', 'opacity-10', 'opacity-20', 'opacity-25', 'opacity-30', 'opacity-40', 'opacity-50', 'opacity-60', 'opacity-70', 'opacity-75', 'opacity-80', 'opacity-90', 'opacity-95', 'opacity-100',
-        
-        // Background, text, border, and ring opacity classes
-        'bg-opacity-0', 'bg-opacity-5', 'bg-opacity-10', 'bg-opacity-20', 'bg-opacity-25', 'bg-opacity-30', 'bg-opacity-40', 'bg-opacity-50', 'bg-opacity-60', 'bg-opacity-70', 'bg-opacity-75', 'bg-opacity-80', 'bg-opacity-90', 'bg-opacity-95', 'bg-opacity-100',
-        'text-opacity-0', 'text-opacity-5', 'text-opacity-10', 'text-opacity-20', 'text-opacity-25', 'text-opacity-30', 'text-opacity-40', 'text-opacity-50', 'text-opacity-60', 'text-opacity-70', 'text-opacity-75', 'text-opacity-80', 'text-opacity-90', 'text-opacity-95', 'text-opacity-100',
-        'border-opacity-0', 'border-opacity-5', 'border-opacity-10', 'border-opacity-20', 'border-opacity-25', 'border-opacity-30', 'border-opacity-40', 'border-opacity-50', 'border-opacity-60', 'border-opacity-70', 'border-opacity-75', 'border-opacity-80', 'border-opacity-90', 'border-opacity-95', 'border-opacity-100',
-        'ring-opacity-0', 'ring-opacity-5', 'ring-opacity-10', 'ring-opacity-20', 'ring-opacity-25', 'ring-opacity-30', 'ring-opacity-40', 'ring-opacity-50', 'ring-opacity-60', 'ring-opacity-70', 'ring-opacity-75', 'ring-opacity-80', 'ring-opacity-90', 'ring-opacity-95', 'ring-opacity-100',
-        'divide-opacity-0', 'divide-opacity-5', 'divide-opacity-10', 'divide-opacity-20', 'divide-opacity-25', 'divide-opacity-30', 'divide-opacity-40', 'divide-opacity-50', 'divide-opacity-60', 'divide-opacity-70', 'divide-opacity-75', 'divide-opacity-80', 'divide-opacity-90', 'divide-opacity-95', 'divide-opacity-100',
-        
-        // Outline
-        'outline-none', 'outline', 'outline-dashed', 'outline-dotted', 'outline-double', 'outline-hidden',
-        'outline-0', 'outline-1', 'outline-2', 'outline-4', 'outline-8',
-        'outline-offset-0', 'outline-offset-1', 'outline-offset-2', 'outline-offset-4', 'outline-offset-8',
-        
-        // Ring (Focus rings)
-        'ring-0', 'ring-1', 'ring-2', 'ring-4', 'ring-8', 'ring', 'ring-inset',
-        'ring-offset-0', 'ring-offset-1', 'ring-offset-2', 'ring-offset-4', 'ring-offset-8',
-        
-        // Backdrop Filters
-        'backdrop-blur-none', 'backdrop-blur-sm', 'backdrop-blur', 'backdrop-blur-md', 'backdrop-blur-lg', 'backdrop-blur-xl', 'backdrop-blur-2xl', 'backdrop-blur-3xl',
-        'backdrop-brightness-0', 'backdrop-brightness-50', 'backdrop-brightness-75', 'backdrop-brightness-90', 'backdrop-brightness-95', 'backdrop-brightness-100', 'backdrop-brightness-105', 'backdrop-brightness-110', 'backdrop-brightness-125', 'backdrop-brightness-150', 'backdrop-brightness-200',
-        'backdrop-contrast-0', 'backdrop-contrast-50', 'backdrop-contrast-75', 'backdrop-contrast-100', 'backdrop-contrast-125', 'backdrop-contrast-150', 'backdrop-contrast-200',
-        'backdrop-grayscale-0', 'backdrop-grayscale',
-        'backdrop-hue-rotate-0', 'backdrop-hue-rotate-15', 'backdrop-hue-rotate-30', 'backdrop-hue-rotate-60', 'backdrop-hue-rotate-90', 'backdrop-hue-rotate-180',
-        'backdrop-invert-0', 'backdrop-invert',
-        'backdrop-opacity-0', 'backdrop-opacity-5', 'backdrop-opacity-10', 'backdrop-opacity-20', 'backdrop-opacity-25', 'backdrop-opacity-30', 'backdrop-opacity-40', 'backdrop-opacity-50', 'backdrop-opacity-60', 'backdrop-opacity-70', 'backdrop-opacity-75', 'backdrop-opacity-80', 'backdrop-opacity-90', 'backdrop-opacity-95', 'backdrop-opacity-100',
-        'backdrop-saturate-0', 'backdrop-saturate-50', 'backdrop-saturate-100', 'backdrop-saturate-150', 'backdrop-saturate-200',
-        'backdrop-sepia-0', 'backdrop-sepia',
-        
-        // Filters
-        'filter', 'filter-none',
-        'blur-none', 'blur-sm', 'blur', 'blur-md', 'blur-lg', 'blur-xl', 'blur-2xl', 'blur-3xl',
-        'brightness-0', 'brightness-50', 'brightness-75', 'brightness-90', 'brightness-95', 'brightness-100', 'brightness-105', 'brightness-110', 'brightness-125', 'brightness-150', 'brightness-200',
-        'contrast-0', 'contrast-50', 'contrast-75', 'contrast-100', 'contrast-125', 'contrast-150', 'contrast-200',
-        'drop-shadow-sm', 'drop-shadow', 'drop-shadow-md', 'drop-shadow-lg', 'drop-shadow-xl', 'drop-shadow-2xl', 'drop-shadow-none',
-        'grayscale-0', 'grayscale',
-        'hue-rotate-0', 'hue-rotate-15', 'hue-rotate-30', 'hue-rotate-60', 'hue-rotate-90', 'hue-rotate-180',
-        'invert-0', 'invert',
-        'saturate-0', 'saturate-50', 'saturate-100', 'saturate-150', 'saturate-200',
-        'sepia-0', 'sepia',
-        
-        // Overflow and Visibility
-        'overflow-auto', 'overflow-hidden', 'overflow-clip', 'overflow-visible', 'overflow-scroll',
-        'overflow-x-auto', 'overflow-x-hidden', 'overflow-x-clip', 'overflow-x-visible', 'overflow-x-scroll',
-        'overflow-y-auto', 'overflow-y-hidden', 'overflow-y-clip', 'overflow-y-visible', 'overflow-y-scroll',
-        'visible', 'invisible', 'collapse',
-        
-        // Additional layout utilities
-        'container', 'box-border', 'box-content',
-        'float-right', 'float-left', 'float-none', 'clear-left', 'clear-right', 'clear-both', 'clear-none',
-        
-        // Additional flexbox utilities
-        'flex-1', 'flex-auto', 'flex-initial', 'flex-none', 'flex-shrink-0', 'flex-shrink', 'flex-grow-0', 'flex-grow',
-        'basis-0', 'basis-1', 'basis-2', 'basis-3', 'basis-4', 'basis-5', 'basis-6', 'basis-8', 'basis-10', 'basis-11', 'basis-12', 'basis-14', 'basis-16', 'basis-20', 'basis-24', 'basis-28', 'basis-32', 'basis-36', 'basis-40', 'basis-44', 'basis-48', 'basis-52', 'basis-56', 'basis-60', 'basis-64', 'basis-72', 'basis-80', 'basis-96',
-        'basis-auto', 'basis-px', 'basis-0.5', 'basis-1.5', 'basis-2.5', 'basis-3.5', 'basis-full',
-        'basis-1/2', 'basis-1/3', 'basis-2/3', 'basis-1/4', 'basis-2/4', 'basis-3/4', 'basis-1/5', 'basis-2/5', 'basis-3/5', 'basis-4/5', 'basis-1/6', 'basis-2/6', 'basis-3/6', 'basis-4/6', 'basis-5/6',
-        
-        // Min/Max width and height
-        'min-w-0', 'min-w-full', 'min-w-min', 'min-w-max', 'min-w-fit',
-        'max-w-0', 'max-w-none', 'max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'max-w-xl', 'max-w-2xl', 'max-w-3xl', 'max-w-4xl', 'max-w-5xl', 'max-w-6xl', 'max-w-7xl',
-        'max-w-full', 'max-w-min', 'max-w-max', 'max-w-fit', 'max-w-prose',
-        'min-h-0', 'min-h-full', 'min-h-screen', 'min-h-min', 'min-h-max', 'min-h-fit',
-        'max-h-0', 'max-h-1', 'max-h-2', 'max-h-3', 'max-h-4', 'max-h-5', 'max-h-6', 'max-h-8', 'max-h-10', 'max-h-11', 'max-h-12', 'max-h-14', 'max-h-16', 'max-h-20', 'max-h-24', 'max-h-28', 'max-h-32', 'max-h-36', 'max-h-40', 'max-h-44', 'max-h-48', 'max-h-52', 'max-h-56', 'max-h-60', 'max-h-64', 'max-h-72', 'max-h-80', 'max-h-96',
-        'max-h-px', 'max-h-0.5', 'max-h-1.5', 'max-h-2.5', 'max-h-3.5', 'max-h-full', 'max-h-screen', 'max-h-min', 'max-h-max', 'max-h-fit',
-        
-        // Object Fit and Position
-        'object-contain', 'object-cover', 'object-fill', 'object-none', 'object-scale-down',
-        'object-bottom', 'object-center', 'object-left', 'object-left-bottom', 'object-left-top', 'object-right', 'object-right-bottom', 'object-right-top', 'object-top',
-        
-        // Background Size and Position
-        'bg-auto', 'bg-cover', 'bg-contain',
-        'bg-center', 'bg-top', 'bg-right-top', 'bg-right', 'bg-right-bottom', 'bg-bottom', 'bg-left-bottom', 'bg-left', 'bg-left-top',
-        'bg-repeat', 'bg-no-repeat', 'bg-repeat-x', 'bg-repeat-y', 'bg-repeat-round', 'bg-repeat-space',
-        'bg-origin-border', 'bg-origin-padding', 'bg-origin-content',
-        'bg-clip-border', 'bg-clip-padding', 'bg-clip-content', 'bg-clip-text',
-        
-        // Background Attachment and Blend
-        'bg-fixed', 'bg-local', 'bg-scroll',
-        'bg-blend-normal', 'bg-blend-multiply', 'bg-blend-screen', 'bg-blend-overlay', 'bg-blend-darken', 'bg-blend-lighten', 'bg-blend-color-dodge', 'bg-blend-color-burn', 'bg-blend-hard-light', 'bg-blend-soft-light', 'bg-blend-difference', 'bg-blend-exclusion', 'bg-blend-hue', 'bg-blend-saturation', 'bg-blend-color', 'bg-blend-luminosity',
-        'mix-blend-normal', 'mix-blend-multiply', 'mix-blend-screen', 'mix-blend-overlay', 'mix-blend-darken', 'mix-blend-lighten', 'mix-blend-color-dodge', 'mix-blend-color-burn', 'mix-blend-hard-light', 'mix-blend-soft-light', 'mix-blend-difference', 'mix-blend-exclusion', 'mix-blend-hue', 'mix-blend-saturation', 'mix-blend-color', 'mix-blend-luminosity', 'mix-blend-plus-lighter',
-        
-        // Table Layout
-        'table', 'inline-table', 'table-caption', 'table-cell', 'table-column', 'table-column-group', 'table-footer-group', 'table-header-group', 'table-row-group', 'table-row',
-        'table-auto', 'table-fixed',
-        'border-collapse', 'border-separate',
-        'caption-top', 'caption-bottom',
-        
-        // List Styles
-        'list-inside', 'list-outside', 'list-none', 'list-disc', 'list-decimal',
-        
-        // Appearance and User Select
-        'appearance-none', 'appearance-auto',
-        'select-none', 'select-text', 'select-all', 'select-auto',
-        
-        // Resize
-        'resize-none', 'resize-y', 'resize-x', 'resize',
-        
-        // Scroll Behavior and Snap
-        'scroll-auto', 'scroll-smooth',
-        'snap-none', 'snap-x', 'snap-y', 'snap-both', 'snap-mandatory', 'snap-proximity',
-        'snap-start', 'snap-end', 'snap-center', 'snap-align-none',
-        
-        // Touch Action
-        'touch-auto', 'touch-none', 'touch-pan-x', 'touch-pan-left', 'touch-pan-right', 'touch-pan-y', 'touch-pan-up', 'touch-pan-down', 'touch-pinch-zoom', 'touch-manipulation',
-        
-        // Will Change
-        'will-change-auto', 'will-change-scroll', 'will-change-contents', 'will-change-transform',
-        
-        // Content
-        'content-none',
-        
-        // Cursor and Pointer Events
-        'cursor-auto', 'cursor-default', 'cursor-pointer', 'cursor-wait', 'cursor-text', 'cursor-move', 'cursor-help', 'cursor-not-allowed', 'cursor-none', 'cursor-context-menu', 'cursor-progress', 'cursor-cell', 'cursor-crosshair', 'cursor-vertical-text', 'cursor-alias', 'cursor-copy', 'cursor-no-drop', 'cursor-grab', 'cursor-grabbing',
-        'pointer-events-none', 'pointer-events-auto',
-        
-        // Animations and Transitions
-        'animate-none', 'animate-spin', 'animate-ping', 'animate-pulse', 'animate-bounce',
-        'transition-none', 'transition-all', 'transition', 'transition-colors', 'transition-opacity', 'transition-shadow', 'transition-transform',
-        'duration-75', 'duration-100', 'duration-150', 'duration-200', 'duration-300', 'duration-500', 'duration-700', 'duration-1000',
-        'ease-linear', 'ease-in', 'ease-out', 'ease-in-out',
-        
-        // Transform and Scale
-        'transform', 'transform-cpu', 'transform-gpu', 'transform-none',
-        'scale-0', 'scale-50', 'scale-75', 'scale-90', 'scale-95', 'scale-100', 'scale-105', 'scale-110', 'scale-125', 'scale-150',
-        // Group utilities
-        'group', 'group-hover:scale-105', 'group-hover:scale-110', 'group-hover:scale-125', 'group-hover:opacity-75', 'group-hover:opacity-50',
-        // Transform translate classes (including negative values)
-        'translate-x-0', 'translate-x-1', 'translate-x-2', 'translate-x-3', 'translate-x-4', 'translate-x-5', 'translate-x-6', 'translate-x-8', 'translate-x-10', 'translate-x-12', 'translate-x-16', 'translate-x-20', 'translate-x-24',
-        '-translate-x-1', '-translate-x-2', '-translate-x-3', '-translate-x-4', '-translate-x-5', '-translate-x-6', '-translate-x-8', '-translate-x-10', '-translate-x-12', '-translate-x-16', '-translate-x-20', '-translate-x-24',
-        'translate-y-0', 'translate-y-1', 'translate-y-2', 'translate-y-3', 'translate-y-4', 'translate-y-5', 'translate-y-6', 'translate-y-8', 'translate-y-10', 'translate-y-12', 'translate-y-16', 'translate-y-20', 'translate-y-24',
-        '-translate-y-1', '-translate-y-2', '-translate-y-3', '-translate-y-4', '-translate-y-5', '-translate-y-6', '-translate-y-8', '-translate-y-10', '-translate-y-12', '-translate-y-16', '-translate-y-20', '-translate-y-24',
-        // Hover transforms
-        'hover:-translate-y-1', 'hover:-translate-y-2', 'hover:-translate-y-3', 'hover:translate-y-1', 'hover:translate-y-2', 'hover:translate-y-3',
-        'hover:-translate-x-1', 'hover:-translate-x-2', 'hover:-translate-x-3', 'hover:translate-x-1', 'hover:translate-x-2', 'hover:translate-x-3',
-        'hover:scale-105', 'hover:scale-110', 'hover:scale-125', 'hover:scale-95', 'hover:scale-90',
-        
-        // Space between utilities (critical missing classes!)
-        'space-x-0', 'space-x-1', 'space-x-2', 'space-x-3', 'space-x-4', 'space-x-5', 'space-x-6', 'space-x-8', 'space-x-10', 'space-x-12', 'space-x-16', 'space-x-20', 'space-x-24',
-        'space-y-0', 'space-y-1', 'space-y-2', 'space-y-3', 'space-y-4', 'space-y-5', 'space-y-6', 'space-y-8', 'space-y-10', 'space-y-12', 'space-y-16', 'space-y-20', 'space-y-24',
-        '-space-x-1', '-space-x-2', '-space-x-3', '-space-x-4', '-space-x-5', '-space-x-6', '-space-x-8', '-space-x-10', '-space-x-12', '-space-x-16', '-space-x-20', '-space-x-24',
-        '-space-y-1', '-space-y-2', '-space-y-3', '-space-y-4', '-space-y-5', '-space-y-6', '-space-y-8', '-space-y-10', '-space-y-12', '-space-y-16', '-space-y-20', '-space-y-24',
-        'space-x-reverse', 'space-y-reverse',
-        
-        // Divide utilities  
-        'divide-x-0', 'divide-x-2', 'divide-x-4', 'divide-x-8', 'divide-x', 'divide-y-0', 'divide-y-2', 'divide-y-4', 'divide-y-8', 'divide-y',
-        'divide-solid', 'divide-dashed', 'divide-dotted', 'divide-double', 'divide-none',
-        'divide-x-reverse', 'divide-y-reverse',
-        
-        // Additional responsive transforms and effects
-        'sm:transform', 'sm:hover:scale-105', 'sm:hover:-translate-y-1',
-        'md:transform', 'md:hover:scale-105', 'md:hover:-translate-y-1', 
-        'lg:transform', 'lg:hover:scale-105', 'lg:hover:-translate-y-1',
-        
-        // Additional hover and focus states for shadows
-        'hover:shadow-sm', 'hover:shadow', 'hover:shadow-md', 'hover:shadow-lg', 'hover:shadow-xl', 'hover:shadow-2xl', 'hover:shadow-none',
-        'focus:shadow-sm', 'focus:shadow', 'focus:shadow-md', 'focus:shadow-lg', 'focus:shadow-xl', 'focus:shadow-2xl', 'focus:shadow-none',
-        'dark:hover:shadow-sm', 'dark:hover:shadow', 'dark:hover:shadow-md', 'dark:hover:shadow-lg', 'dark:hover:shadow-xl', 'dark:hover:shadow-2xl',
-        'rotate-0', 'rotate-1', 'rotate-2', 'rotate-3', 'rotate-6', 'rotate-12', 'rotate-45', 'rotate-90', 'rotate-180', '-rotate-180', '-rotate-90', '-rotate-45', '-rotate-12', '-rotate-6', '-rotate-3', '-rotate-2', '-rotate-1',
-        'translate-x-0', 'translate-x-1', 'translate-x-2', 'translate-x-3', 'translate-x-4', 'translate-x-5', 'translate-x-6', 'translate-x-8', 'translate-x-10', 'translate-x-12', 'translate-x-16', 'translate-x-20', 'translate-x-24',
-        'translate-y-0', 'translate-y-1', 'translate-y-2', 'translate-y-3', 'translate-y-4', 'translate-y-5', 'translate-y-6', 'translate-y-8', 'translate-y-10', 'translate-y-12', 'translate-y-16', 'translate-y-20', 'translate-y-24',
-        'skew-x-0', 'skew-x-1', 'skew-x-2', 'skew-x-3', 'skew-x-6', 'skew-x-12', 'skew-y-0', 'skew-y-1', 'skew-y-2', 'skew-y-3', 'skew-y-6', 'skew-y-12',
-        
-        // Max-width responsive classes
-        'max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'max-w-xl', 'max-w-2xl', 'max-w-3xl', 'max-w-4xl', 'max-w-5xl', 'max-w-6xl', 'max-w-7xl',
-        'max-w-full', 'max-w-fit', 'max-w-min', 'max-w-max', 'max-w-prose', 'max-w-screen-sm', 'max-w-screen-md', 'max-w-screen-lg', 'max-w-screen-xl', 'max-w-screen-2xl',
-        // Responsive max-width classes
-        'sm:max-w-xs', 'sm:max-w-sm', 'sm:max-w-md', 'sm:max-w-lg', 'sm:max-w-xl', 'sm:max-w-2xl', 'sm:max-w-3xl', 'sm:max-w-4xl', 'sm:max-w-5xl', 'sm:max-w-6xl', 'sm:max-w-7xl',
-        'sm:max-w-full', 'sm:max-w-fit', 'sm:max-w-min', 'sm:max-w-max', 'sm:max-w-prose', 'sm:max-w-screen-sm', 'sm:max-w-screen-md', 'sm:max-w-screen-lg', 'sm:max-w-screen-xl', 'sm:max-w-screen-2xl',
-        'md:max-w-xs', 'md:max-w-sm', 'md:max-w-md', 'md:max-w-lg', 'md:max-w-xl', 'md:max-w-2xl', 'md:max-w-3xl', 'md:max-w-4xl', 'md:max-w-5xl', 'md:max-w-6xl', 'md:max-w-7xl',
-        'md:max-w-full', 'md:max-w-fit', 'md:max-w-min', 'md:max-w-max', 'md:max-w-prose', 'md:max-w-screen-sm', 'md:max-w-screen-md', 'md:max-w-screen-lg', 'md:max-w-screen-xl', 'md:max-w-screen-2xl',
-        'lg:max-w-xs', 'lg:max-w-sm', 'lg:max-w-md', 'lg:max-w-lg', 'lg:max-w-xl', 'lg:max-w-2xl', 'lg:max-w-3xl', 'lg:max-w-4xl', 'lg:max-w-5xl', 'lg:max-w-6xl', 'lg:max-w-7xl',
-        'lg:max-w-full', 'lg:max-w-fit', 'lg:max-w-min', 'lg:max-w-max', 'lg:max-w-prose', 'lg:max-w-screen-sm', 'lg:max-w-screen-md', 'lg:max-w-screen-lg', 'lg:max-w-screen-xl', 'lg:max-w-screen-2xl',
-        'xl:max-w-xs', 'xl:max-w-sm', 'xl:max-w-md', 'xl:max-w-lg', 'xl:max-w-xl', 'xl:max-w-2xl', 'xl:max-w-3xl', 'xl:max-w-4xl', 'xl:max-w-5xl', 'xl:max-w-6xl', 'xl:max-w-7xl',
-        'xl:max-w-full', 'xl:max-w-fit', 'xl:max-w-min', 'xl:max-w-max', 'xl:max-w-prose', 'xl:max-w-screen-sm', 'xl:max-w-screen-md', 'xl:max-w-screen-lg', 'xl:max-w-screen-xl', 'xl:max-w-screen-2xl',
-        '2xl:max-w-xs', '2xl:max-w-sm', '2xl:max-w-md', '2xl:max-w-lg', '2xl:max-w-xl', '2xl:max-w-2xl', '2xl:max-w-3xl', '2xl:max-w-4xl', '2xl:max-w-5xl', '2xl:max-w-6xl', '2xl:max-w-7xl',
-        '2xl:max-w-full', '2xl:max-w-fit', '2xl:max-w-min', '2xl:max-w-max', '2xl:max-w-prose', '2xl:max-w-screen-sm', '2xl:max-w-screen-md', '2xl:max-w-screen-lg', '2xl:max-w-screen-xl', '2xl:max-w-screen-2xl',
-        
-        // Responsive display and flexbox classes
-        'sm:flex', 'sm:inline-flex', 'sm:block', 'sm:inline-block', 'sm:hidden', 'sm:grid',
-        'md:flex', 'md:inline-flex', 'md:block', 'md:inline-block', 'md:hidden', 'md:grid',
-        'lg:flex', 'lg:inline-flex', 'lg:block', 'lg:inline-block', 'lg:hidden', 'lg:grid',
-        'xl:flex', 'xl:inline-flex', 'xl:block', 'xl:inline-block', 'xl:hidden', 'xl:grid',
-        '2xl:flex', '2xl:inline-flex', '2xl:block', '2xl:inline-block', '2xl:hidden', '2xl:grid',
-        'sm:flex-row', 'sm:flex-col', 'sm:justify-center', 'sm:justify-between', 'sm:items-center',
-        'md:flex-row', 'md:flex-col', 'md:justify-center', 'md:justify-between', 'md:items-center',
-        'lg:flex-row', 'lg:flex-col', 'lg:justify-center', 'lg:justify-between', 'lg:items-center',
-        
-        // Responsive grid classes
-        'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3', 'sm:grid-cols-4', 'sm:grid-cols-5', 'sm:grid-cols-6', 'sm:grid-cols-7', 'sm:grid-cols-8', 'sm:grid-cols-9', 'sm:grid-cols-10', 'sm:grid-cols-11', 'sm:grid-cols-12',
-        'md:grid-cols-1', 'md:grid-cols-2', 'md:grid-cols-3', 'md:grid-cols-4', 'md:grid-cols-5', 'md:grid-cols-6', 'md:grid-cols-7', 'md:grid-cols-8', 'md:grid-cols-9', 'md:grid-cols-10', 'md:grid-cols-11', 'md:grid-cols-12',
-        'lg:grid-cols-1', 'lg:grid-cols-2', 'lg:grid-cols-3', 'lg:grid-cols-4', 'lg:grid-cols-5', 'lg:grid-cols-6', 'lg:grid-cols-7', 'lg:grid-cols-8', 'lg:grid-cols-9', 'lg:grid-cols-10', 'lg:grid-cols-11', 'lg:grid-cols-12',
-        'xl:grid-cols-1', 'xl:grid-cols-2', 'xl:grid-cols-3', 'xl:grid-cols-4', 'xl:grid-cols-5', 'xl:grid-cols-6', 'xl:grid-cols-7', 'xl:grid-cols-8', 'xl:grid-cols-9', 'xl:grid-cols-10', 'xl:grid-cols-11', 'xl:grid-cols-12',
-        '2xl:grid-cols-1', '2xl:grid-cols-2', '2xl:grid-cols-3', '2xl:grid-cols-4', '2xl:grid-cols-5', '2xl:grid-cols-6', '2xl:grid-cols-7', '2xl:grid-cols-8', '2xl:grid-cols-9', '2xl:grid-cols-10', '2xl:grid-cols-11', '2xl:grid-cols-12',
-        
-        // Responsive typography
-        'sm:text-xs', 'sm:text-sm', 'sm:text-base', 'sm:text-lg', 'sm:text-xl', 'sm:text-2xl', 'sm:text-3xl', 'sm:text-4xl',
-        'md:text-xs', 'md:text-sm', 'md:text-base', 'md:text-lg', 'md:text-xl', 'md:text-2xl', 'md:text-3xl', 'md:text-4xl',
-        'lg:text-xs', 'lg:text-sm', 'lg:text-base', 'lg:text-lg', 'lg:text-xl', 'lg:text-2xl', 'lg:text-3xl', 'lg:text-4xl',
-        
-        // Responsive spacing (most common ones)
-        'sm:p-0', 'sm:p-1', 'sm:p-2', 'sm:p-4', 'sm:p-6', 'sm:p-8', 'sm:px-4', 'sm:py-2', 'sm:m-0', 'sm:m-2', 'sm:m-4', 'sm:mx-auto',
-        'md:p-0', 'md:p-1', 'md:p-2', 'md:p-4', 'md:p-6', 'md:p-8', 'md:px-4', 'md:py-2', 'md:m-0', 'md:m-2', 'md:m-4', 'md:mx-auto',
-        'lg:p-0', 'lg:p-1', 'lg:p-2', 'lg:p-4', 'lg:p-6', 'lg:p-8', 'lg:px-4', 'lg:py-2', 'lg:m-0', 'lg:m-2', 'lg:m-4', 'lg:mx-auto',
-        
-        // Responsive width/height
-        'sm:w-full', 'sm:w-auto', 'sm:w-1/2', 'sm:w-1/3', 'sm:w-2/3', 'sm:w-1/4', 'sm:w-3/4',
-        'md:w-full', 'md:w-auto', 'md:w-1/2', 'md:w-1/3', 'md:w-2/3', 'md:w-1/4', 'md:w-3/4',
-        'lg:w-full', 'lg:w-auto', 'lg:w-1/2', 'lg:w-1/3', 'lg:w-2/3', 'lg:w-1/4', 'lg:w-3/4',
-        
-        // Comprehensive responsive utilities
-        'sm:space-x-0', 'sm:space-x-1', 'sm:space-x-2', 'sm:space-x-3', 'sm:space-x-4', 'sm:space-x-6', 'sm:space-x-8',
-        'md:space-x-0', 'md:space-x-1', 'md:space-x-2', 'md:space-x-3', 'md:space-x-4', 'md:space-x-6', 'md:space-x-8',
-        'lg:space-x-0', 'lg:space-x-1', 'lg:space-x-2', 'lg:space-x-3', 'lg:space-x-4', 'lg:space-x-6', 'lg:space-x-8',
-        'sm:space-y-0', 'sm:space-y-1', 'sm:space-y-2', 'sm:space-y-3', 'sm:space-y-4', 'sm:space-y-6', 'sm:space-y-8',
-        'md:space-y-0', 'md:space-y-1', 'md:space-y-2', 'md:space-y-3', 'md:space-y-4', 'md:space-y-6', 'md:space-y-8',
-        'lg:space-y-0', 'lg:space-y-1', 'lg:space-y-2', 'lg:space-y-3', 'lg:space-y-4', 'lg:space-y-6', 'lg:space-y-8',
-        
-        // Responsive gap utilities
-        'sm:gap-0', 'sm:gap-1', 'sm:gap-2', 'sm:gap-3', 'sm:gap-4', 'sm:gap-5', 'sm:gap-6', 'sm:gap-8', 'sm:gap-10', 'sm:gap-12',
-        'md:gap-0', 'md:gap-1', 'md:gap-2', 'md:gap-3', 'md:gap-4', 'md:gap-5', 'md:gap-6', 'md:gap-8', 'md:gap-10', 'md:gap-12',
-        'lg:gap-0', 'lg:gap-1', 'lg:gap-2', 'lg:gap-3', 'lg:gap-4', 'lg:gap-5', 'lg:gap-6', 'lg:gap-8', 'lg:gap-10', 'lg:gap-12',
-        
-        // Responsive positioning
-        'sm:relative', 'sm:absolute', 'sm:fixed', 'sm:sticky', 'sm:static',
-        'md:relative', 'md:absolute', 'md:fixed', 'md:sticky', 'md:static',
-        'lg:relative', 'lg:absolute', 'lg:fixed', 'lg:sticky', 'lg:static',
-        
-        // Responsive overflow
-        'sm:overflow-hidden', 'sm:overflow-visible', 'sm:overflow-auto', 'sm:overflow-scroll',
-        'md:overflow-hidden', 'md:overflow-visible', 'md:overflow-auto', 'md:overflow-scroll',
-        'lg:overflow-hidden', 'lg:overflow-visible', 'lg:overflow-auto', 'lg:overflow-scroll',
-        
-        // All aspect ratio utilities
-        'aspect-auto', 'aspect-square', 'aspect-video',
-        'aspect-[1/1]', 'aspect-[16/9]', 'aspect-[4/3]', 'aspect-[3/2]', 'aspect-[2/3]', 'aspect-[9/16]',
-        
-        // Odd/even table row classes
-        'even:bg-gray-50', 'odd:bg-white', 'even:bg-gray-100', 'odd:bg-gray-50',
-        'dark:even:bg-gray-700', 'dark:odd:bg-gray-800', 'dark:even:bg-gray-600', 'dark:odd:bg-gray-700',
-        'hover:bg-gray-100', 'dark:hover:bg-gray-600', 'transition-colors', 'duration-150',
-        
-        // Toggle switch essential classes
-        'peer', 'peer-focus:ring-4', 'peer-checked:after:translate-x-full', 'peer-checked:after:border-white',
-        'after:content-[""]', 'after:absolute', 'after:top-0.5', 'after:left-[2px]', 'after:bg-white',
-        'after:border-gray-300', 'after:border', 'after:rounded-full', 'after:h-5', 'after:w-5', 'after:transition-all',
-        
-        // Checkbox selection state classes - generated for all theme colors
-        ...['sky', 'cyan', 'emerald', 'teal', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'green', 'pink', 'red', 'rose', 'orange', 'yellow', 'amber', 'lime', 'gray', 'slate', 'stone'].flatMap(color => [
-            `has-[:checked]:bg-${color}-500`,
-            `has-[:checked]:text-white`, 
-            `dark:has-[:checked]:bg-${color}-600`,
-            `dark:has-[:checked]:text-white`,
-            `focus:bg-${color}-500`,
-            `focus:text-white`,
-            `dark:focus:bg-${color}-600`,
-            `dark:focus:text-white`,
-            // Toggle/peer-checked classes
-            `peer-checked:bg-${color}-500`,
-            `peer-checked:bg-${color}-600`,
-            `dark:peer-checked:bg-${color}-500`,
-            `dark:peer-checked:bg-${color}-600`,
-            `peer-focus:ring-${color}-300`,
-            `peer-focus:ring-${color}-400`,
-            `dark:peer-focus:ring-${color}-800`,
-            `dark:peer-focus:ring-${color}-900`
-        ]),
-        
-        // Generate all theme colors - this approach ensures all dynamic classes are included
-        ...['sky', 'cyan', 'emerald', 'teal', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'green', 'pink', 'red', 'rose', 'orange', 'yellow', 'amber', 'lime', 'gray', 'slate', 'stone'].flatMap(color => 
-            ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'].flatMap(shade => [
-                // Basic color classes
-                `bg-${color}-${shade}`,
-                `text-${color}-${shade}`,
-                `border-${color}-${shade}`,
-                `ring-${color}-${shade}`,
-                `from-${color}-${shade}`,
-                `to-${color}-${shade}`,
-                `stroke-${color}-${shade}`,
-                `fill-${color}-${shade}`,
-                // Hover states
-                `hover:bg-${color}-${shade}`,
-                `hover:text-${color}-${shade}`,  
-                `hover:border-${color}-${shade}`,
-                `hover:from-${color}-${shade}`,
-                `hover:to-${color}-${shade}`,
-                `hover:stroke-${color}-${shade}`,
-                `hover:fill-${color}-${shade}`,
-                // Dark mode
-                `dark:bg-${color}-${shade}`,
-                `dark:text-${color}-${shade}`,
-                `dark:border-${color}-${shade}`,
-                `dark:ring-${color}-${shade}`,
-                `dark:stroke-${color}-${shade}`,
-                `dark:fill-${color}-${shade}`,
-                // Dark mode hover
-                `dark:hover:bg-${color}-${shade}`,
-                `dark:hover:text-${color}-${shade}`,
-                `dark:hover:border-${color}-${shade}`,
-                `dark:hover:stroke-${color}-${shade}`,
-                `dark:hover:fill-${color}-${shade}`,
-                // Focus states
-                `focus:ring-${color}-${shade}`,
-                `focus:border-${color}-${shade}`,
-                `focus:stroke-${color}-${shade}`,
-                `focus:fill-${color}-${shade}`,
-                // Dark focus states
-                `dark:focus:ring-${color}-${shade}`,
-                `dark:focus:border-${color}-${shade}`,
-                `dark:focus:stroke-${color}-${shade}`,
-                `dark:focus:fill-${color}-${shade}`,
-                // Peer focus states
-                `peer-focus:bg-${color}-${shade}`,
-                `peer-focus:text-${color}-${shade}`,
-                `peer-focus:border-${color}-${shade}`,
-                `peer-focus:ring-${color}-${shade}`,
-                `peer-focus:stroke-${color}-${shade}`,
-                `peer-focus:fill-${color}-${shade}`,
-                // Dark peer focus states
-                `dark:peer-focus:bg-${color}-${shade}`,
-                `dark:peer-focus:text-${color}-${shade}`,
-                `dark:peer-focus:border-${color}-${shade}`,
-                `dark:peer-focus:ring-${color}-${shade}`,
-                `dark:peer-focus:stroke-${color}-${shade}`,
-                `dark:peer-focus:fill-${color}-${shade}`
-            ])
-        )
-    ],
+  // Dynamic color-based classes (ALL shades including 50, 400, 500, 600, 800, 900)
+  {
+    pattern: /^(bg|text|border|ring|from|to|via|fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900)$/,
+    variants: ['hover', 'focus', 'active', 'dark', 'group-hover'],
+  },
+
+  // Opacity variations for colors
+  {
+    pattern: /^(bg|text|border|ring)-opacity-(0|5|10|20|25|30|40|50|60|70|75|80|90|95|100)$/,
+    variants: ['hover', 'focus', 'dark'],
+  },
+
+  // Comprehensive spacing and sizing
+  {
+    pattern: /^(w|h|min-w|min-h|max-w|max-h)-(\d+|px|auto|full|screen|min|max|fit)$/,
+    variants: ['sm', 'md', 'lg', 'xl', '2xl'],
+  },
+  {
+    pattern: /^(p|px|py|pl|pr|pt|pb|m|mx|my|ml|mr|mt|mb)-(\d+|px|auto)$/,
+    variants: ['sm', 'md', 'lg', 'xl', '2xl'],
+  },
+
+  // Layout and positioning
+  {
+    pattern: /^(relative|absolute|fixed|sticky|static|inset-\d+|inset-x-\d+|inset-y-\d+|top-\d+|right-\d+|bottom-\d+|left-\d+|-top-\d+|-right-\d+|-bottom-\d+|-left-\d+|inset-0|inset-px)$/,
+  },
+
+  // Flexbox and grid (comprehensive)
+  {
+    pattern: /^(flex|inline-flex|grid|inline-grid|flex-1|flex-auto|flex-initial|flex-none|flex-row|flex-col|flex-wrap|flex-nowrap|items-start|items-end|items-center|items-baseline|items-stretch|justify-start|justify-end|justify-center|justify-between|justify-around|justify-evenly|content-start|content-end|content-center|content-between|content-around|content-evenly)$/,
+    variants: ['sm', 'md', 'lg', 'xl', '2xl'],
+  },
+  {
+    pattern: /^(grid-cols-(\d+|none)|col-span-(\d+|full)|gap-(\d+|x-\d+|y-\d+)|space-(x|y)-(\d+|reverse))$/,
+    variants: ['sm', 'md', 'lg', 'xl', '2xl'],
+  },
+
+  // Typography (comprehensive)
+  {
+    pattern: /^(text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)|font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)|leading-(none|tight|snug|normal|relaxed|loose|\d+)|tracking-(tighter|tight|normal|wide|wider|widest))$/,
+    variants: ['sm', 'md', 'lg', 'xl', '2xl'],
+  },
+
+  // Display and visibility
+  {
+    pattern: /^(block|inline-block|inline|flex|inline-flex|table|inline-table|table-caption|table-cell|table-column|table-column-group|table-footer-group|table-header-group|table-row-group|table-row|flow-root|grid|inline-grid|contents|list-item|hidden|visible|invisible)$/,
+    variants: ['sm', 'md', 'lg', 'xl', '2xl'],
+  },
+
+  // Borders and rounded corners
+  {
+    pattern: /^(rounded|rounded-(t|r|b|l|tl|tr|br|bl)|border|border-(t|r|b|l|x|y))-(none|sm|md|lg|xl|2xl|3xl|full|\d+)$/,
+    variants: ['hover', 'focus'],
+  },
+
+  // Shadows and effects
+  {
+    pattern: /^(shadow|shadow-(sm|md|lg|xl|2xl|inner|none)|opacity-(\d+|0|5|10|20|25|30|40|50|60|70|75|80|90|95|100))$/,
+    variants: ['hover', 'focus', 'group-hover'],
+  },
+
+  // Transform and animation
+  {
+    pattern: /^(transform|transform-none|scale-(\d+|0|50|75|90|95|100|105|110|125|150)|rotate-(\d+|0|1|2|3|6|12|45|90|180)|-rotate-(\d+|1|2|3|6|12|45|90|180)|translate-(x|y)-(\d+|0|1|2|3|4|5|6|8|10|12|16|20|24)|-translate-(x|y)-(\d+|1|2|3|4|5|6|8|10|12|16|20|24))$/,
+    variants: ['hover', 'focus', 'group-hover'],
+  },
+
+  // Transitions and duration
+  {
+    pattern: /^(transition|transition-(none|all|colors|opacity|shadow|transform)|duration-(\d+|75|100|150|200|300|500|700|1000)|ease-(linear|in|out|in-out))$/,
+  },
+
+  // Backdrop filters
+  {
+    pattern: /^(backdrop-filter|backdrop-filter-none|backdrop-blur|backdrop-blur-(none|sm|md|lg|xl|2xl|3xl)|backdrop-brightness-(\d+|0|50|75|90|95|100|105|110|125|150|200)|backdrop-contrast-(\d+|0|50|75|100|125|150|200)|backdrop-grayscale|backdrop-grayscale-0|backdrop-hue-rotate-(\d+|0|15|30|60|90|180)|backdrop-invert|backdrop-invert-0|backdrop-opacity-(\d+|0|5|10|20|25|30|40|50|60|70|75|80|90|95|100)|backdrop-saturate-(\d+|0|50|100|150|200)|backdrop-sepia|backdrop-sepia-0)$/,
+  },
+
+  // Special utility classes
+  {
+    pattern: /^(truncate|text-ellipsis|text-clip|break-words|break-all|whitespace-(normal|nowrap|pre|pre-line|pre-wrap)|select-(none|text|all|auto)|pointer-events-(none|auto)|resize|resize-(none|y|x)|cursor-(auto|default|pointer|wait|text|move|help|not-allowed)|outline-(none|white|black|\d+)|ring-(\d+|inset)|ring-offset-\d+|appearance-none|list-(none|disc|decimal)|sr-only|not-sr-only|overflow-(auto|hidden|visible|scroll)|overflow-(x|y)-(auto|hidden|visible|scroll))$/,
+    variants: ['hover', 'focus', 'active'],
+  },
+
+  // Layout and screen classes
+  'min-h-screen', 'max-w-7xl', 'max-w-2xl', 'mx-auto', 'text-center',
+  
+  // All possible theme color combinations (for dynamic PHP theme generation)
+  // Blue theme classes
+  'bg-blue-50', 'bg-blue-100', 'bg-blue-400', 'bg-blue-500', 'bg-blue-600', 'bg-blue-700', 'bg-blue-800', 'bg-blue-900',
+  'text-blue-400', 'text-blue-500', 'text-blue-600', 'text-blue-700',
+  'border-blue-400', 'border-blue-500', 'border-blue-600',
+  'from-blue-400', 'from-blue-500', 'from-blue-600', 'to-blue-400', 'to-blue-500', 'to-blue-600', 'to-blue-700',
+  'hover:bg-blue-500', 'hover:bg-blue-600', 'hover:bg-blue-700', 'hover:from-blue-600', 'hover:from-blue-700', 'hover:to-blue-700', 'hover:to-blue-800',
+  'hover:border-blue-400', 'hover:border-blue-500', 'hover:text-blue-500', 'hover:text-blue-400',
+  'dark:bg-blue-600', 'dark:bg-blue-700', 'dark:bg-blue-800', 'dark:bg-blue-900',
+  'dark:text-blue-400', 'dark:text-blue-500',
+  'dark:from-blue-400', 'dark:from-blue-500', 'dark:from-blue-600', 'dark:to-blue-400', 'dark:to-blue-500', 'dark:to-blue-600',
+  'dark:hover:bg-blue-600', 'dark:hover:bg-blue-700', 'dark:hover:from-blue-700', 'dark:hover:to-blue-700',
+  'dark:hover:border-blue-500', 'dark:hover:text-blue-400',
+  'dark:group-hover:bg-blue-900', 'dark:group-hover:text-blue-400', 'group-hover:bg-blue-100', 'group-hover:text-blue-500',
+  
+  // Green theme classes  
+  'bg-green-50', 'bg-green-100', 'bg-green-400', 'bg-green-500', 'bg-green-600', 'bg-green-700', 'bg-green-800', 'bg-green-900',
+  'text-green-400', 'text-green-500', 'text-green-600', 'text-green-700', 'text-green-800',
+  'border-green-400', 'border-green-500', 'border-green-600',
+  'from-green-400', 'from-green-500', 'from-green-600', 'to-green-400', 'to-green-500', 'to-green-600', 'to-green-700',
+  'hover:bg-green-500', 'hover:bg-green-600', 'hover:bg-green-700', 'hover:from-green-600', 'hover:from-green-700', 'hover:to-green-700', 'hover:to-green-800',
+  'hover:border-green-400', 'hover:border-green-500', 'hover:text-green-500', 'hover:text-green-400',
+  'dark:bg-green-600', 'dark:bg-green-700', 'dark:bg-green-800', 'dark:bg-green-900', 'dark:bg-green-900/30',
+  'dark:text-green-400', 'dark:text-green-500',
+  'dark:from-green-400', 'dark:from-green-500', 'dark:from-green-600', 'dark:to-green-400', 'dark:to-green-500', 'dark:to-green-600',
+  'dark:hover:bg-green-600', 'dark:hover:bg-green-700', 'dark:hover:from-green-700', 'dark:hover:to-green-700',
+  'dark:hover:border-green-500', 'dark:hover:text-green-400',
+  'dark:group-hover:bg-green-900', 'dark:group-hover:text-green-400', 'group-hover:bg-green-100', 'group-hover:text-green-500',
+  
+  // Red theme classes
+  'bg-red-50', 'bg-red-100', 'bg-red-400', 'bg-red-500', 'bg-red-600', 'bg-red-700', 'bg-red-800', 'bg-red-900',
+  'text-red-400', 'text-red-500', 'text-red-600', 'text-red-700', 'text-red-800',
+  'border-red-200', 'border-red-400', 'border-red-500', 'border-red-600', 'border-red-800',
+  'from-red-400', 'from-red-500', 'from-red-600', 'to-red-400', 'to-red-500', 'to-red-600', 'to-red-700',
+  'hover:bg-red-100', 'hover:bg-red-500', 'hover:bg-red-600', 'hover:bg-red-700', 'hover:from-red-600', 'hover:from-red-700', 'hover:to-red-700', 'hover:to-red-800',
+  'hover:border-red-400', 'hover:border-red-500', 'hover:text-red-500', 'hover:text-red-400',
+  'dark:bg-red-600', 'dark:bg-red-700', 'dark:bg-red-800', 'dark:bg-red-900', 'dark:bg-red-900/20', 'dark:bg-red-900/30',
+  'dark:text-red-400', 'dark:text-red-500', 'dark:border-red-800',
+  'dark:from-red-400', 'dark:from-red-500', 'dark:from-red-600', 'dark:to-red-400', 'dark:to-red-500', 'dark:to-red-600',
+  'dark:hover:bg-red-600', 'dark:hover:bg-red-700', 'dark:hover:bg-red-900/30', 'dark:hover:from-red-700', 'dark:hover:to-red-700',
+  'dark:hover:border-red-500', 'dark:hover:text-red-400',
+  'dark:group-hover:bg-red-900', 'dark:group-hover:text-red-400', 'group-hover:bg-red-100', 'group-hover:text-red-500',
+  
+  // Purple theme classes
+  'bg-purple-50', 'bg-purple-100', 'bg-purple-400', 'bg-purple-500', 'bg-purple-600', 'bg-purple-700', 'bg-purple-800', 'bg-purple-900',
+  'text-purple-400', 'text-purple-500', 'text-purple-600', 'text-purple-700',
+  'border-purple-400', 'border-purple-500', 'border-purple-600',
+  'from-purple-400', 'from-purple-500', 'from-purple-600', 'to-purple-400', 'to-purple-500', 'to-purple-600', 'to-purple-700',
+  'hover:bg-purple-500', 'hover:bg-purple-600', 'hover:bg-purple-700', 'hover:from-purple-600', 'hover:from-purple-700', 'hover:to-purple-700', 'hover:to-purple-800',
+  'hover:border-purple-400', 'hover:border-purple-500', 'hover:text-purple-500', 'hover:text-purple-400',
+  'dark:bg-purple-600', 'dark:bg-purple-700', 'dark:bg-purple-800', 'dark:bg-purple-900',
+  'dark:text-purple-400', 'dark:text-purple-500',
+  'dark:from-purple-400', 'dark:from-purple-500', 'dark:from-purple-600', 'dark:to-purple-400', 'dark:to-purple-500', 'dark:to-purple-600',
+  'dark:hover:bg-purple-600', 'dark:hover:bg-purple-700', 'dark:hover:from-purple-700', 'dark:hover:to-purple-700',
+  'dark:hover:border-purple-500', 'dark:hover:text-purple-400',
+  'dark:group-hover:bg-purple-900', 'dark:group-hover:text-purple-400', 'group-hover:bg-purple-100', 'group-hover:text-purple-500',
+
+  // Amber/Yellow theme classes
+  'bg-amber-50', 'bg-amber-100', 'bg-amber-400', 'bg-amber-500', 'bg-amber-600', 'bg-amber-700', 'bg-amber-800', 'bg-amber-900',
+  'text-amber-400', 'text-amber-500', 'text-amber-600', 'text-amber-700',
+  'border-amber-400', 'border-amber-500', 'border-amber-600',
+  'from-amber-400', 'from-amber-500', 'from-amber-600', 'to-amber-400', 'to-amber-500', 'to-amber-600', 'to-amber-700',
+  'hover:bg-amber-500', 'hover:bg-amber-600', 'hover:bg-amber-700', 'hover:from-amber-600', 'hover:from-amber-700', 'hover:to-amber-700', 'hover:to-amber-800',
+  'hover:border-amber-400', 'hover:border-amber-500', 'hover:text-amber-500', 'hover:text-amber-400',
+  'dark:bg-amber-600', 'dark:bg-amber-700', 'dark:bg-amber-800', 'dark:bg-amber-900',
+  'dark:text-amber-400', 'dark:text-amber-500',
+  'dark:from-amber-400', 'dark:from-amber-500', 'dark:from-amber-600', 'dark:to-amber-400', 'dark:to-amber-500', 'dark:to-amber-600',
+  'dark:hover:bg-amber-600', 'dark:hover:bg-amber-700', 'dark:hover:from-amber-700', 'dark:hover:to-amber-700',
+  'dark:hover:border-amber-500', 'dark:hover:text-amber-400',
+  'dark:group-hover:bg-amber-900', 'dark:group-hover:text-amber-400', 'group-hover:bg-amber-100', 'group-hover:text-amber-500',
+
+  // Specific utility classes used in the file  
+  'group', 'relative', 'absolute', 'inset-0', 'flex-1', 'min-w-0', 'truncate', 'font-mono', 'inline-flex', 'mr-1', 'mr-2',
+  'transition-transform', 'transition-colors', 'duration-200', 'duration-300', 'group-hover:scale-110', 'group-hover:text-gray-700',
+  'dark:group-hover:text-gray-300', 'backdrop-filter', 'backdrop-blur-sm', 'ring-opacity-50', 'dark:ring-opacity-50',
+  'text-gray-400', 'text-gray-500', 'text-gray-600', 'text-gray-700', 'text-gray-900',
+  'dark:text-gray-400', 'dark:text-gray-500', 'dark:text-gray-300', 'dark:text-white',
+  'bg-gray-50', 'bg-gray-100', 'bg-gray-700', 'bg-gray-800', 'bg-gray-900',
+  'dark:bg-gray-700', 'dark:bg-gray-800', 'dark:bg-gray-900',
+  'hover:text-gray-100', 'hover:text-gray-900', 'dark:text-gray-200', 
+  'border-gray-100', 'border-gray-200', 'border-gray-300', 'border-gray-600', 'border-gray-700',
+  'dark:border-gray-600', 'dark:border-gray-700',
+  'space-x-4', 'space-x-2', 'space-y-3', 'mb-4', 'mb-6', 'mb-8', 'mb-12', 'mt-1',
+  'w-3', 'w-4', 'w-5', 'w-6', 'w-12', 'w-16', 'w-20', 'w-24',
+  'h-2', 'h-3', 'h-4', 'h-5', 'h-6', 'h-12', 'h-16', 'h-20', 'h-24',
+  'p-3', 'p-6', 'px-2', 'px-3', 'px-6', 'px-8', 'py-1', 'py-2', 'py-3', 'py-8', 'py-16',
+  'ring-2', 'ring-white', 'dark:ring-gray-600', 'ring-green-500', 'ring-red-500', 'ring-offset-2',
+  'border-2', 'border-dashed', 'overflow-hidden', 'cursor-pointer', 'cursor-not-allowed',
+  'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-full',
+  'shadow-lg', 'shadow-2xl', 'hover:shadow-xl', 'dark:hover:shadow-2xl',
+  'text-xs', 'text-sm', 'text-lg', 'text-2xl', 'text-4xl',
+  'font-medium', 'font-semibold', 'font-bold',
+  'hover:scale-105', 'hover:-translate-y-1', 'transform', 'transition-all',
+  'bg-clip-text', 'text-transparent', 'bg-gradient-to-r',
+  'sm:px-6', 'lg:px-8', 'sm:grid-cols-2', 'lg:grid-cols-3', 'xl:grid-cols-4',
+  'grid', 'grid-cols-1', 'gap-6', 'inline', 'fill', 'stroke',
+]
+,
     plugins: [
         require('@tailwindcss/typography'),
     ],
