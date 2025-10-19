@@ -15,7 +15,7 @@ class AGGrid
     private bool $enableDelete = false;
     private bool $enableSelection = false;
     private string $dbTable = '';
-    private string $theme = 'blue';
+    private string $theme = COLOR_SCHEME;
 
     public function __construct(string $gridId = '')
     {
@@ -109,7 +109,7 @@ class AGGrid
     public static function fromDBTable(
         string $dbTable, 
         ?string $title = null, 
-        string $theme = 'blue', 
+        string $theme = COLOR_SCHEME, 
         bool $edit = true, 
         bool $delete = true, 
         string $orderBy = 'id', 
@@ -170,7 +170,7 @@ class AGGrid
     /**
      * Static factory method similar to DataGrid::fromData
      */
-    public static function fromData(?string $title, array $data, string $theme = 'blue'): string
+    public static function fromData(?string $title, array $data, string $theme = COLOR_SCHEME): string
     {
         if (empty($data)) {
             $noResultsText = ($title) ? 'No results for "' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '"' : 'No results found';

@@ -221,7 +221,7 @@ class SystemConfig
         // Load WAF settings from JSON file
         $jsonSettingsPath = ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'system-settings.json';
         if (!file_exists($jsonSettingsPath)) {
-            die('JSON settings file is missing. Please create config/settings.json');
+            die('JSON settings file is missing. Please create ' . $jsonSettingsPath);
         }
 
         $jsonSettingsContent = file_get_contents($jsonSettingsPath);
@@ -232,7 +232,11 @@ class SystemConfig
         }
 
         // Define WAF-related constants with defaults if not set
-        define('AUTH_EXPIRY', $jsonSettings['auth_expiry']['value'] ?? die('auth_expiry must be set in config/settings.json'));
+        define('AUTH_EXPIRY', $jsonSettings['auth_expiry']['value'] ?? die('auth_expiry must be set in ' . $jsonSettingsPath));
+        define('DEFAULT_DATA_GRID_ENGINE', $jsonSettings['default_data_grid_engine']['value'] ?? die('default_data_grid_engine must be set in ' . $jsonSettingsPath));
+        if (!in_array(DEFAULT_DATA_GRID_ENGINE, ['AGGrid', 'DataGrid'], true)) {
+            die('default_data_grid_engine must be either "AGGrid", "DataGrid" in ' . $jsonSettingsPath);
+        }
     }
     
     private static function defineAuthConstants(): void

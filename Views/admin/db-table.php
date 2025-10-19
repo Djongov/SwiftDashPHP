@@ -43,15 +43,12 @@ echo '</form>';
 
 if (isset($_GET['table']) && in_array($_GET['table'], $dbTables)) {
     $tableName = $_GET['table'];
-    echo Components\AGGrid::fromDBTable(
+    $engine = DEFAULT_DATA_GRID_ENGINE;
+    echo "\Components\\$engine"::fromDBTable(
         $tableName,           // table name
         $tableName, // title
         $theme,           // theme
         true,             // enable edit
-        true,             // enable delete
-        'id',             // order by column
-        'desc',           // sort direction
-        1000000              // limit
+        true
     );
-    //echo DataGrid::fromDBTable($tableName, $tableName, $theme);
 }
