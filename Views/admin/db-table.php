@@ -43,6 +43,15 @@ echo '</form>';
 
 if (isset($_GET['table']) && in_array($_GET['table'], $dbTables)) {
     $tableName = $_GET['table'];
-    
-    echo DataGrid::fromDBTable($tableName, $tableName, $theme);
+    echo Components\AGGrid::fromDBTable(
+        $tableName,           // table name
+        $tableName, // title
+        $theme,           // theme
+        true,             // enable edit
+        true,             // enable delete
+        'id',             // order by column
+        'desc',           // sort direction
+        1000000              // limit
+    );
+    //echo DataGrid::fromDBTable($tableName, $tableName, $theme);
 }

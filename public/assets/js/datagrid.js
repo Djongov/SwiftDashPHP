@@ -9,13 +9,15 @@ REFACTORED STRUCTURE:
 - Perfect for tables loaded via fetch/AJAX - just call initializeDataGridActions(tableId) after loading
 
 Main functions:
-- initializeEditButtons(tableId): Initialize edit button functionality
+- initializeDataGridEditButtons(tableId): Initialize edit button functionality
 - initializeCheckboxes(tableId): Initialize checkbox functionality  
 - initializeMassDelete(tableId): Initialize mass delete functionality
-- initializeDeleteButtons(tableId): Initialize individual delete buttons
+- initializeDataGridDeleteButtons(tableId): Call main.js delete button initialization
 - initializeSelectAll(tableId): Initialize select all functionality
 - initializeDataGridActions(tableId): Initialize ALL actions for a table
 - initializeAllDataGrids(): Initialize all existing DataGrid tables
+
+Note: Delete button functionality is handled by main.js initializeDeleteButtons() function
 
 */
 
@@ -43,7 +45,7 @@ const updateFilteredResults = (tableId, newValue) => {
 }
 
 // Main function to initialize edit button functionality
-const initializeEditButtons = (tableId) => {
+const initializeDataGridEditButtons = (tableId) => {
     const editButtons = document.querySelectorAll(`#${tableId} button.edit`);
 
     if (editButtons.length > 0) {
@@ -275,95 +277,15 @@ const initializeMassDelete = (tableId) => {
     }
 }
 
-// Initialize individual delete buttons
-const initializeDeleteButtons = (tableId) => {
-    let totalResults = document.getElementById(tableId + '-total');
-    const deleteButtons = document.querySelectorAll(`#${tableId} > tbody > tr > td > button.delete`);
-
-    if (deleteButtons.length > 0) {
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                // insert the modal after the table
-                let modal = deleteModal(tableId, `Delete entry with id <b>${event.target.dataset.id}</b> in table <b>${event.target.dataset.table}</b>?`);
-                // Insert the modal at the bottom of the first div after the body
-                document.body.insertBefore(modal, document.body.firstChild);
-                // Now show the modal
-                modal.classList.remove('hidden');
-                // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
-                document.body.classList.add('overflow-hidden');
-                // Blur the body excluding the modal
-                toggleBlur(modal);
-                // First, the close button
-                const closeXButton = document.getElementById(`${tableId}-x-button`);
-                // The cancel button
-                const cancelButton = document.getElementById(`${tableId}-close-button`);
-                const cancelButtonsArray = [closeXButton, cancelButton];
-                cancelButtonsArray.forEach(cancelButton => {
-                    cancelButton.addEventListener('click', () => {
-                        // Completely remove the modal
-                        modal.remove();
-                        // Return the overflow of the body
-                        document.body.classList.remove('overflow-hidden');
-                        // Remove the blur by toggling the blur class
-                        toggleBlur(modal);
-                    })
-                })
-                const deleteModalButton = document.getElementById(`${tableId}-delete`);
-                let modalBody = document.getElementById(`${tableId}-body`);
-                let responseStatus = 0;
-                deleteModalButton.addEventListener('click', () => {
-                    // transform the button text to a loader
-                    deleteModalButton.innerHTML = loaderString();
-                    // Build the body of the delete request
-                    const formData = new URLSearchParams();
-                    formData.append('id', event.target.dataset.id);
-                    formData.append('table', event.target.dataset.table);
-                    formData.append('csrf_token', event.target.dataset.csrf);
-                    fetch('/api/datagrid/delete-records', {
-                        method: 'POST',
-                        headers: {
-                            'secretHeader': 'badass',
-                            'X-CSRF-TOKEN': event.target.dataset.csrf
-                        },
-                        body: formData,
-                        redirect: 'manual'
-                    }).then(response => {
-                        responseStatus = response.status;
-                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                            modalBody.innerHTML = `<p class="text-red-500 font-semibold">${json.data}</p>`;
-                            location.reload();
-                        } else {
-                            return response.json()
-                        }
-                    }).then(json => {
-                        // Return the overflow of the body
-                        document.body.classList.remove('overflow-hidden');
-                        // Remove the blur by toggling the blur class
-                        toggleBlur(modal);
-                        if (responseStatus === 200) {
-                            // if we are deleting from a table, Delete the closest row
-                            const closestRow = button.closest('tr');
-                            if (closestRow) {
-                                closestRow.remove();
-                            }
-                            // Decrement the total results
-                            totalResults.innerText = parseInt(totalResults.innerText) - 1;
-                            // Decrease the filtered results if the row is visible
-                            if (closestRow.style.display !== 'none') {
-                                updateFilteredResults(tableId, countVisibleRows(tableId) - 1);
-                            }
-                            // Completely remove the modal
-                            modal.remove();
-                        } else {
-                            deleteModalButton.textContent = 'Retry';
-                            modalBody.innerHTML = `<p class="text-red-500 font-semibold">${json.data}</p>`;
-                        }
-                    }).catch(error => {
-                        console.error('Error during fetch:', error);
-                    })
-                })
-            }, false);
-        });
+// Initialize individual delete buttons - calls main.js functionality
+const initializeDataGridDeleteButtons = (tableId) => {
+    // Call the main.js initializeDeleteButtons function to handle all delete buttons
+    // This will find and initialize all delete buttons with class 'delete-button'
+    // including those in DataGrid tables
+    if (globalThis.initializeDeleteButtons && typeof globalThis.initializeDeleteButtons === 'function') {
+        globalThis.initializeDeleteButtons();
+    } else {
+        console.warn('initializeDeleteButtons function from main.js is not available');
     }
 }
 
@@ -406,10 +328,10 @@ const initializeSelectAll = (tableId, theme = 'blue') => {
 // Initialize all DataGrid functionalities for a specific table
 const initializeDataGridActions = (tableId, theme = 'blue') => {
     updateFilteredResults(tableId, countVisibleRows(tableId));
-    initializeEditButtons(tableId);
+    initializeDataGridEditButtons(tableId);
     initializeCheckboxes(tableId, theme);
     initializeMassDelete(tableId);
-    initializeDeleteButtons(tableId);
+    initializeDataGridDeleteButtons(tableId);
     initializeSelectAll(tableId, theme);
 }
 

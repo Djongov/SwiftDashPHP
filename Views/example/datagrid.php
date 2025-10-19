@@ -187,3 +187,62 @@ echo $agGrid2_option2->render();
 echo '</div>';
 echo '</div>';
 echo '</div>';
+
+
+// Method 1: Using the fluent interface (most flexible)
+$grid = new Components\AGGrid('my-enhanced-grid');
+$grid->setTheme('blue');
+$grid->setColumns(['id', 'name', 'email', 'created_at']);
+$grid->setData([
+    ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'created_at' => '2023-01-01'],
+    ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'created_at' => '2023-01-02'],
+]);
+
+// Enable features
+$grid->enableSelection(true);          // Enable row selection with checkboxes
+$grid->enableEdit(true, 'users');      // Enable edit buttons, specify table for API calls
+$grid->enableDelete(true, 'users');    // Enable delete buttons and mass delete
+
+echo $grid->render();
+
+// Method 2: Using static factory method from database (similar to DataGrid::fromDBTable)
+echo Components\AGGrid::fromDBTable(
+    'users',           // table name
+    'User Management', // title
+    $theme,           // theme
+    true,             // enable edit
+    true,             // enable delete
+    'id',             // order by column
+    'desc',           // sort direction
+    1000              // limit
+);
+
+echo Components\AGGrid::fromDBTable(
+    'cache',           // table name
+    'Cache Management', // title
+    $theme,           // theme
+    true,             // enable edit
+    true,             // enable delete
+    'id',             // order by column
+    'desc',           // sort direction
+    1000              // limit
+);
+
+// Method 3: Using static factory method from data array (similar to DataGrid::fromData)
+$userData = [
+    ['id' => 1, 'name' => 'John', 'status' => 'active'],
+    ['id' => 2, 'name' => 'Jane', 'status' => 'inactive'],
+];
+
+echo Components\AGGrid::fromData('User Data', $userData, 'green');
+
+// Method 4: Multiple grids in a container
+$grid1 = new Components\AGGrid('grid1');
+$grid1->setColumns(['id', 'name']);
+$grid1->setData([['id' => 1, 'name' => 'Test']]);
+
+$grid2 = new Components\AGGrid('grid2');
+$grid2->setColumns(['id', 'email']);
+$grid2->setData([['id' => 1, 'email' => 'test@example.com']]);
+
+echo Components\AGGrid::renderMultiple([$grid1, $grid2], 'grid grid-cols-2 gap-4');

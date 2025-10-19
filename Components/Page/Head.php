@@ -25,7 +25,7 @@ class Head
         // Icon
         $html .= '<link rel="icon" type="image/x-icon" href="' . LOGO . '" >' . PHP_EOL;
         // General Meta tags
-        $html .= '<meta name="viewport" content="width=device-width, initial-scale=1">' . PHP_EOL;
+        $html .= '<meta name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover">' . PHP_EOL;
         $html .= '<meta charset="UTF-8">' . PHP_EOL;
         $html .= '<meta name="robots" content="index, follow" >' . PHP_EOL;
         $html .= '<meta name="author" content="Dimitar Dzhongov" >' . PHP_EOL;

@@ -1,3 +1,5 @@
+/* Cache buster: Sun, Oct 19, 2025 11:48:28 PM */
+/* Cache buster: Sun, Oct 19, 2025 11:32:43 PM */
 // Get current theme from localStorage or system preference
 const isSystemDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -644,262 +646,286 @@ const toggleBlur = (excludeElement) => {
 
 
 
-// Edit button
+// Edit button functionality wrapped in a reusable function
+// Updated: Fixed duplicate declaration issue - Cache buster 2024-10-19
+const initializeEditButtons = () => {
+    const editButtons = document.querySelectorAll(`button.edit-button`);
 
-const editButtons = document.querySelectorAll(`button.edit-button`);
-
-if (editButtons.length > 0) {
-    editButtons.forEach(button => {
-        button.addEventListener('click', async (event) => {
-            // First fetch the data from /api/datagrid/get-records
-            const uniqueId = generateUniqueId(4);
-            // Generate the modal
-            let modal = editModal(uniqueId, button.dataset.id, button.dataset.table);
-            // Insert the modal at the bottom of the first div after the body
-            document.body.insertBefore(modal, document.body.firstChild);
-            // Now show the modal
-            modal.classList.remove('hidden');
-            // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
-            document.body.classList.add('overflow-hidden');
-            // Blur the body excluding the modal
-            toggleBlur(modal);
-            // Let's make some bindings
-            const modalResult = document.getElementById(`${uniqueId}-result`);
-            // First, the close button
-            const closeXButton = document.getElementById(`${uniqueId}-x-button`);
-            // The cancel button
-            const cancelButton = document.getElementById(`${uniqueId}-close-button`);
-            // Modal Save button
-            const saveButton = document.getElementById(`${uniqueId}-edit`);
-            const cancelButtonsArray = [closeXButton, cancelButton];
-
-            // Function to close the modal
-            const closeModal = () => {
-                // Completely remove the modal
-                modal.remove();
-                // Return the overflow of the body
-                document.body.classList.remove('overflow-hidden');
-                // Remove the blur by toggling the blur class
-                toggleBlur(modal);
-
-                // Remove the Escape key listener once the modal is closed
-                document.removeEventListener('keydown', handleEscapeKey);
-            };
-
-            // Add click listeners to the cancel buttons
-            cancelButtonsArray.forEach(cancelButton => {
-                cancelButton.addEventListener('click', closeModal);
-            });
-
-            // Function to handle the Escape key press
-            const handleEscapeKey = (event) => {
-                if (event.key === 'Escape') { // Check if the Escape key was pressed
-                    closeModal();
-                }
-            };
-
-            // Add the Escape key listener when the modal is shown
-            document.addEventListener('keydown', handleEscapeKey);
+    if (editButtons.length > 0) {
+        editButtons.forEach(button => {
+            // Skip if button already has event listener to avoid duplicates
+            if (button.hasAttribute('data-edit-initialized')) {
+                return;
+            }
+            button.setAttribute('data-edit-initialized', 'true');
             
-            let modalBody = document.getElementById(`${uniqueId}-body`);
-            createLoader(modalBody, `${uniqueId}-loader`, 'Loading data...');
-            // Fetch the data
-            const formData = new FormData();
-            formData.append('table', button.dataset.table);
-            formData.append('columns', button.dataset.columns);
-            formData.append('id', button.dataset.id);
-            formData.append('csrf_token', button.dataset.csrf);
-            const getDataApi = (button.dataset.getApi) ? button.dataset.getApi : '/api/datagrid/get-records';
-            const data = fetch(getDataApi, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': button.dataset.csrf,
-                    'secretheader': 'badass'
-                },
-                body: formData
-            }).then(response => response.text());
-            modalBody.innerHTML = await data;
-            let initialButtonText = saveButton.innerText;
-            // Let's focus the cursor make the focus on the first input
-            const firstInput = modalBody.querySelector('input');
-            firstInput.focus();
-            // Now let's make the save button work
-            saveButton.addEventListener('click', async () => {
-                // First, get the form data
-                saveButton.innerHTML = '';
-                createLoader(saveButton, `${uniqueId}-save-button-edit-loader`);
-                // Prevent the form from submitting
-                const modalForm = document.getElementById(`${uniqueId}-form`);
-                modalForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                });
-                // Build the body of the update request. We need to go through all the inputs and get their values
-                const formData = new FormData();
-                // Loop through all of the modalBody inputs, textarea and select and save them to the formData
-                const modalBodyInputs = modal.querySelectorAll(`input, textarea, select`);
-                modalBodyInputs.forEach(input => {
-                    let value = input.value;
-                    // Check if the value is a valid number
-                    if (!isNaN(value) && value.includes('.')) {
-                        // Convert to float and format to a specific number of decimal places (e.g., 2)
-                        value = parseFloat(value);
-                    }
-                    formData.append(input.name, value);
-                });
-                // Now let's take care of potential checkboxes
-                const modalBodyCheckboxes = modal.querySelectorAll(`input[type=checkbox]`);
-                // Loop through the checkboxes and if they are checked, we transmit the value as 1, else as 0
-                modalBodyCheckboxes.forEach(checkbox => {
-                    formData.append(checkbox.name, checkbox.checked ? 1 : 0);
-                });
-                let responseStatus = 0;
-                formData.append('id', button.dataset.id);
-                const editApi = (button.dataset.editApi) ? button.dataset.editApi : '/api/datagrid/update-records';
-                // Now let's fetch the data
-                fetch(editApi, {
-                    method: 'POST',
-                    headers: {
-                        'secretHeader': 'badass',
-                        'X-CSRF-TOKEN': formData.get('csrf_token')
-                    },
-                    body: formData,
-                    redirect: 'manual'
-                }).then(response => {
-                    responseStatus = response.status;
-                    console.log(responseStatus);
-                    if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                        modalBody.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
-                        location.reload();
-                    } else {
-                        // Check if the response is JSON or text/HTML
-                        if (response.headers.get('content-type').includes('application/json')) {
-                            return response.json().then(data => ({ data, isJson: true }));
-                        } else {
-                            return response.text().then(data => ({ data, isJson: false }));
-                        }
-                    }
-                }).then(({ data, isJson }) => {
-                    // If the response status is >= 400, handle it as an error
-                    if (responseStatus >= 400) {
-                        saveButton.innerText = 'Retry';
-                        let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
-                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
-                    } else {
-                        saveButton.innerText = initialButtonText;
-                
-                        if (isJson) {
-                            modalResult.innerHTML = `<p class="text-green-500 font-semibold">${data.data}</p>`;
-                            location.reload();
-                        } else {
-                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">${data}</p>`;
-                        }
-                    }
-                }).catch(error => {
-                    console.error('Error during fetch:', error);
-                });                                           
-            })
-        });
-    });
-}
+            button.addEventListener('click', async (event) => {
+                // First fetch the data from /api/datagrid/get-records
+                const uniqueId = generateUniqueId(4);
+                // Generate the modal
+                let modal = editModal(uniqueId, button.dataset.id, button.dataset.table);
+                // Insert the modal at the bottom of the first div after the body
+                document.body.insertBefore(modal, document.body.firstChild);
+                // Now show the modal
+                modal.classList.remove('hidden');
+                // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
+                document.body.classList.add('overflow-hidden');
+                // Blur the body excluding the modal
+                toggleBlur(modal);
+                // Let's make some bindings
+                const modalResult = document.getElementById(`${uniqueId}-result`);
+                // First, the close button
+                const closeXButton = document.getElementById(`${uniqueId}-x-button`);
+                // The cancel button
+                const cancelButton = document.getElementById(`${uniqueId}-close-button`);
+                // Modal Save button
+                const saveButton = document.getElementById(`${uniqueId}-edit`);
+                const cancelButtonsArray = [closeXButton, cancelButton];
 
-// Delete button
-
-const deleteButtons = document.querySelectorAll(`button.delete-button`);
-
-if (deleteButtons.length > 0) {
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', async (event) => {
-            // First fetch the data from /api/datagrid/get-records
-            const uniqueId = generateUniqueId(4);
-            // Get the confirm message
-            const confirmMessage = button.dataset.confirmMessage || `Are you sure you want to delete entry with id ${button.dataset.id}?`;
-            // Generate the modal
-            let modal = deleteModal(uniqueId, confirmMessage);
-            // Insert the modal at the bottom of the first div after the body
-            document.body.insertBefore(modal, document.body.firstChild);
-            // Now show the modal
-            modal.classList.remove('hidden');
-            // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
-            document.body.classList.add('overflow-hidden');
-            // Blur the body excluding the modal
-            toggleBlur(modal);
-            // Let's make some bindings
-            const modalResult = document.getElementById(`${uniqueId}-result`);
-            // First, the close button
-            const closeXButton = document.getElementById(`${uniqueId}-x-button`);
-            // The cancel button
-            const cancelButton = document.getElementById(`${uniqueId}-close-button`);
-            // Modal Save button
-            const saveButton = document.getElementById(`${uniqueId}-delete`);
-            const cancelButtonsArray = [closeXButton, cancelButton];
-            cancelButtonsArray.forEach(cancelButton => {
-                cancelButton.addEventListener('click', () => {
+                // Function to close the modal
+                const closeModal = () => {
                     // Completely remove the modal
                     modal.remove();
                     // Return the overflow of the body
                     document.body.classList.remove('overflow-hidden');
                     // Remove the blur by toggling the blur class
                     toggleBlur(modal);
-                })
-            })
-            let initialButtonText = saveButton.innerText;
-            // Now let's make the save button work
-            saveButton.addEventListener('click', async () => {
-                // First, get the form data
-                saveButton.innerHTML = '';
-                createLoader(saveButton, `${uniqueId}-save-button-delete-loader`);
-                // Build the body of the update request. We need to go through all the inputs and get their values
+
+                    // Remove the Escape key listener once the modal is closed
+                    document.removeEventListener('keydown', handleEscapeKey);
+                };
+
+                // Add click listeners to the cancel buttons
+                cancelButtonsArray.forEach(cancelButton => {
+                    cancelButton.addEventListener('click', closeModal);
+                });
+
+                // Function to handle the Escape key press
+                const handleEscapeKey = (event) => {
+                    if (event.key === 'Escape') { // Check if the Escape key was pressed
+                        closeModal();
+                    }
+                };
+
+                // Add the Escape key listener when the modal is shown
+                document.addEventListener('keydown', handleEscapeKey);
+                
+                let modalBody = document.getElementById(`${uniqueId}-body`);
+                createLoader(modalBody, `${uniqueId}-loader`, 'Loading data...');
+                // Fetch the data
                 const formData = new FormData();
+                formData.append('table', button.dataset.table);
+                formData.append('columns', button.dataset.columns);
                 formData.append('id', button.dataset.id);
                 formData.append('csrf_token', button.dataset.csrf);
-                formData.append('table', button.dataset.table);
-                const deleteApi = (button.dataset.deleteApi) ? button.dataset.deleteApi : '/api/datagrid/delete-records';
-                let responseStatus = 0;
-                // Now let's fetch the data
-                fetch(deleteApi, {
+                const getDataApi = (button.dataset.getApi) ? button.dataset.getApi : '/api/datagrid/get-records';
+                const data = fetch(getDataApi, {
                     method: 'POST',
                     headers: {
-                        'secretHeader': 'badass',
-                        'X-CSRF-TOKEN': formData.get('csrf_token')
+                        'X-CSRF-TOKEN': button.dataset.csrf,
+                        'secretheader': 'badass'
                     },
                     body: formData
-                }).then(response => {
-                    responseStatus = response.status;
-                    if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
-                        location.reload();
-                    } else {
-                        // Check if the response is JSON or text/HTML
-                        if (response.headers.get('content-type').includes('application/json')) {
-                            return response.json().then(data => ({ data, isJson: true }));
-                        } else {
-                            return response.text().then(data => ({ data, isJson: false }));
+                }).then(response => response.text());
+                modalBody.innerHTML = await data;
+                let initialButtonText = saveButton.innerText;
+                // Let's focus the cursor make the focus on the first input
+                const firstInput = modalBody.querySelector('input');
+                firstInput.focus();
+                // Now let's make the save button work
+                saveButton.addEventListener('click', async () => {
+                    // First, get the form data
+                    saveButton.innerHTML = '';
+                    createLoader(saveButton, `${uniqueId}-save-button-edit-loader`);
+                    // Prevent the form from submitting
+                    const modalForm = document.getElementById(`${uniqueId}-form`);
+                    modalForm.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                    });
+                    // Build the body of the update request. We need to go through all the inputs and get their values
+                    const formData = new FormData();
+                    // Loop through all of the modalBody inputs, textarea and select and save them to the formData
+                    const modalBodyInputs = modal.querySelectorAll(`input, textarea, select`);
+                    modalBodyInputs.forEach(input => {
+                        let value = input.value;
+                        // Check if the value is a valid number
+                        if (!isNaN(value) && value.includes('.')) {
+                            // Convert to float and format to a specific number of decimal places (e.g., 2)
+                            value = parseFloat(value);
                         }
-                    }
-                }
-                ).then(({ data, isJson }) => {
-                    // If the response status is >= 400, handle it as an error
-                    if (responseStatus >= 400) {
-                        saveButton.innerText = 'Retry';
-                        let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
-                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
-                    } else {
-                        saveButton.innerText = initialButtonText;
-                
-                        if (isJson) {
-                            modalResult.innerHTML = `<p class="text-green-500-font-semibold">${data.data}</p>`;
+                        formData.append(input.name, value);
+                    });
+                    // Now let's take care of potential checkboxes
+                    const modalBodyCheckboxes = modal.querySelectorAll(`input[type=checkbox]`);
+                    // Loop through the checkboxes and if they are checked, we transmit the value as 1, else as 0
+                    modalBodyCheckboxes.forEach(checkbox => {
+                        formData.append(checkbox.name, checkbox.checked ? 1 : 0);
+                    });
+                    let responseStatus = 0;
+                    formData.append('id', button.dataset.id);
+                    const editApi = (button.dataset.editApi) ? button.dataset.editApi : '/api/datagrid/update-records';
+                    // Now let's fetch the data
+                    fetch(editApi, {
+                        method: 'POST',
+                        headers: {
+                            'secretHeader': 'badass',
+                            'X-CSRF-TOKEN': formData.get('csrf_token')
+                        },
+                        body: formData,
+                        redirect: 'manual'
+                    }).then(response => {
+                        responseStatus = response.status;
+                        console.log(responseStatus);
+                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
+                            modalBody.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
                             location.reload();
                         } else {
-                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">${data}</p>`;
+                            // Check if the response is JSON or text/HTML
+                            if (response.headers.get('content-type').includes('application/json')) {
+                                return response.json().then(data => ({ data, isJson: true }));
+                            } else {
+                                return response.text().then(data => ({ data, isJson: false }));
+                            }
+                        }
+                    }).then(({ data, isJson }) => {
+                        // If the response status is >= 400, handle it as an error
+                        if (responseStatus >= 400) {
+                            saveButton.innerText = 'Retry';
+                            let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
+                        } else {
+                            saveButton.innerText = initialButtonText;
+                    
+                            if (isJson) {
+                                modalResult.innerHTML = `<p class="text-green-500 font-semibold">${data.data}</p>`;
+                                location.reload();
+                            } else {
+                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">${data}</p>`;
+                            }
+                        }
+                    }).catch(error => {
+                        console.error('Error during fetch:', error);
+                    });                                           
+                })
+            });
+        });
+    }
+};
+
+// Initialize edit buttons on page load
+initializeEditButtons();
+
+// Delete button functionality wrapped in an arrow function
+const initializeDeleteButtons = () => {
+    const deleteButtons = document.querySelectorAll(`button.delete-button`);
+
+    if (deleteButtons.length > 0) {
+        deleteButtons.forEach(button => {
+            // Skip if button already has event listener to avoid duplicates
+            if (button.hasAttribute('data-delete-initialized')) {
+                return;
+            }
+            button.setAttribute('data-delete-initialized', 'true');
+            
+            button.addEventListener('click', async (event) => {
+                // First fetch the data from /api/datagrid/get-records
+                const uniqueId = generateUniqueId(4);
+                // Get the confirm message
+                const confirmMessage = button.dataset.confirmMessage || `Are you sure you want to delete entry with id ${button.dataset.id}?`;
+                // Generate the modal
+                let modal = deleteModal(uniqueId, confirmMessage);
+                // Insert the modal at the bottom of the first div after the body
+                document.body.insertBefore(modal, document.body.firstChild);
+                // Now show the modal
+                modal.classList.remove('hidden');
+                // Now let's disable scrolling on the rest of the page by adding overflow-hidden to the body
+                document.body.classList.add('overflow-hidden');
+                // Blur the body excluding the modal
+                toggleBlur(modal);
+                // Let's make some bindings
+                const modalResult = document.getElementById(`${uniqueId}-result`);
+                // First, the close button
+                const closeXButton = document.getElementById(`${uniqueId}-x-button`);
+                // The cancel button
+                const cancelButton = document.getElementById(`${uniqueId}-close-button`);
+                // Modal Save button
+                const saveButton = document.getElementById(`${uniqueId}-delete`);
+                const cancelButtonsArray = [closeXButton, cancelButton];
+                cancelButtonsArray.forEach(cancelButton => {
+                    cancelButton.addEventListener('click', () => {
+                        // Completely remove the modal
+                        modal.remove();
+                        // Return the overflow of the body
+                        document.body.classList.remove('overflow-hidden');
+                        // Remove the blur by toggling the blur class
+                        toggleBlur(modal);
+                    })
+                })
+                let initialButtonText = saveButton.innerText;
+                // Now let's make the save button work
+                saveButton.addEventListener('click', async () => {
+                    // First, get the form data
+                    saveButton.innerHTML = '';
+                    createLoader(saveButton, `${uniqueId}-save-button-delete-loader`);
+                    // Build the body of the update request. We need to go through all the inputs and get their values
+                    const formData = new FormData();
+                    formData.append('id', button.dataset.id);
+                    formData.append('csrf_token', button.dataset.csrf);
+                    formData.append('table', button.dataset.table);
+                    const deleteApi = (button.dataset.deleteApi) ? button.dataset.deleteApi : '/api/datagrid/delete-records';
+                    let responseStatus = 0;
+                    // Now let's fetch the data
+                    fetch(deleteApi, {
+                        method: 'POST',
+                        headers: {
+                            'secretHeader': 'badass',
+                            'X-CSRF-TOKEN': formData.get('csrf_token')
+                        },
+                        body: formData
+                    }).then(response => {
+                        responseStatus = response.status;
+                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                            location.reload();
+                        } else {
+                            // Check if the response is JSON or text/HTML
+                            if (response.headers.get('content-type').includes('application/json')) {
+                                return response.json().then(data => ({ data, isJson: true }));
+                            } else {
+                                return response.text().then(data => ({ data, isJson: false }));
+                            }
                         }
                     }
-                }).catch(error => {
-                    console.error('Error during fetch:', error);
-                });
-            })
+                    ).then(({ data, isJson }) => {
+                        // If the response status is >= 400, handle it as an error
+                        if (responseStatus >= 400) {
+                            saveButton.innerText = 'Retry';
+                            let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">${errorMessage}</p>`;
+                        } else {
+                            saveButton.innerText = initialButtonText;
+                    
+                            if (isJson) {
+                                modalResult.innerHTML = `<p class="text-green-500-font-semibold">${data.data}</p>`;
+                                location.reload();
+                            } else {
+                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">${data}</p>`;
+                            }
+                        }
+                    }).catch(error => {
+                        console.error('Error during fetch:', error);
+                    });
+                })
+            });
         });
-    });
-}
+    }
+};
+
+// Make the function globally available for use in other scripts
+globalThis.initializeDeleteButtons = initializeDeleteButtons;
+
+// Initialize delete buttons on page load
+initializeDeleteButtons();
 
 const createModal = (id, title, submitButtonName, parentDiv, action) => {
     let html = `
