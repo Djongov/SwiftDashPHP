@@ -83,13 +83,13 @@ echo '<div class="max-w-6xl mx-auto p-4">';
     echo Html::h1(translate('user_settings'), true);
     
     // Tab navigation
-    echo '<div class="border-b border-gray-200 dark:border-gray-700 mb-6">';
+    echo '<div class="w-full max-w-full overflow-x-auto p-2 border-b border-gray-200 dark:border-gray-700 mb-6">';
         echo '<nav class="-mb-px flex space-x-8" aria-label="Tabs" role="tablist">';
-            echo '<button data-tab="profile" id="tab-profile" class="tab-button border-blue-500 text-blue-600 hover:text-blue-700 hover:border-blue-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" role="tab" aria-selected="true" aria-controls="content-profile">📋 Profile</button>';
-            echo '<button data-tab="security" id="tab-security" class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" role="tab" aria-selected="false" aria-controls="content-security">🔒 Security</button>';
-            echo '<button data-tab="preferences" id="tab-preferences" class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" role="tab" aria-selected="false" aria-controls="content-preferences">⚙️ Preferences</button>';
+            echo '<button data-tab="profile" id="tab-profile" class="tab-button border-' . $theme . '-500 text-' . $theme . '-600 hover:text-' . $theme . '-700 hover:border-' . $theme . '-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-offset-2" role="tab" aria-selected="true" aria-controls="content-profile">📋 Profile</button>';
+            echo '<button data-tab="security" id="tab-security" class="tab-button border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-200 dark:hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-offset-2" role="tab" aria-selected="false" aria-controls="content-security">🔒 Security</button>';
+            echo '<button data-tab="preferences" id="tab-preferences" class="tab-button border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-200 dark:hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-offset-2" role="tab" aria-selected="false" aria-controls="content-preferences">⚙️ Preferences</button>';
             if ($isAdmin) {
-                echo '<button data-tab="admin" id="tab-admin" class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" role="tab" aria-selected="false" aria-controls="content-admin">👑 Admin</button>';
+                echo '<button data-tab="admin" id="tab-admin" class="tab-button border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-200 dark:hover:text-gray-300 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-' . $theme . '-500 focus:ring-offset-2" role="tab" aria-selected="false" aria-controls="content-admin">👑 Admin</button>';
             }
         echo '</nav>';
     echo '</div>';
@@ -376,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const allContents = document.querySelectorAll(".tab-content");
         
         allButtons.forEach(btn => {
-            btn.classList.remove("border-blue-500", "text-blue-600");
+            btn.classList.remove("border-<?=$theme?>-500", "text-<?=$theme?>-600");
             btn.classList.add("border-transparent", "text-gray-500");
             btn.setAttribute("aria-selected", "false");
         });
@@ -390,7 +390,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         if (activeButton && activeContent) {
             activeButton.classList.remove("border-transparent", "text-gray-500");
-            activeButton.classList.add("border-blue-500", "text-blue-600");
+            activeButton.classList.add("border-<?=$theme?>-500", "text-<?=$theme?>-600");
             activeButton.setAttribute("aria-selected", "true");
             activeContent.classList.remove("hidden");
         }

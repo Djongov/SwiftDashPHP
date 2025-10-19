@@ -35,7 +35,7 @@ echo '<form method="get" action="" class="my-8 max-w-md mx-auto p-4 text-gray-90
             }
         echo '</select>';
     echo '</div>';
-    echo Html::p('Choose a database table to view its contents in a data grid format. Only databases with a columnd `id` are supported');
+    echo Html::p('Choose a database table to view its contents in a data grid format. Only databases with a column `id` are supported');
     echo '<div>';
         echo Html::submitButton('view-table-submit', 'View Table', $theme);
     echo '</div>';

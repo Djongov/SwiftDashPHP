@@ -87,41 +87,6 @@ class AGGrid
     }
 
     /**
-     * Generate edit button HTML using DBButton component
-     */
-    private function generateEditButtonHTML(): string
-    {
-        if (empty($this->columns)) {
-            $this->columns = ['id']; // fallback
-        }
-        return \Components\DBButton::editButton($this->dbTable, $this->columns, 'PLACEHOLDER_ID', $this->theme, '');
-    }
-
-    /**
-     * Generate delete button HTML using DBButton component
-     */
-    private function generateDeleteButtonHTML(): string
-    {
-        return \Components\DBButton::deleteButton($this->dbTable, 'PLACEHOLDER_ID', '', 'Are you sure you want to delete this record?');
-    }
-
-    /**
-     * Get escaped edit button HTML for JavaScript
-     */
-    private function getEscapedEditButtonHTML(): string
-    {
-        return addslashes($this->generateEditButtonHTML());
-    }
-
-    /**
-     * Get escaped delete button HTML for JavaScript
-     */
-    private function getEscapedDeleteButtonHTML(): string
-    {
-        return addslashes($this->generateDeleteButtonHTML());
-    }
-
-    /**
      * Static method to render multiple grids in a container
      */
     public static function renderMultiple(array $grids, string $containerClass = 'grid gap-6'): string
@@ -277,10 +242,24 @@ public function render(): string
     $dataJson = json_encode($this->data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
     // Prepare JavaScript boolean values
-    $enableEditJS = $this->enableEdit ? 'true' : 'false';
-    $enableDeleteJS = $this->enableDelete ? 'true' : 'false';
     $enableSelectionJS = $this->enableSelection ? 'true' : 'false';
+    $enableDeleteJS = $this->enableDelete ? 'true' : 'false';
     $rowSelectionMode = $this->enableSelection ? 'multiple' : 'single';
+
+    // Generate button code based on enabled features
+    $columnsStr = implode(',', $this->columns);
+    $csrfToken = \App\Security\CSRF::create();
+    
+    // Sanitize grid ID for JavaScript variable names (replace hyphens and other invalid chars)
+    $jsGridId = preg_replace('/\W/', '_', $this->gridId);
+    
+    $editButtonCode = $this->enableEdit
+        ? 'buttonsHtml += this.createEditButton(params.data.id);'
+        : '// Edit disabled';
+        
+    $deleteButtonCode = $this->enableDelete
+        ? 'buttonsHtml += this.createDeleteButton(params.data.id);'
+        : '// Delete disabled';
 
     $html = '';
     
@@ -315,10 +294,10 @@ HTML;
 
 <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
 (function() {
-    const initGrid_{$this->gridId} = () => {
+    const initGrid_{$jsGridId} = () => {
         const eGridDiv = document.querySelector("#{$this->gridId}");
         if (!eGridDiv || !window.agGrid) {
-            setTimeout(initGrid_{$this->gridId}, 100);
+            setTimeout(initGrid_{$jsGridId}, 100);
             return;
         }
 
@@ -330,41 +309,55 @@ HTML;
                 
                 let buttonsHtml = '';
                 
-                if ($enableEditJS) {
-                    buttonsHtml += `{$this->getEscapedEditButtonHTML()}`.replace(/PLACEHOLDER_ID/g, params.data.id);
-                }
+                $editButtonCode
                 
-                if ($enableDeleteJS) {
-                    buttonsHtml += `{$this->getEscapedDeleteButtonHTML()}`.replace(/PLACEHOLDER_ID/g, params.data.id);
-                }
+                $deleteButtonCode
                 
                 this.eGui.innerHTML = buttonsHtml;
                 
                 // Since buttons are created dynamically, we need to manually bind events
                 setTimeout(() => {
-                    const editBtn = this.eGui.querySelector('.edit-button');
-                    const deleteBtn = this.eGui.querySelector('.delete-button');
+                    const editBtn = this.eGui.querySelector('.aggrid-edit-button');
+                    const deleteBtn = this.eGui.querySelector('.aggrid-delete-button');
                     
                     // For edit button - use event delegation to trigger main.js handler
                     if (editBtn) {
                         // Simply trigger a click event that main.js can catch through event delegation
                         // We'll add the button to DOM temporarily so main.js can handle it
                         editBtn.addEventListener('click', (event) => {
+                            event.preventDefault();
                             event.stopPropagation();
-                            // Create a temporary element that main.js will recognize and handle
+                            event.stopImmediatePropagation(); // Prevent main.js edit handler from firing
                             this.triggerMainJSEdit(editBtn);
                         });
                     }
                     
-                    // For delete button - use the working logic we already have
-                    // Delete button should trigger main.js delete functionality
+                    // For delete button - use custom class to avoid main.js conflicts
                     if (deleteBtn) {
                         deleteBtn.addEventListener('click', (event) => {
+                            event.preventDefault();
                             event.stopPropagation();
+                            event.stopImmediatePropagation(); // Prevent any other handlers
                             this.triggerMainJSDelete(deleteBtn);
                         });
                     }
                 }, 0);
+            }
+            
+            createEditButton(id) {
+                return `<button title="Edit" data-table="{$this->dbTable}" data-columns="{$columnsStr}" data-csrf="{$csrfToken}" data-id="\${id}" type="button" class="aggrid-edit-button inline-flex items-center justify-center w-8 h-8 text-white bg-gradient-to-r from-{$this->theme}-500 to-{$this->theme}-600 hover:from-{$this->theme}-600 hover:to-{$this->theme}-700 focus:ring-4 focus:outline-none focus:ring-{$this->theme}-300 dark:focus:ring-{$this->theme}-800 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                </button>`;
+            }
+            
+            createDeleteButton(id) {
+                return `<button title="Delete" data-table="{$this->dbTable}" data-csrf="{$csrfToken}" data-id="\${id}" data-confirm-message="Are you sure you want to delete this record?" type="button" class="aggrid-delete-button inline-flex items-center justify-center w-8 h-8 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>`;
             }
             
             triggerMainJSEdit(button) {
@@ -393,9 +386,7 @@ HTML;
                     modal.classList.remove('hidden');
                     document.body.classList.add('overflow-hidden');
                     
-                    if (typeof toggleBlur === 'function') {
-                        toggleBlur(modal);
-                    }
+                    // NO BLUR for edit modals either - keep both modals completely blur-free
                     
                     // Set up modal bindings directly
                     this.setupModalBindings(modal, uniqueId, button);
@@ -420,26 +411,45 @@ HTML;
                 const closeModal = () => {
                     modal.remove();
                     document.body.classList.remove('overflow-hidden');
-                    if (typeof toggleBlur === 'function') {
-                        toggleBlur(modal);
+                    
+                    // Remove blur only if no other modals are open
+                    const remainingModals = document.querySelectorAll('.fixed.inset-0:not(.hidden)');
+                    if (remainingModals.length === 0) {
+                        if (typeof toggleBlur === 'function') {
+                            toggleBlur(modal);
+                        }
                     }
+                    
                     document.removeEventListener('keydown', handleEscapeKey);
                 };
 
-                // Add click listeners to cancel buttons
-                cancelButtonsArray.forEach(cancelBtn => {
-                    if (cancelBtn) {
-                        cancelBtn.addEventListener('click', closeModal);
-                    }
+                // Function to close the edit modal (unique name to avoid conflicts)
+                const closeEditModal = () => {
+                    // Ensure modal is NOT set to aria-hidden before removing (to prevent focus warnings)
+                    modal.removeAttribute('aria-hidden');
+                    modal.setAttribute('aria-modal', 'false');
+                    
+                    // Completely remove the modal
+                    modal.remove();
+                    // Return the overflow of the body
+                    document.body.classList.remove('overflow-hidden');
+                    
+                    // Remove the Escape key listener once the modal is closed
+                    document.removeEventListener('keydown', handleEditEscapeKey);
+                };
+
+                // Add click listeners to the cancel buttons (simple and clean)
+                cancelButtonsArray.forEach(cancelButton => {
+                    cancelButton.addEventListener('click', closeEditModal);
                 });
 
-                // Handle Escape key
-                const handleEscapeKey = (event) => {
-                    if (event.key === 'Escape') {
-                        closeModal();
+                // Function to handle the Escape key press for edit modal (unique name)
+                const handleEditEscapeKey = (event) => {
+                    if (event.key === 'Escape') { // Check if the Escape key was pressed
+                        closeEditModal();
                     }
                 };
-                document.addEventListener('keydown', handleEscapeKey);
+                document.addEventListener('keydown', handleEditEscapeKey);
                 
                 // Load modal content
                 let modalBody = document.getElementById(`\${uniqueId}-body`);
@@ -566,134 +576,185 @@ HTML;
                 });
             }
             
-            triggerMainJSDelete(button) {
-                // Prevent any loops by checking if we're already processing
-                if (button.hasAttribute('data-processing-delete')) {
-                    console.log('Delete button already being processed, ignoring click');
-                    return;
-                }
-                
-                button.setAttribute('data-processing-delete', 'true');
-                
-                // Create modal directly using main.js functions (same as edit but for delete)
-                try {
-                    // Check if required functions exist
-                    if (typeof generateUniqueId !== 'function' || typeof deleteModal !== 'function') {
-                        alert('Delete functionality not available - required functions not found');
-                        return;
+            setupDeleteModalBindings(modal, uniqueId, button) {
+                const modalResult = document.getElementById(`\${uniqueId}-result`);
+                const closeXButton = document.getElementById(`\${uniqueId}-x-button`);
+                const cancelButton = document.getElementById(`\${uniqueId}-close-button`);
+                const deleteButton = document.getElementById(`\${uniqueId}-delete`);
+                const cancelButtonsArray = [closeXButton, cancelButton];
+
+                // Function to close the delete modal (unique name to avoid conflicts)
+                const closeDeleteModal = () => {
+                    // Simple clean close - no aria manipulation needed since we never set aria-hidden
+                    modal.remove();
+                    document.body.classList.remove('overflow-hidden');
+                    document.removeEventListener('keydown', handleDeleteEscapeKey);
+                };
+
+                // Add click listeners to cancel buttons (simple and clean like edit modal)
+                cancelButtonsArray.forEach(cancelButton => {
+                    cancelButton.addEventListener('click', closeDeleteModal);
+                });
+
+
+                // Handle escape key for delete modal (unique name)
+                const handleDeleteEscapeKey = (event) => {
+                    if (event.key === 'Escape') {
+                        closeDeleteModal();
                     }
+                };
+                document.addEventListener('keydown', handleDeleteEscapeKey);
+                
+                // Set up delete button (adapted from the original delete logic)
+                this.setupDeleteButton(modal, uniqueId, button, deleteButton, modalResult);
+            }
+            
+            setupDeleteButton(modal, uniqueId, button, deleteButton, modalResult) {
+                const initialButtonText = deleteButton.innerText;
+                
+                deleteButton.addEventListener('click', async (e) => {
+                    e.preventDefault();
                     
-                    // Create delete modal directly (same logic as main.js)
-                    const uniqueId = generateUniqueId(4);
-                    const confirmMessage = button.dataset.confirmMessage || `Are you sure you want to delete entry with id \${button.dataset.id}?`;
-                    let modal = deleteModal(uniqueId, confirmMessage);
+                    // Prevent double clicks
+                    if (deleteButton.disabled) return;
+                    deleteButton.disabled = true;
                     
-                    // Insert and show modal
-                    document.body.insertBefore(modal, document.body.firstChild);
-                    modal.classList.remove('hidden');
-                    document.body.classList.add('overflow-hidden');
-                    
-                    // Apply blur only if no other modals are open
-                    const existingModals = document.querySelectorAll('.fixed.inset-0:not(.hidden)');
-                    if (existingModals.length <= 1) { // Only this modal
-                        if (typeof toggleBlur === 'function') {
-                            toggleBlur(modal);
-                        }
-                    }
-                    
-                    // Get modal elements
-                    const modalResult = document.getElementById(`\${uniqueId}-result`);
-                    const closeXButton = document.getElementById(`\${uniqueId}-x-button`);
-                    const cancelButton = document.getElementById(`\${uniqueId}-close-button`);
-                    const deleteButton = document.getElementById(`\${uniqueId}-delete`);
-                    
-                    // Close modal function
-                    const closeModal = () => {
-                        modal.remove();
-                        document.body.classList.remove('overflow-hidden');
-                        
-                        // Remove blur only if no other modals are open
-                        const remainingModals = document.querySelectorAll('.fixed.inset-0:not(.hidden)');
-                        if (remainingModals.length === 0) {
-                            if (typeof toggleBlur === 'function') {
-                                toggleBlur(modal);
-                            }
-                        }
-                        
-                        button.removeAttribute('data-processing-delete');
-                    };
-                    
-                    // Bind close buttons
-                    [closeXButton, cancelButton].forEach(btn => {
-                        if (btn) btn.addEventListener('click', closeModal);
-                    });
-                    
-                    // Handle delete button click
-                    let initialButtonText = deleteButton.innerText;
-                    deleteButton.addEventListener('click', async () => {
-                        deleteButton.innerHTML = '';
+                    // Show loading
+                    deleteButton.innerHTML = '';
+                    if (typeof createLoader === 'function') {
                         createLoader(deleteButton, `\${uniqueId}-save-button-delete-loader`);
-                        
-                        const formData = new FormData();
-                        formData.append('id', button.dataset.id);
-                        formData.append('csrf_token', button.dataset.csrf);
-                        formData.append('table', button.dataset.table);
-                        
-                        const deleteApi = button.dataset.deleteApi || '/api/datagrid/delete-records';
-                        let responseStatus = 0;
-                        
-                        fetch(deleteApi, {
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('id', button.dataset.id);
+                    formData.append('csrf_token', button.dataset.csrf);
+                    formData.append('table', button.dataset.table);
+                    
+                    const deleteApi = button.dataset.deleteApi || '/api/datagrid/delete-records';
+                    
+                    try {
+                        const response = await fetch(deleteApi, {
                             method: 'POST',
                             headers: {
                                 'secretHeader': 'badass',
                                 'X-CSRF-TOKEN': formData.get('csrf_token')
                             },
                             body: formData
-                        })
-                        .then(response => {
-                            responseStatus = response.status;
-                            if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                        });
+                        
+                        const responseStatus = response.status;
+                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                            location.reload();
+                            return;
+                        }
+                        
+                        let data, isJson;
+                        if (response.headers.get('content-type')?.includes('application/json')) {
+                            data = await response.json();
+                            isJson = true;
+                        } else {
+                            data = await response.text();
+                            isJson = false;
+                        }
+                        
+                        deleteButton.disabled = false; // Re-enable button
+                        
+                        if (responseStatus >= 400) {
+                            deleteButton.innerText = 'Retry';
+                            let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">\${errorMessage}</p>`;
+                        } else {
+                            deleteButton.innerText = initialButtonText;
+                            
+                            if (isJson) {
+                                modalResult.innerHTML = `<p class="text-green-500 font-semibold">\${data.data}</p>`;
                                 location.reload();
                             } else {
-                                if (response.headers.get('content-type')?.includes('application/json')) {
-                                    return response.json().then(data => ({ data, isJson: true }));
-                                } else {
-                                    return response.text().then(data => ({ data, isJson: false }));
-                                }
+                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">\${data}</p>`;
                             }
-                        })
-                        .then(({ data, isJson }) => {
-                            if (responseStatus >= 400) {
-                                deleteButton.innerText = 'Retry';
-                                let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
-                                modalResult.innerHTML = `<p class="text-red-500 font-semibold">\${errorMessage}</p>`;
-                            } else {
-                                deleteButton.innerText = initialButtonText;
-                                
-                                if (isJson) {
-                                    modalResult.innerHTML = `<p class="text-green-500 font-semibold">\${data.data}</p>`;
-                                    location.reload();
-                                } else {
-                                    modalResult.innerHTML = `<p class="text-red-500 font-semibold">\${data}</p>`;
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error during fetch:', error);
-                            deleteButton.innerText = 'Retry';
-                            modalResult.innerHTML = '<p class="text-red-500 font-semibold">Network error occurred</p>';
-                        });
-                    });
+                        }
+                    } catch (error) {
+                        deleteButton.disabled = false; // Re-enable button
+                        console.error('Error during fetch:', error);
+                        deleteButton.innerText = 'Retry';
+                        modalResult.innerHTML = '<p class="text-red-500 font-semibold">Network error occurred</p>';
+                    }
+                });
+            }
+            
+            triggerMainJSDelete(button) {
+                // Prevent any loops by checking if we're already processing
+                if (button.hasAttribute('data-processing-delete')) {
+                    return;
+                }
+                
+                button.setAttribute('data-processing-delete', 'true');
+                
+                // Create modal directly - don't use main.js deleteModal to avoid aria issues
+                try {
+                    // Check if required functions exist
+                    if (typeof generateUniqueId !== 'function') {
+                        alert('Delete functionality not available - required functions not found');
+                        return;
+                    }
+                    
+                    // Create delete modal directly with our own HTML (no aria-hidden)
+                    const uniqueId = generateUniqueId(4);
+                    const confirmMessage = button.dataset.confirmMessage || `Are you sure you want to delete entry with id \${button.dataset.id}?`;
+                    
+                    // Create modal HTML without aria-hidden
+                    let modalHTML = `
+                        <div id="\${uniqueId}-container" class="relative w-full max-w-2xl max-h-full mx-auto">
+                            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700 border border-gray-700 dark:border-gray-400">
+                                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Delete</h3>
+                                    <button id="\${uniqueId}-x-button" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                        </svg>
+                                        <span class="sr-only">Close modal</span>
+                                    </button>
+                                </div>
+                                <div id="\${uniqueId}-body" class="p-4 md:p-5 space-y-4 break-words">
+                                    <p class="text-base leading-relaxed text-gray-700 dark:text-gray-400">\${confirmMessage}</p>
+                                </div>
+                                <div id="\${uniqueId}-result" class="m-4"></div>
+                                <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                    <button id="\${uniqueId}-delete" type="button" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Delete</button>
+                                    <button id="\${uniqueId}-close-button" type="button" class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-red-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Create modal element WITHOUT aria-hidden
+                    const modal = document.createElement('div');
+                    modal.id = uniqueId;
+                    modal.classList.add('hidden', 'overflow-y-hidden', 'overflow-x-hidden', 'fixed', 'top-0', 'right-0', 'left-0', 'z-50', 'justify-center', 'items-center', 'w-full', 'md:inset-0', 'h-[calc(100%-1rem)]', 'max-h-full', 'mt-12');
+                    modal.setAttribute('tabindex', '-1');
+                    // DO NOT SET aria-hidden="true" - this causes the accessibility warnings
+                    modal.setAttribute('aria-modal', 'true'); // Set proper modal attribute from the start
+                    modal.innerHTML = modalHTML;
+                    
+                    // Insert and show modal
+                    document.body.insertBefore(modal, document.body.firstChild);
+                    modal.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                    
+                    // NO BLUR for delete modals - keep it simple like edit modals work perfectly
+                    
+                    // Set up modal bindings directly (same as edit button)
+                    this.setupDeleteModalBindings(modal, uniqueId, button);
                     
                 } catch (error) {
                     console.error('Error creating delete modal:', error);
                     alert('Error opening delete dialog');
                 } finally {
-                    // Clean up processing flag
+                    // Clean up processing flag (same as edit button)
                     setTimeout(() => {
                         button.removeAttribute('data-processing-delete');
-                    }, 1000);
+                    }, 100);
                 }
             }
             
@@ -800,9 +861,9 @@ HTML;
     };
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initGrid_{$this->gridId});
+        document.addEventListener('DOMContentLoaded', initGrid_{$jsGridId});
     } else {
-        initGrid_{$this->gridId}();
+        initGrid_{$jsGridId}();
     }
 })();
 </script>

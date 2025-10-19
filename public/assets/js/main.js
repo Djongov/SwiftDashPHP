@@ -1,5 +1,3 @@
-/* Cache buster: Sun, Oct 19, 2025 11:48:28 PM */
-/* Cache buster: Sun, Oct 19, 2025 11:32:43 PM */
 // Get current theme from localStorage or system preference
 const isSystemDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -927,6 +925,13 @@ globalThis.initializeDeleteButtons = initializeDeleteButtons;
 // Initialize delete buttons on page load
 initializeDeleteButtons();
 
+// Signal that main.js is fully loaded
+globalThis.mainJSLoaded = true;
+if (globalThis.mainJSLoadedCallbacks) {
+    globalThis.mainJSLoadedCallbacks.forEach(callback => callback());
+    globalThis.mainJSLoadedCallbacks = [];
+}
+
 const createModal = (id, title, submitButtonName, parentDiv, action) => {
     let html = `
      <form id="${id}-form" action="${action}" method="POST">
@@ -1365,4 +1370,17 @@ if (shareButton) {
             await fallbackToClipboard(shareData.url);
         }
     });
-}
+}/* Test cache: Mon, Oct 20, 2025 12:11:15 AM */
+/* Cache clear: Mon, Oct 20, 2025 12:18:43 AM */
+/* Cache clear: Mon, Oct 20, 2025 12:33:15 AM */
+/* Cancel buttons fixed: Mon, Oct 20, 2025 12:40:36 AM */
+/* Exact main.js pattern: Mon, Oct 20, 2025 12:43:18 AM */
+/* Fixed syntax error with unique function names: Mon, Oct 20, 2025 12:44:47 AM */
+/* Modal blur protection added: Mon, Oct 20, 2025 12:47:12 AM */
+/* AG Grid-aware blur management: Mon, Oct 20, 2025 12:49:07 AM */
+/* Cancel button blur and aria fixes: Mon, Oct 20, 2025 12:52:11 AM */
+/* Fixed whole page blur on modal close: Mon, Oct 20, 2025 12:57:16 AM */
+/* Delete modal - NO BLUR completely removed: Mon, Oct 20, 2025  1:01:01 AM */
+/* Prevented main.js handler conflicts: Mon, Oct 20, 2025  1:03:16 AM */
+/* Custom delete modal no aria-hidden: Mon, Oct 20, 2025  1:04:42 AM */
+/* AGGrid custom button classes to avoid main.js: Mon, Oct 20, 2025  1:07:31 AM */

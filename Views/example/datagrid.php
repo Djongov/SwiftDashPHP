@@ -218,8 +218,8 @@ echo Components\AGGrid::fromDBTable(
 );
 
 echo Components\AGGrid::fromDBTable(
-    'cache',           // table name
-    'Cache Management', // title
+    'api_access_log',           // table name
+    'api_access_log Management', // title
     $theme,           // theme
     true,             // enable edit
     true,             // enable delete

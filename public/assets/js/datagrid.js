@@ -279,13 +279,32 @@ const initializeMassDelete = (tableId) => {
 
 // Initialize individual delete buttons - calls main.js functionality
 const initializeDataGridDeleteButtons = (tableId) => {
-    // Call the main.js initializeDeleteButtons function to handle all delete buttons
-    // This will find and initialize all delete buttons with class 'delete-button'
-    // including those in DataGrid tables
-    if (globalThis.initializeDeleteButtons && typeof globalThis.initializeDeleteButtons === 'function') {
+    // Check if main.js is loaded
+    if (globalThis.mainJSLoaded && globalThis.initializeDeleteButtons && typeof globalThis.initializeDeleteButtons === 'function') {
+        // Call the main.js initializeDeleteButtons function to handle all delete buttons
+        // This will find and initialize all delete buttons with class 'delete-button'
+        // including those in DataGrid tables
         globalThis.initializeDeleteButtons();
     } else {
-        console.warn('initializeDeleteButtons function from main.js is not available');
+        // Queue the function to run when main.js is loaded
+        if (!globalThis.mainJSLoadedCallbacks) {
+            globalThis.mainJSLoadedCallbacks = [];
+        }
+        
+        globalThis.mainJSLoadedCallbacks.push(() => {
+            if (globalThis.initializeDeleteButtons && typeof globalThis.initializeDeleteButtons === 'function') {
+                globalThis.initializeDeleteButtons();
+            } else {
+                console.warn('initializeDeleteButtons function still not available after main.js loaded');
+            }
+        });
+        
+        // Also try with a timeout as fallback
+        setTimeout(() => {
+            if (globalThis.initializeDeleteButtons && typeof globalThis.initializeDeleteButtons === 'function') {
+                globalThis.initializeDeleteButtons();
+            }
+        }, 500);
     }
 }
 
