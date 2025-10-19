@@ -289,8 +289,107 @@ HTML;
     }
 
     $html .= $massDeleteButton;
+    
+    // Calculate dynamic dimensions based on content
+    $rowCount = count($this->data);
+    $columnCount = count($this->columns);
+    
+    // Add action column to count if enabled
+    if ($this->enableEdit || $this->enableDelete) {
+        $columnCount++;
+    }
+    
+    // Add selection column to count if enabled  
+    if ($this->enableSelection) {
+        $columnCount++;
+    }
+    
+    // Dynamic height calculation
+    $headerHeight = 56; // Header + filter row
+    $rowHeight = 42; // Default AG Grid row height
+    $paginationHeight = $rowCount > 100 ? 64 : 0; // Pagination bar if needed
+    $minHeight = 300; // Minimum height to avoid too small grids
+    $maxHeight = 700; // Maximum height to avoid too large grids
+    
+    $calculatedHeight = $headerHeight + ($rowCount * $rowHeight) + $paginationHeight + 40; // +40 for padding
+    $dynamicHeight = max($minHeight, min($maxHeight, $calculatedHeight));
+    
+    // Dynamic width calculation  
+    $baseColumnWidth = 150; // Base width per column
+    $actionColumnWidth = 120; // Width for action column
+    $selectionColumnWidth = 50; // Width for selection column
+    $minWidth = 400; // Minimum width
+    
+    $calculatedWidth = ($columnCount - ($this->enableEdit || $this->enableDelete ? 1 : 0) - ($this->enableSelection ? 1 : 0)) * $baseColumnWidth;
+    if ($this->enableEdit || $this->enableDelete) {
+        $calculatedWidth += $actionColumnWidth;
+    }
+    if ($this->enableSelection) {
+        $calculatedWidth += $selectionColumnWidth;
+    }
+    
+    // Smart width logic: use full width if we have enough columns or data density
+    $useFullWidth = false;
+    
+    // Use full width if we have many columns (6+ columns including actions)
+    if ($columnCount >= 6) {
+        $useFullWidth = true;
+    }
+    
+    // Use full width if we have lots of data (50+ rows)
+    if ($rowCount >= 50) {
+        $useFullWidth = true;
+    }
+    
+    // Use full width if calculated width would be close to full anyway (80%+ of 1200px)
+    if ($calculatedWidth >= 960) {
+        $useFullWidth = true;
+    }
+    
+    // Determine final width
+    if ($useFullWidth) {
+        $dynamicWidth = '100%';
+        $maxWidthStyle = '';
+    } else {
+        $dynamicWidth = max($minWidth, min(1200, $calculatedWidth)) . 'px';
+        $maxWidthStyle = 'max-width: 100%;';
+    }
+    
+    // Prepare container and grid classes based on width strategy
+    $containerClass = $useFullWidth ? 'w-full' : 'mx-auto';
+    $gridClass = $useFullWidth ? 'w-full' : 'mx-auto';
+    $widthStyle = "width: {$dynamicWidth};";
+    $minWidthStyle = $useFullWidth ? 'min-width: 100%;' : 'min-width: 400px;';
+    
     $html .= <<<HTML
-<div id="{$this->gridId}" class="ag-theme-alpine h-[80vh] w-full mb-6"></div>
+<div class="ag-grid-responsive-container mb-6 {$containerClass}">
+    <div id="{$this->gridId}" class="ag-theme-alpine {$gridClass}" style="height: {$dynamicHeight}px; {$widthStyle} {$minWidthStyle}"></div>
+</div>
+
+<style nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+.ag-grid-responsive-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ag-grid-responsive-container #{$this->gridId} {
+        width: 100% !important;
+        min-width: 320px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .ag-grid-responsive-container #{$this->gridId} {
+        font-size: 12px;
+    }
+    
+    .ag-grid-responsive-container .ag-header-cell-text {
+        font-size: 11px;
+    }
+}
+</style>
 
 <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
 (function() {
@@ -788,6 +887,64 @@ HTML;
         };
         
         const gridApi = window.agGrid.createGrid(eGridDiv, gridOptions);
+
+        // Smart auto-sizing based on content and container
+        setTimeout(() => {
+            const isFullWidth = eGridDiv.classList.contains('w-full');
+            const gridWidth = eGridDiv.offsetWidth;
+            const columnCount = gridApi.getColumns().length;
+            
+            if (isFullWidth) {
+                // For full-width grids, balance between auto-sizing and filling space
+                gridApi.autoSizeAllColumns();
+                
+                // Check if auto-sized columns are too narrow for the available space
+                const columnsWidth = gridApi.getColumns().reduce((total, col) => {
+                    return total + (col.getActualWidth() || 150);
+                }, 0);
+                
+                // If columns take up less than 70% of available space, size to fit
+                if (columnsWidth < gridWidth * 0.7) {
+                    gridApi.sizeColumnsToFit();
+                }
+            } else {
+                // For fixed-width grids, just auto-size to content
+                gridApi.autoSizeAllColumns();
+                
+                // If content is much smaller than fixed width, allow some expansion
+                const columnsWidth = gridApi.getColumns().reduce((total, col) => {
+                    return total + (col.getActualWidth() || 150);
+                }, 0);
+                
+                if (columnsWidth < gridWidth - 100) {
+                    gridApi.sizeColumnsToFit();
+                }
+            }
+        }, 100);
+        
+        // Handle window resize with smarter responsive behavior
+        const resizeHandler = () => {
+            setTimeout(() => {
+                const isFullWidth = eGridDiv.classList.contains('w-full');
+                if (isFullWidth) {
+                    // Full-width grids should always try to fill available space
+                    gridApi.sizeColumnsToFit();
+                } else {
+                    // Fixed-width grids maintain their column sizing unless very cramped
+                    const gridWidth = eGridDiv.offsetWidth;
+                    if (gridWidth < 600) {
+                        gridApi.sizeColumnsToFit();
+                    }
+                }
+            }, 50);
+        };
+        
+        window.addEventListener('resize', resizeHandler);
+        
+        // Clean up resize listener when grid is destroyed
+        eGridDiv.addEventListener('destroyed', () => {
+            window.removeEventListener('resize', resizeHandler);
+        });
 
         // Mass delete functionality
         const massDeleteEnabled = $enableSelectionJS && $enableDeleteJS;
