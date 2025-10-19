@@ -792,36 +792,73 @@ HTML;
         // Mass delete functionality
         const massDeleteEnabled = $enableSelectionJS && $enableDeleteJS;
         if (massDeleteEnabled) {
-            document.getElementById('{$this->gridId}_massDelete')?.addEventListener('click', () => {
+            document.getElementById('{$this->gridId}_massDelete')?.addEventListener('click', async () => {
                 const selectedRows = gridApi.getSelectedRows();
                 if (selectedRows.length === 0) return;
                 
                 const ids = selectedRows.map(row => row.id);
                 if (confirm(`Are you sure you want to delete \${selectedRows.length} selected records?`)) {
-                    fetch('/api/admin/delete-records', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                        },
-                        body: JSON.stringify({
-                            table: '{$this->dbTable}',
-                            ids: ids
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            gridApi.applyTransaction({ remove: selectedRows });
-                            alert(`\${selectedRows.length} records deleted successfully`);
-                        } else {
-                            alert('Error deleting records: ' + (data.message || 'Unknown error'));
+                    const massDeleteButton = document.getElementById('{$this->gridId}_massDelete');
+                    const originalText = massDeleteButton.textContent;
+                    
+                    // Show loading state
+                    massDeleteButton.disabled = true;
+                    massDeleteButton.textContent = 'Deleting...';
+                    
+                    try {
+                        // Create FormData to match API expected format for mass delete
+                        const formData = new FormData();
+                        formData.append('deleteRecords', '{$this->dbTable}');
+                        formData.append('csrf_token', '{$csrfToken}');
+                        
+                        // Send each ID as a separate 'row[]' parameter (PHP array format)
+                        ids.forEach(id => {
+                            formData.append('row[]', id);
+                        });
+                        
+                        const response = await fetch('/api/datagrid/delete-records', {
+                            method: 'POST',
+                            headers: {
+                                'secretHeader': 'badass',
+                                'X-CSRF-TOKEN': '{$csrfToken}'
+                            },
+                            body: formData
+                        });
+                        
+                        const responseStatus = response.status;
+                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
+                            alert('Authentication error, refreshing page');
+                            location.reload();
+                            return;
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error deleting records');
-                    });
+                        
+                        let data, isJson;
+                        if (response.headers.get('content-type')?.includes('application/json')) {
+                            data = await response.json();
+                            isJson = true;
+                        } else {
+                            data = await response.text();
+                            isJson = false;
+                        }
+                        
+                        if (responseStatus >= 400) {
+                            let errorMessage = isJson ? (data.data || JSON.stringify(data)) : data;
+                            alert('Delete failed: ' + errorMessage);
+                        } else {
+                            // Success - remove rows from grid
+                            gridApi.applyTransaction({ remove: selectedRows });
+                            let successMessage = isJson ? data.data : `\${selectedRows.length} records deleted successfully`;
+                            alert(successMessage);
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error during mass delete:', error);
+                        alert('Network error during delete operation');
+                    } finally {
+                        // Reset button state
+                        massDeleteButton.disabled = false;
+                        massDeleteButton.textContent = originalText;
+                    }
                 }
             });
         }

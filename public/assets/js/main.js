@@ -1384,3 +1384,6 @@ if (shareButton) {
 /* Prevented main.js handler conflicts: Mon, Oct 20, 2025  1:03:16 AM */
 /* Custom delete modal no aria-hidden: Mon, Oct 20, 2025  1:04:42 AM */
 /* AGGrid custom button classes to avoid main.js: Mon, Oct 20, 2025  1:07:31 AM */
+/* Mass delete functionality updated: Mon, Oct 20, 2025  1:10:13 AM */
+/* API endpoint fixed for mass delete: Mon, Oct 20, 2025  1:14:43 AM */
+/* AGGrid mass delete format fixed: Mon, Oct 20, 2025  1:16:58 AM */
