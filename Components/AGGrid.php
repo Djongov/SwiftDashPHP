@@ -20,7 +20,7 @@ class AGGrid
     public function __construct(string $gridId = '')
     {
         self::$instanceCount++;
-        $this->gridId = $gridId ?: 'agGrid_' . self::$instanceCount;
+        $this->gridId = $gridId ?: 'agGrid_' . self::$instanceCount . '_' . uniqid();
     }
 
     public function setColumns(array $columns): void
@@ -84,6 +84,47 @@ class AGGrid
     public function getGridId(): string
     {
         return $this->gridId;
+    }
+
+    /**
+     * Generate JavaScript code to initialize AGGrids after AJAX content load
+     * Call this after inserting AGGrid HTML via fetch/AJAX
+     */
+    public static function getInitializationScript(): string
+    {
+        return <<<HTML
+<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+console.log('AGGrid: getInitializationScript executed');
+// Initialize any AGGrid instances that were loaded via AJAX
+if (typeof window.initializeAGGrids === 'function') {
+    console.log('AGGrid: Calling initializeAGGrids from getInitializationScript');
+    window.initializeAGGrids();
+} else {
+    console.warn('AGGrid: initializeAGGrids function not found. Make sure at least one AGGrid was loaded on the initial page.');
+}
+</script>
+HTML;
+    }
+
+    /**
+     * Generate JavaScript code to initialize a specific AGGrid by ID
+     */
+    public static function getSpecificInitializationScript(string $gridId): string
+    {
+        return <<<HTML
+<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+console.log('AGGrid: getSpecificInitializationScript executed for: {$gridId}');
+// Initialize specific AGGrid instance
+if (typeof window.initializeAGGrid === 'function') {
+    console.log('AGGrid: Calling initializeAGGrid for specific grid: {$gridId}');
+    if (!window.initializeAGGrid('{$gridId}')) {
+        console.warn('AGGrid: Failed to initialize specific grid: {$gridId}');
+    }
+} else {
+    console.warn('AGGrid: initializeAGGrid function not found. Make sure at least one AGGrid was loaded on the initial page.');
+}
+</script>
+HTML;
     }
 
     /**
@@ -177,13 +218,16 @@ class AGGrid
             return \Components\Alerts::danger($noResultsText);
         }
 
+        // Normalize data structure for AGGrid compatibility
+        $normalizedData = self::normalizeDataStructure($data);
+
         $grid = new self();
         $grid->setTheme($theme);
         
-        // Extract columns from data
-        $columns = array_keys($data[0] ?? []);
+        // Extract columns from normalized data
+        $columns = array_keys($normalizedData[0] ?? []);
         $grid->setColumns($columns);
-        $grid->setData($data);
+        $grid->setData($normalizedData);
         
         $html = '';
         if ($title) {
@@ -193,6 +237,166 @@ class AGGrid
         $html .= $grid->render();
         
         return $html;
+    }
+
+    /**
+     * Normalize complex array structures (like $_SERVER) for AGGrid display
+     * Handles cases where array values might be mixed types (arrays, strings, etc.)
+     */
+    private static function normalizeDataStructure(array $data): array
+    {
+        // Check if data is already in tabular format (array of associative arrays)
+        if (self::isTabularData($data)) {
+            return $data;
+        }
+        
+        // Handle associative arrays like $_SERVER, $_ENV, etc.
+        if (self::isAssociativeArray($data)) {
+            return self::convertAssociativeToTabular($data);
+        }
+        
+        // Handle indexed arrays with mixed content
+        return self::convertIndexedToTabular($data);
+    }
+    
+    /**
+     * Check if data is already in proper tabular format
+     */
+    private static function isTabularData(array $data): bool
+    {
+        if (empty($data)) {
+            return false;
+        }
+        
+        // Check if first element is an associative array
+        $firstElement = reset($data);
+        return is_array($firstElement) && !self::isAssociativeArray($firstElement);
+    }
+    
+    /**
+     * Check if array is associative (not purely indexed)
+     */
+    private static function isAssociativeArray(array $array): bool
+    {
+        if (empty($array)) {
+            return false;
+        }
+        return array_keys($array) !== range(0, count($array) - 1);
+    }
+    
+    /**
+     * Convert associative array (like $_SERVER) to tabular format
+     */
+    private static function convertAssociativeToTabular(array $data): array
+    {
+        $tabularData = [];
+        $maxColumns = 0;
+        
+        // First pass: determine the maximum number of columns needed
+        foreach ($data as $key => $value) {
+            $columns = self::flattenValue($value);
+            $maxColumns = max($maxColumns, count($columns));
+        }
+        
+        // Second pass: create rows with consistent column count
+        foreach ($data as $key => $value) {
+            $row = ['key' => $key];
+            $flattenedValue = self::flattenValue($value);
+            
+            // Add value columns
+            for ($i = 0; $i < $maxColumns; $i++) {
+                $columnName = $maxColumns === 1 ? 'value' : 'column' . ($i + 1);
+                $row[$columnName] = $flattenedValue[$i] ?? '';
+            }
+            
+            $tabularData[] = $row;
+        }
+        
+        return $tabularData;
+    }
+    
+    /**
+     * Convert indexed array to tabular format
+     */
+    private static function convertIndexedToTabular(array $data): array
+    {
+        $tabularData = [];
+        $maxColumns = 0;
+        
+        // Determine max columns needed
+        foreach ($data as $index => $value) {
+            $columns = self::flattenValue($value);
+            $maxColumns = max($maxColumns, count($columns));
+        }
+        
+        // Create tabular structure
+        foreach ($data as $index => $value) {
+            $row = ['index' => $index];
+            $flattenedValue = self::flattenValue($value);
+            
+            for ($i = 0; $i < $maxColumns; $i++) {
+                $columnName = $maxColumns === 1 ? 'value' : 'column' . ($i + 1);
+                $row[$columnName] = $flattenedValue[$i] ?? '';
+            }
+            
+            $tabularData[] = $row;
+        }
+        
+        return $tabularData;
+    }
+    
+    /**
+     * Flatten a value into an array of strings for display
+     */
+    private static function flattenValue($value): array
+    {
+        if (is_array($value)) {
+            if (empty($value)) {
+                return ['[empty array]'];
+            }
+            
+            // For simple arrays, join with commas
+            if (!self::isAssociativeArray($value)) {
+                // If all elements are scalar, join them
+                $allScalar = array_reduce($value, function($carry, $item) {
+                    return $carry && is_scalar($item);
+                }, true);
+                
+                if ($allScalar && count($value) <= 5) {
+                    return [implode(', ', $value)];
+                }
+            }
+            
+            // For complex arrays, convert to JSON or key-value pairs
+            if (count($value) <= 3 && self::isAssociativeArray($value)) {
+                $pairs = [];
+                foreach ($value as $k => $v) {
+                    if (is_scalar($v)) {
+                        $pairs[] = "$k: $v";
+                    } else {
+                        $pairs[] = "$k: " . json_encode($v);
+                    }
+                }
+                return $pairs;
+            }
+            
+            // For large or complex arrays, use JSON
+            return [json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)];
+        }
+        
+        if (is_object($value)) {
+            return [json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)];
+        }
+        
+        if (is_bool($value)) {
+            return [$value ? 'true' : 'false'];
+        }
+        
+        if (is_null($value)) {
+            return ['null'];
+        }
+        
+        return [(string)$value];
     }
 
 
@@ -399,6 +603,14 @@ HTML;
             setTimeout(initGrid_{$jsGridId}, 100);
             return;
         }
+        
+        // PREVENT DOUBLE INITIALIZATION - check if already initialized
+        if (eGridDiv.hasAttribute('data-ag-grid-initialized')) {
+            console.log('AGGrid: Grid {$this->gridId} already initialized, skipping');
+            return;
+        }
+        
+        console.log('AGGrid: Starting initialization for:', '{$this->gridId}');
 
         // Action cell renderer for edit/delete buttons
         class ActionCellRenderer {
@@ -886,7 +1098,46 @@ HTML;
             }
         };
         
+        // CRITICAL: Check if grid is already created to prevent double initialization
+        if (eGridDiv._agGridApi) {
+            console.log('AGGrid: Grid already exists, destroying before recreating:', eGridDiv.id);
+            try {
+                eGridDiv._agGridApi.destroy();
+                delete eGridDiv._agGridApi;
+            } catch(e) {
+                console.log('AGGrid: Error destroying existing grid:', e);
+            }
+        }
+        
+        // Double-check for any remaining AG-Grid DOM elements
+        const existingAgElements = eGridDiv.querySelectorAll('.ag-root-wrapper, .ag-aria-description-container');
+        if (existingAgElements.length > 0) {
+            console.log('AGGrid: Found', existingAgElements.length, 'remaining AG-Grid elements, removing them');
+            existingAgElements.forEach(el => el.remove());
+        }
+        
+        // Mark as initialized BEFORE creating to prevent race conditions
+        eGridDiv.setAttribute('data-ag-grid-initialized', 'true');
+        
+        console.log('AGGrid: Creating new grid for:', eGridDiv.id);
         const gridApi = window.agGrid.createGrid(eGridDiv, gridOptions);
+        
+        // Store the API reference for cleanup purposes
+        eGridDiv._agGridApi = gridApi;
+        console.log('AGGrid: Grid created successfully for:', eGridDiv.id);
+        
+        // Final check for duplicate content after creation
+        setTimeout(() => {
+            const rootWrappers = eGridDiv.querySelectorAll('.ag-root-wrapper');
+            if (rootWrappers.length > 1) {
+                console.error('AGGrid: CRITICAL - Multiple ag-root-wrapper elements detected after creation!', rootWrappers.length);
+                // Remove all but the last one
+                for (let i = 0; i < rootWrappers.length - 1; i++) {
+                    console.log('AGGrid: Emergency removal of duplicate wrapper', i);
+                    rootWrappers[i].remove();
+                }
+            }
+        }, 100);
 
         // Smart auto-sizing based on content and container
         setTimeout(() => {
@@ -1054,12 +1305,331 @@ HTML;
         });
     };
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initGrid_{$jsGridId});
+    // Register this grid for dynamic initialization
+    if (!window.AGGridInstances) {
+        console.log('AGGrid: Creating global AGGridInstances registry');
+        window.AGGridInstances = new Map();
+    }
+    console.log('AGGrid: Registering grid for dynamic initialization:', '{$this->gridId}');
+    console.log('AGGrid: JavaScript function name:', 'initGrid_{$jsGridId}');
+    console.log('AGGrid: Registration happening at:', new Date().toISOString());
+    window.AGGridInstances.set('{$this->gridId}', initGrid_{$jsGridId});
+    console.log('AGGrid: Registry now contains:', Array.from(window.AGGridInstances.keys()));
+
+    // Only auto-initialize if not in AJAX context (document ready state check)
+    // For AJAX content, initializeAGGrids() will handle the initialization
+    const gridElement = document.querySelector('#{$this->gridId}');
+    if (gridElement && !gridElement.hasAttribute('data-ag-grid-initialized')) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initGrid_{$jsGridId});
+        } else {
+            // Add a small delay to ensure DOM is fully ready and avoid double initialization
+            setTimeout(() => {
+                const stillNotInitialized = !gridElement.hasAttribute('data-ag-grid-initialized');
+                console.log('AGGrid: Auto-init check for {$this->gridId}, not initialized:', stillNotInitialized);
+                if (stillNotInitialized) {
+                    initGrid_{$jsGridId}();
+                }
+            }, 10);
+        }
     } else {
-        initGrid_{$jsGridId}();
+        console.log('AGGrid: Skipping auto-init for {$this->gridId} - element not found or already initialized');
     }
 })();
+
+// Global function to initialize AGGrid instances dynamically (for AJAX-loaded content)
+if (!window.initializeAGGrids) {
+    console.log('AGGrid: Setting up global initializeAGGrids function');
+    
+    window.initializeAGGrids = function(containerElement = document) {
+        console.log('AGGrid: initializeAGGrids called');
+        console.log('AGGrid: Container element:', containerElement);
+        console.log('AGGrid: Container element type:', containerElement ? containerElement.constructor.name : 'null');
+        console.log('AGGrid: Container is document?', containerElement === document);
+        
+        if (containerElement && containerElement.innerHTML) {
+            console.log('AGGrid: Container innerHTML (first 300 chars):', containerElement.innerHTML.substring(0, 300));
+        }
+        
+        // Find all AGGrid containers in the specified element
+        const gridContainers = containerElement.querySelectorAll('[id^="agGrid_"]');
+        console.log('AGGrid: Found', gridContainers.length, 'grid containers');
+        
+        // If we're initializing AJAX-loaded content (not the whole document), optionally clean up existing grids
+        if (containerElement !== document && gridContainers.length > 0) {
+            console.log('AGGrid: AJAX content detected');
+            
+            // Enable cleanup to replace old grids with new ones
+            const enableCleanup = true; // Set to false to allow multiple grids
+            
+            if (enableCleanup) {
+                console.log('AGGrid: Performing selective cleanup of old AGGrid elements');
+            
+            // Remove containers that don't contain the new content
+            const allContainers = document.querySelectorAll('.ag-grid-responsive-container');
+            console.log('AGGrid: Found', allContainers.length, 'containers to check');
+            allContainers.forEach((container, index) => {
+                if (!containerElement.contains(container)) {
+                    console.log('AGGrid: Removing old container', index);
+                    container.remove();
+                } else {
+                    console.log('AGGrid: Keeping container', index, '- it contains new content');
+                }
+            });
+            
+            // Remove ALL grids that aren't in the new container - check both DOM and registry
+            console.log('AGGrid: Checking registry for grids to remove');
+            if (window.AGGridInstances) {
+                const registryKeys = Array.from(window.AGGridInstances.keys());
+                console.log('AGGrid: Registry contains:', registryKeys);
+                
+                registryKeys.forEach(gridId => {
+                    const gridElement = document.getElementById(gridId);
+                    if (gridElement) {
+                        if (!containerElement.contains(gridElement)) {
+                            console.log('AGGrid: Removing registry grid from DOM:', gridId);
+                            // Remove the grid's container
+                            const gridContainer = gridElement.closest('.ag-grid-responsive-container');
+                            if (gridContainer) {
+                                gridContainer.remove();
+                            } else {
+                                gridElement.remove();
+                            }
+                            // Remove from registry
+                            window.AGGridInstances.delete(gridId);
+                            console.log('AGGrid: Removed', gridId, 'from registry');
+                        } else {
+                            console.log('AGGrid: Keeping registry grid:', gridId, '- it is in new content');
+                        }
+                    } else {
+                        console.log('AGGrid: Registry grid', gridId, 'not found in DOM - removing from registry');
+                        window.AGGridInstances.delete(gridId);
+                    }
+                });
+            }
+            
+            // Also check DOM for any remaining grids
+            const allExistingGrids = document.querySelectorAll('[id^="agGrid_"]');
+            console.log('AGGrid: Found', allExistingGrids.length, 'grid elements in DOM after registry cleanup');
+            allExistingGrids.forEach((grid, index) => {
+                if (!containerElement.contains(grid)) {
+                    console.log('AGGrid: Removing remaining DOM grid element', index, ':', grid.id);
+                    const gridContainer = grid.closest('.ag-grid-responsive-container');
+                    if (gridContainer) {
+                        gridContainer.remove();
+                    } else {
+                        grid.remove();
+                    }
+                } else {
+                    console.log('AGGrid: Keeping DOM grid element', index, ':', grid.id, '- it is in new content');
+                }
+            });
+
+            
+                console.log('AGGrid: Finished removing existing grids');
+                console.log('AGGrid: Registry now contains:', window.AGGridInstances ? Array.from(window.AGGridInstances.keys()) : 'none');
+                
+                // Advanced debugging to detect duplicate AG-Grid structures
+                const remainingGrids = document.querySelectorAll('[id^="agGrid_"]');
+                console.log('AGGrid: After cleanup - remaining grids in DOM:', remainingGrids.length);
+                
+                remainingGrids.forEach((grid, index) => {
+                    const gridId = grid.id;
+                    const agRootWrappers = grid.querySelectorAll('.ag-root-wrapper');
+                    const visibleWrappers = Array.from(agRootWrappers).filter(wrapper => 
+                        wrapper.offsetWidth > 0 && wrapper.offsetHeight > 0
+                    );
+                    
+                    console.log('AGGrid: Grid', index, ':', gridId);
+                    console.log('  - Total ag-root-wrapper elements:', agRootWrappers.length);
+                    console.log('  - Visible ag-root-wrapper elements:', visibleWrappers.length);
+                    console.log('  - Grid element visible:', grid.offsetWidth > 0 && grid.offsetHeight > 0);
+                    
+                    // If we have multiple ag-root-wrapper elements, this is the problem!
+                    if (agRootWrappers.length > 1) {
+                        console.warn('AGGrid: DUPLICATE DETECTED! Grid', gridId, 'has', agRootWrappers.length, 'ag-root-wrapper elements!');
+                        
+                        // Remove all but the last one (assuming the last one is the new one)
+                        for (let i = 0; i < agRootWrappers.length - 1; i++) {
+                            console.log('AGGrid: Removing duplicate ag-root-wrapper', i, 'from grid', gridId);
+                            agRootWrappers[i].remove();
+                        }
+                        console.log('AGGrid: Removed', agRootWrappers.length - 1, 'duplicate ag-root-wrapper elements from', gridId);
+                    }
+                });
+                
+                const remainingContainers = document.querySelectorAll('.ag-grid-responsive-container');
+                console.log('AGGrid: After cleanup - remaining containers:', remainingContainers.length);
+            } else {
+                console.log('AGGrid: Cleanup disabled - allowing multiple grids');
+            }
+        }
+        
+        // Log details about each found container
+        for (let i = 0; i < gridContainers.length; i++) {
+            const element = gridContainers[i];
+            console.log('AGGrid: Container ' + i + ': ID=' + element.id + ', initialized=' + element.hasAttribute('data-ag-grid-initialized'));
+            console.log('AGGrid: Container ' + i + ' parent:', element.parentElement ? element.parentElement.tagName + '.' + element.parentElement.className : 'no parent');
+        }
+        
+        // Also check all grids in the entire document for comparison
+        if (containerElement !== document) {
+            const allGridContainers = document.querySelectorAll('[id^="agGrid_"]');
+            console.log('AGGrid: For comparison - total grids in document:', allGridContainers.length);
+            for (let i = 0; i < allGridContainers.length; i++) {
+                const element = allGridContainers[i];
+                console.log('AGGrid: Document grid ' + i + ': ID=' + element.id + ', initialized=' + element.hasAttribute('data-ag-grid-initialized'), ', hidden=' + element.hasAttribute('data-ag-grid-hidden'));
+            }
+        }
+        
+        gridContainers.forEach(gridElement => {
+            const gridId = gridElement.id;
+            console.log('AGGrid: Processing grid:', gridId);
+            
+            // CRITICAL: Before initializing, completely clear any existing AG-Grid content
+            console.log('AGGrid: Clearing any existing AG-Grid content from element:', gridId);
+            const existingAgContent = gridElement.querySelectorAll('.ag-root-wrapper, .ag-aria-description-container');
+            if (existingAgContent.length > 0) {
+                console.log('AGGrid: Found', existingAgContent.length, 'existing AG-Grid elements to remove');
+                existingAgContent.forEach((element, index) => {
+                    console.log('AGGrid: Removing existing element', index, ':', element.className);
+                    element.remove();
+                });
+            }
+            
+            // Also destroy any existing grid API if available
+            if (gridElement._agGridApi) {
+                console.log('AGGrid: Destroying existing grid API for:', gridId);
+                try {
+                    gridElement._agGridApi.destroy();
+                    delete gridElement._agGridApi;
+                } catch (error) {
+                    console.log('AGGrid: Error destroying existing API:', error);
+                }
+            }
+            
+            if (window.AGGridInstances && window.AGGridInstances.has(gridId)) {
+                console.log('AGGrid: Found initialization function for:', gridId);
+                const initFunction = window.AGGridInstances.get(gridId);
+                
+                // Only initialize if not already initialized
+                if (!gridElement.hasAttribute('data-ag-grid-initialized')) {
+                    console.log('AGGrid: Initializing grid:', gridId);
+                    try {
+                        initFunction();
+                        gridElement.setAttribute('data-ag-grid-initialized', 'true');
+                        console.log('AGGrid: Successfully initialized dynamically:', gridId);
+                    } catch (error) {
+                        console.error('AGGrid: Error initializing grid:', gridId, error);
+                    }
+                } else {
+                    console.log('AGGrid: Grid already initialized:', gridId);
+                }
+            } else {
+                console.warn('AGGrid: No initialization function found for:', gridId);
+                console.log('AGGrid: Available instances:', window.AGGridInstances ? Array.from(window.AGGridInstances.keys()) : 'none');
+                
+                // The script tag didn't execute because innerHTML doesn't run scripts
+                // Let's find and execute the script manually
+                console.log('AGGrid: Looking for script tags to execute for:', gridId);
+                const scriptTags = containerElement.querySelectorAll('script');
+                console.log('AGGrid: Found', scriptTags.length, 'script tags in container');
+                
+                scriptTags.forEach((script, index) => {
+                    console.log('AGGrid: Processing script tag', index);
+                    if (script.innerHTML && script.innerHTML.includes(gridId)) {
+                        console.log('AGGrid: Found script for grid', gridId, '- executing it');
+                        try {
+                            // Create a new script element and execute it
+                            const newScript = document.createElement('script');
+                            newScript.innerHTML = script.innerHTML;
+                            if (script.nonce) newScript.nonce = script.nonce;
+                            document.head.appendChild(newScript);
+                            console.log('AGGrid: Script executed successfully for:', gridId);
+                            
+                            // Now try to initialize after a brief delay
+                            setTimeout(() => {
+                                if (window.AGGridInstances && window.AGGridInstances.has(gridId)) {
+                                    console.log('AGGrid: Found registration after script execution:', gridId);
+                                    const initFunction = window.AGGridInstances.get(gridId);
+                                    if (!gridElement.hasAttribute('data-ag-grid-initialized')) {
+                                        try {
+                                            initFunction();
+                                            gridElement.setAttribute('data-ag-grid-initialized', 'true');
+                                            console.log('AGGrid: Successfully initialized grid after script execution:', gridId);
+                                        } catch (error) {
+                                            console.error('AGGrid: Error initializing grid after script execution:', gridId, error);
+                                        }
+                                    }
+                                } else {
+                                    console.error('AGGrid: Still no registration found after script execution:', gridId);
+                                }
+                            }, 50);
+                        } catch (error) {
+                            console.error('AGGrid: Error executing script for:', gridId, error);
+                        }
+                    }
+                });
+            }
+        });
+        
+        console.log('AGGrid: Initialization complete. Total grids processed:', gridContainers.length);
+        
+        // FINAL DEBUG: Let's see what's actually visible to the user
+        setTimeout(() => {
+            const allVisibleGrids = [];
+            document.querySelectorAll('[id^="agGrid_"]').forEach(grid => {
+                const rect = grid.getBoundingClientRect();
+                const isActuallyVisible = rect.width > 0 && rect.height > 0 && 
+                                        grid.offsetParent !== null && 
+                                        window.getComputedStyle(grid).display !== 'none' &&
+                                        window.getComputedStyle(grid).visibility !== 'hidden' &&
+                                        window.getComputedStyle(grid).opacity !== '0';
+                if (isActuallyVisible) {
+                    allVisibleGrids.push({
+                        id: grid.id,
+                        rect: rect,
+                        parent: grid.parentElement ? grid.parentElement.className : 'no parent'
+                    });
+                }
+            });
+            console.log('AGGrid: ACTUALLY VISIBLE GRIDS COUNT:', allVisibleGrids.length);
+            allVisibleGrids.forEach((grid, index) => {
+                console.log('AGGrid: Visible grid', index, ':', grid.id, 'at', grid.rect.left + ',' + grid.rect.top, 'size', grid.rect.width + 'x' + grid.rect.height);
+            });
+        }, 500);
+    };
+    
+    // Helper function to initialize a specific AGGrid by ID
+    window.initializeAGGrid = function(gridId) {
+        console.log('AGGrid: initializeAGGrid called for:', gridId);
+        console.log('AGGrid: Available instances:', window.AGGridInstances ? Array.from(window.AGGridInstances.keys()) : 'none');
+        
+        if (window.AGGridInstances && window.AGGridInstances.has(gridId)) {
+            console.log('AGGrid: Found initialization function for specific grid:', gridId);
+            const gridElement = document.getElementById(gridId);
+            const initFunction = window.AGGridInstances.get(gridId);
+            
+            if (gridElement && !gridElement.hasAttribute('data-ag-grid-initialized')) {
+                console.log('AGGrid: Element found and not initialized, proceeding with initialization');
+                try {
+                    initFunction();
+                    gridElement.setAttribute('data-ag-grid-initialized', 'true');
+                    console.log('AGGrid: Successfully initialized specific grid:', gridId);
+                    return true;
+                } catch (error) {
+                    console.error('AGGrid: Error initializing specific grid:', gridId, error);
+                    return false;
+                }
+            } else {
+                console.log('AGGrid: Element not found or already initialized for:', gridId);
+            }
+        } else {
+            console.warn('AGGrid: No initialization function found for specific grid:', gridId);
+        }
+        return false;
+    };
+}
 </script>
 
 HTML;

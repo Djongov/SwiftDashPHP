@@ -21,8 +21,8 @@ $allowedParams = ['api-action', 'csrf_token'];
 // Check if the required parameters are present
 $checks->checkParams($allowedParams, $_POST);
 
-if ($_POST['api-action'] !== 'prase-phpinfo') {
-    Response::output('Invalid action');
+if ($_POST['api-action'] !== 'parse-phpinfo') {
+    Response::output('Invalid action', 400);
 }
 
 $phpInfoArray = General::parsePhpInfo();

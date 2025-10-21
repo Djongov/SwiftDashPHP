@@ -44,7 +44,8 @@ echo '</form>';
 if (isset($_GET['table']) && in_array($_GET['table'], $dbTables)) {
     $tableName = $_GET['table'];
     $engine = DEFAULT_DATA_GRID_ENGINE;
-    echo "\Components\\$engine"::fromDBTable(
+    $componentClass = "\\Components\\$engine";
+    echo $componentClass::fromDBTable(
         $tableName,           // table name
         $tableName, // title
         $theme,           // theme

@@ -1389,3 +1389,5 @@ if (shareButton) {
 /* AGGrid mass delete format fixed: Mon, Oct 20, 2025  1:16:58 AM */
 /* AGGrid dynamic sizing implemented: Mon, Oct 20, 2025  1:21:11 AM */
 /* AGGrid smart width logic implemented: Mon, Oct 20, 2025  1:25:41 AM */
+/* AGGrid dynamic initialization added: Mon, Oct 20, 2025 10:20:23 AM */
+/* AGGrid data normalization restored: Mon, Oct 20, 2025 10:24:17 AM */

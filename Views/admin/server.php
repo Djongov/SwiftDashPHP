@@ -74,8 +74,8 @@ if (empty($errorLog)) {
     echo '</div>';
 }
 
-
-echo DataGrid::fromData('Server Info', $_SERVER, $theme);
+//echo DataGrid::fromData('Server Info', $_SERVER, $theme);
+echo \Components\AGGrid::fromData('Server Info (AG Grid)', $_SERVER, $theme);
 
 echo Html::h2('PHP Info', true);
 
@@ -84,7 +84,7 @@ $phpInfoFormOptions = [
         'hidden' => [
             [
                 'name' => 'api-action',
-                'value' => 'prase-phpinfo'
+                'value' => 'parse-phpinfo'
             ]
         ]
     ],

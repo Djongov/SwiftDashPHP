@@ -303,6 +303,15 @@ const handleFormFetch = (form, currentEvent, resultType) => {
                         initializeAllDataGrids();
                     })
                 }
+                
+                // Initialize any AGGrid instances that were loaded via fetch
+                if (typeof window.initializeAGGrids === 'function') {
+                    console.log('forms.js: Calling initializeAGGrids after form fetch');
+                    window.initializeAGGrids(newResultDiv);
+                } else {
+                    console.log('forms.js: AGGrid initialization function not available');
+                }
+                
                 if (form.getAttribute("data-reload") === "true") {
                     location.reload();
                     // Otherwise display the returned data
@@ -596,6 +605,15 @@ const handleFetchDataResponse = (response, form) => {
                     initializeAllDataGrids();
                 })
             }
+            
+            // Initialize any AGGrid instances that were loaded via fetch
+            if (typeof window.initializeAGGrids === 'function') {
+                console.log('forms.js: Calling initializeAGGrids after fetch data response');
+                window.initializeAGGrids(newResultDiv);
+            } else {
+                console.log('forms.js: AGGrid initialization function not available');
+            }
+            
             // If there were copy buttons in the response, let's initiate them
             copyToClipboard();
             // If we have html coming in, it could hold other forms, so let's initiate them. So let's find if there is a form.generic selector in the response
