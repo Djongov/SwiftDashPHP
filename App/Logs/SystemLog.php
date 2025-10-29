@@ -13,6 +13,9 @@ class SystemLog
 {
     public static function write(string $message, string $category): void
     {
+        if (!mb_check_encoding($message, 'UTF-8')) {
+            $message = mb_convert_encoding($message, 'UTF-8');
+        }
         $username = AuthToken::get() != null ? JWT::extractUserName(AuthToken::get()) : 'unknown';
         $db = new DB();
         $pdo = $db->getConnection();
