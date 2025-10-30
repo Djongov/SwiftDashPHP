@@ -195,3 +195,40 @@ function base64url_decode(string $data): string
     $data .= str_repeat('=', (4 - strlen($data) % 4) % 4); // Add padding
     return base64_decode(strtr($data, '-_', '+/'));
 }
+function containsArray($piece, $array, $case_sensitive = false)
+{
+    foreach ($array as $element) {
+        if ($element === null || $piece === null) {
+            continue;
+        }
+        if ($case_sensitive) {
+            if (stristr($piece, $element) !== false) {
+                return true;
+            }
+        } else {
+            if (strstr($piece, $element) !== false) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+function containsArrayReturnElement($piece, $array, $case_sensitive = false)
+{
+    foreach ($array as $element) {
+        if ($case_sensitive) {
+            if (stristr($piece, $element) !== false) {
+                return $element;
+            }
+        } else {
+            if (strstr($piece, $element) !== false) {
+                return $element;
+            }
+        }
+    }
+    return false;
+}
+function compareIsEqualArray(array $array1, array $array2): bool
+{
+    return array_diff($array1, $array2) == [] && array_diff($array2, $array1) == [];
+}

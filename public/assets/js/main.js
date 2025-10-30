@@ -318,22 +318,22 @@ const initializeAutoLoadedComponents = () => {
 initializeAutoLoadedComponents();
 
 // Handle the submitting of the IP address form if there is a get request with query paramter "ip". If it does, find a form with .generic-form class and simulate a click on the form submitter
-const urlParams = new URLSearchParams(window.location.search);
-const ip = urlParams.get('ip');
-if (ip) {
-    const form = document.querySelector('form.generic-form');
-    // Also update the value of input with name "ip" to the ip address
-    const ipInput = document.querySelector('input[name="ipAddress"]');
-    ipInput.value = ip;
+// const urlParams = new URLSearchParams(window.location.search);
+// const ip = urlParams.get('ip');
+// if (ip) {
+//     const form = document.querySelector('form.generic-form');
+//     // Also update the value of input with name "ip" to the ip address
+//     const ipInput = document.querySelector('input[name="ipAddress"]');
+//     ipInput.value = ip;
 
-    // Find the submit button by tag name (button) or by class name (e.g., "submit-button-class")
-    const submitButton = form.querySelector('button'); // By tag name
-    // Or, if the button has a class name:
-    // const submitButton = form.querySelector('.submit-button-class');
-    if (submitButton) {
-        submitButton.click();
-    }
-}
+//     // Find the submit button by tag name (button) or by class name (e.g., "submit-button-class")
+//     const submitButton = form.querySelector('button'); // By tag name
+//     // Or, if the button has a class name:
+//     // const submitButton = form.querySelector('.submit-button-class');
+//     if (submitButton) {
+//         submitButton.click();
+//     }
+// }
 
 // Universal fetch function
 async function fetchData(form, resultDivId = null, resultType = null) {
@@ -1370,24 +1370,4 @@ if (shareButton) {
             await fallbackToClipboard(shareData.url);
         }
     });
-}/* Test cache: Mon, Oct 20, 2025 12:11:15 AM */
-/* Cache clear: Mon, Oct 20, 2025 12:18:43 AM */
-/* Cache clear: Mon, Oct 20, 2025 12:33:15 AM */
-/* Cancel buttons fixed: Mon, Oct 20, 2025 12:40:36 AM */
-/* Exact main.js pattern: Mon, Oct 20, 2025 12:43:18 AM */
-/* Fixed syntax error with unique function names: Mon, Oct 20, 2025 12:44:47 AM */
-/* Modal blur protection added: Mon, Oct 20, 2025 12:47:12 AM */
-/* AG Grid-aware blur management: Mon, Oct 20, 2025 12:49:07 AM */
-/* Cancel button blur and aria fixes: Mon, Oct 20, 2025 12:52:11 AM */
-/* Fixed whole page blur on modal close: Mon, Oct 20, 2025 12:57:16 AM */
-/* Delete modal - NO BLUR completely removed: Mon, Oct 20, 2025  1:01:01 AM */
-/* Prevented main.js handler conflicts: Mon, Oct 20, 2025  1:03:16 AM */
-/* Custom delete modal no aria-hidden: Mon, Oct 20, 2025  1:04:42 AM */
-/* AGGrid custom button classes to avoid main.js: Mon, Oct 20, 2025  1:07:31 AM */
-/* Mass delete functionality updated: Mon, Oct 20, 2025  1:10:13 AM */
-/* API endpoint fixed for mass delete: Mon, Oct 20, 2025  1:14:43 AM */
-/* AGGrid mass delete format fixed: Mon, Oct 20, 2025  1:16:58 AM */
-/* AGGrid dynamic sizing implemented: Mon, Oct 20, 2025  1:21:11 AM */
-/* AGGrid smart width logic implemented: Mon, Oct 20, 2025  1:25:41 AM */
-/* AGGrid dynamic initialization added: Mon, Oct 20, 2025 10:20:23 AM */
-/* AGGrid data normalization restored: Mon, Oct 20, 2025 10:24:17 AM */
+}
