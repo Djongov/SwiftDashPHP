@@ -38,7 +38,7 @@ class SystemConfig
         $dotenv = \Dotenv\Dotenv::createImmutable(ROOT);
         
         try {
-            $dotenv->load();
+            $dotenv->safeLoad();
         } catch (\Exception $e) {
             die($e->getMessage());
         }

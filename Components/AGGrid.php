@@ -8,7 +8,7 @@ class AGGrid
 {
     private string $gridId;
     private array $columns = [];
-    private array $data = [];
+    protected array $data = [];
     private static bool $resourcesLoaded = false;
     private static int $instanceCount = 0;
     private bool $enableEdit = false;
