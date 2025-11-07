@@ -12,6 +12,13 @@ if (ini_get('display_errors') == 1) {
     define('ERROR_VERBOSE', false);
 }
 
+foreach (array_keys($_ENV + getenv()) as $key) {
+    $val = getenv($key);
+    if ($val !== false) {
+        $_ENV[$key] = trim($val, "\"'");
+    }
+}
+
 class SystemConfig
 {
     private static bool $loaded = false;
