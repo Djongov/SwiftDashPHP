@@ -9,39 +9,42 @@ class JsonSettingEditor
     public static function editJsonFile(string $filePath, array $newData, bool $overwrite = false): bool
     {
         if (!file_exists($filePath)) {
-            return false;
+            throw new \RuntimeException("File does not exist: $filePath");
         }
 
-        $jsonContent = file_get_contents($filePath);
+        $jsonContent = @file_get_contents($filePath);
         if ($jsonContent === false) {
-            return false;
+            $error = error_get_last();
+            throw new \RuntimeException("Failed to read file '$filePath'. Error: " . ($error['message'] ?? 'unknown'));
         }
 
         $data = json_decode($jsonContent, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return false;
+            throw new \RuntimeException("JSON decode error in '$filePath': " . json_last_error_msg());
         }
 
         if ($overwrite) {
             $data = $newData;
         } else {
-            // Append if not overwriting
             if (!is_array($data)) {
                 $data = [];
             }
         }
-        // Merge new data into existing data
+
         $updatedData = array_merge($data, $newData);
 
-        // Encode back to JSON with pretty print
         $newJsonContent = json_encode($updatedData, JSON_PRETTY_PRINT);
         if ($newJsonContent === false) {
-            return false;
+            throw new \RuntimeException("Failed to encode JSON: " . json_last_error_msg());
         }
 
-        // Write back to the file
-        $result = file_put_contents($filePath, $newJsonContent);
-        return $result !== false;
+        $result = @file_put_contents($filePath, $newJsonContent);
+        if ($result === false) {
+            $error = error_get_last();
+            throw new \RuntimeException("Failed to write file '$filePath'. Error: " . ($error['message'] ?? 'unknown'));
+        }
+
+        return true;
     }
 
     /**
@@ -82,7 +85,6 @@ class JsonSettingEditor
         
         // Form header
         $html .= '<div class="max-w-4xl mx-auto my-4 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">';
-        $html .= \Components\Html::h2('JSON Configuration Editor', false, ['mb-6']);
         
         // File info
         $html .= '<div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">';
@@ -353,12 +355,12 @@ class JsonSettingEditor
 
         if ($success) {
             return [
-                'success' => true, 
+                'success' => true,
                 'message' => 'Configuration saved successfully to ' . basename($filePath)
             ];
         } else {
             return [
-                'success' => false, 
+                'success' => false,
                 'message' => 'Failed to save configuration file'
             ];
         }

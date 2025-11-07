@@ -6,7 +6,7 @@
         "type": "number"
     },
     "default_data_grid_engine": {
-        "value": "AGGrid",
+        "value": "DataGrid",
         "label": "Default Data Grid Engine",
         "description": "The default data grid engine to use ('AGGrid', 'DataGrid')",
         "type": "string"

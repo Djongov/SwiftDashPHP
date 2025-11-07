@@ -16,23 +16,20 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && apt-get install -y --no-install-recommends \
     # Core utilities
     curl \
-    wget \
     dialog \
-    sed \
-    unzip \
-    vim \
-    # PHP dependencies
+    dnsutils \
+    iputils-ping \
     libgmp-dev \
     libicu-dev \
     libssl-dev \
-    # SSH server
-    openssh-server \
-    # Network utilities
-    iputils-ping \
-    dnsutils \
-    redis-tools \
     net-tools \
+    openssh-server \
+    redis-tools \
+    sed \
     telnet \
+    unzip \
+    vim \
+    wget \
     && rm -rf /var/lib/apt/lists/* \
     \
     # ========================================
@@ -75,7 +72,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && chown www-data:www-data /var/www/html/public/assets/images/profile \
     && chmod 755 /var/www/html \
     && chmod 1733 /var/tmp \
-    \
+    && chown www-data:www-data /var/www/html/config/system-settings.json \
+    && chmod 664 /var/www/html/config/system-settings.json \
     # ========================================
     # Apache Custom Log Setup & Logrotate
     # ========================================
@@ -90,6 +88,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && echo "    notifempty" >> /etc/logrotate.d/apache2-custom \
     && echo "    create 0640 www-data adm" >> /etc/logrotate.d/apache2-custom \
     && echo "}" >> /etc/logrotate.d/apache2-custom \
+    && echo "export ACCESS_LOG='/var/log/apache2/custom_access.log'" >> /etc/apache2/envvars \
     \
     # ========================================
     # Cleanup

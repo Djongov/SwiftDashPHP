@@ -9,3 +9,5 @@ composer.lock
 Dockerfile
 README.md
 LICENSE
+docker-compose.yml
+.devcontainer

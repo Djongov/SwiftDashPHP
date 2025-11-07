@@ -31,18 +31,45 @@ class SystemConfig
     
     private static function loadEnvironment(): void
     {
-        if (!file_exists(ROOT . DIRECTORY_SEPARATOR . '.env')) {
-            die('The .env file is missing. Please create one in the root of the project or use the <a href="/create-env">helper</a>');
+        // First, check if at least one required variable is already in $_ENV
+        $requiredEnvConstants = [
+            'DB_NAME',
+            'DB_DRIVER',
+            'LOCAL_LOGIN_ENABLED',
+            'GOOGLE_LOGIN_ENABLED',
+            'MSLIVE_LOGIN_ENABLED',
+            'ENTRA_ID_LOGIN_ENABLED'
+        ];
+
+        $anyLoaded = false;
+        foreach ($requiredEnvConstants as $var) {
+            if (isset($_ENV[$var]) || getenv($var) !== false) {
+                $anyLoaded = true;
+                break;
+            }
         }
-        
-        $dotenv = \Dotenv\Dotenv::createImmutable(ROOT);
-        
-        try {
-            $dotenv->safeLoad();
-        } catch (\Exception $e) {
-            die($e->getMessage());
+
+        // If none of the critical env vars are set, try loading the .env file
+        if (!$anyLoaded) {
+            $envPath = ROOT . DIRECTORY_SEPARATOR . '.env';
+            if (!file_exists($envPath)) {
+                die('The .env file is missing. Either set environment variables or create one in the root of the project.');
+            }
+
+            $dotenv = \Dotenv\Dotenv::createImmutable(ROOT);
+            try {
+                $dotenv->safeLoad();
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+        }
+        // Normalize environment values into $_ENV
+        foreach ($requiredEnvConstants as $var) {
+            $value = getenv($var) ?: ($_ENV[$var] ?? '');
+            $_ENV[$var] = trim($value, "\"'");
         }
     }
+
     
     private static function validateSystemRequirements(): void
     {
@@ -50,25 +77,34 @@ class SystemConfig
         if (version_compare(PHP_VERSION, '8.4.0', '<')) {
             die('PHP 8.4 or higher is required');
         }
-        
-        // Check required environment variables
+
+        // Core required environment variables
         $requiredEnvConstants = [
             'DB_NAME',
             'DB_DRIVER',
             'LOCAL_LOGIN_ENABLED',
             'GOOGLE_LOGIN_ENABLED',
             'MSLIVE_LOGIN_ENABLED',
-            'ENTRA_ID_LOGIN_ENABLED',
-            'SENDGRID_ENABLED'
+            'ENTRA_ID_LOGIN_ENABLED'
         ];
-        
+
         foreach ($requiredEnvConstants as $constant) {
             if (!isset($_ENV[$constant])) {
-                die($constant . ' must be set in the .env file');
+                die("$constant must be set in the environment");
             }
         }
-        
-        // Check required PHP extensions
+
+        // Now, conditionally validate DB-specific variables only for non-sqlite drivers
+        $driver = $_ENV['DB_DRIVER'];
+        if ($driver !== 'sqlite') {
+            $dbRequired = ['DB_SSL', 'DB_HOST', 'DB_USER', 'DB_PASS', 'DB_PORT'];
+            foreach ($dbRequired as $var) {
+                if (!isset($_ENV[$var])) {
+                    die("$var must be set in the environment when DB_DRIVER is $driver");
+                }
+            }
+        }
+
         self::validateExtensions();
     }
     
@@ -158,7 +194,7 @@ class SystemConfig
             
             foreach ($dbRelatedConstants as $constant) {
                 if (!isset($_ENV[$constant])) {
-                    die($constant . ' must be set in the .env file');
+                    die($constant . ' must be set in the environment when DB_DRIVER is ' . DB_DRIVER);
                 }
             }
             
@@ -197,7 +233,7 @@ class SystemConfig
     private static function defineServiceConstants(): void
     {
         // Sendgrid settings
-        define("SENDGRID", filter_var($_ENV['SENDGRID_ENABLED'], FILTER_VALIDATE_BOOLEAN));
+        define("SENDGRID", $_ENV['SENDGRID_ENABLED'] === 'true' ? true : false);
         
         if (SENDGRID) {
             if (!isset($_ENV['SENDGRID_API_KEY'])) {
