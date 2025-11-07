@@ -106,10 +106,10 @@ class Install
 
         // Insert CSP approved domain for the current host
         $this->createCSPApprovedDomain($conn, $_SERVER['HTTP_HOST']);
-
-        // Insert firewall rule for the current IP
-        $this->createFirewallRule($conn, $ip);
-
+        if (IP::isPublicIp($ip)) {
+            // Insert firewall rule for the current IP if it's not private IP (because we already insert private ranges by default)
+            $this->createFirewallRule($conn, $ip);
+        }
         // Insert administrator for first time login but only if local login is used
         if (LOCAL_USER_LOGIN) {
             $password = General::randomString(12);
@@ -126,8 +126,7 @@ class Install
             $this->createAdminUser($conn, $hashedPassword, $ip, $countryCode);
 
             // Print the credentials to the screen
-            $html .= Alerts::success('Database "' . DB_NAME . '" and system tables created successfully. Please go to <a class="underline" href="/login">Login</a> page. Use "admin" as username. Do not refresh the page until you have copied the password below.');
-            $html .= Html::p('<span class="c0py">' . $password . '</span>');
+            $html .= Alerts::success('Database "' . DB_NAME . '" and system tables created successfully. Please go to <a class="underline" href="/login">Login</a> page. Use "admin" as username. Do not refresh the page until you have copied the password below.<p class="text-black dark:text-gray-400"><strong><span class="c0py">' . $password . '</span></strong></p>');
         } else {
             $html .= Alerts::success('Database "' . DB_NAME . '" and system tables created successfully. Please go to <a class="underline" href="/login">Login</a> page. Because no local login is enabled you need to control admin accounts through the provider claims.');
         }
@@ -154,6 +153,7 @@ class Install
     public function createFirewallRule($conn, $ip)
     {
         try {
+            
             $stmt = $conn->prepare("INSERT INTO firewall (ip_cidr, created_by, comment) VALUES (?, 'System', 'Initial Admin IP')");
             $stmt->execute([$ip . '/32']);
         } catch (PDOException $e) {

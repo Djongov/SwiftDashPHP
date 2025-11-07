@@ -1,3 +1,12 @@
+-- App Settings TABLE
+CREATE TABLE IF NOT EXISTS app_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    value TEXT NOT NULL,
+    type ENUM('string', 'int', 'float', 'bool', 'date', 'json') NOT NULL DEFAULT 'string',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,8 +48,8 @@ CREATE TABLE IF NOT EXISTS firewall (
 );
 
 -- Default firewall rules
-INSERT INTO firewall (ip_cidr, created_by, comment)
-VALUES 
+INSERT IGNORE INTO firewall (ip_cidr, created_by, comment)
+VALUES
     ('127.0.0.1/32', 'System', 'private range'),
     ('10.0.0.0/8', 'System', 'private range'),
     ('172.16.0.0/12', 'System', 'private range'),
@@ -122,7 +131,7 @@ CREATE TABLE IF NOT EXISTS api_access_log (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE utm_captures (
+CREATE TABLE IF NOT EXISTS utm_captures (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     ip_address VARCHAR(45) NULL,
 

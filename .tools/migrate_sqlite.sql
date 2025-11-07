@@ -1,3 +1,13 @@
+-- App Settings TABLE 
+CREATE TABLE IF NOT EXISTS app_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    value TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'string'
+        CHECK (type IN ('string', 'int', 'float', 'bool', 'date', 'json')),
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +41,7 @@ CREATE TABLE IF NOT EXISTS cache (
 -- FIREWALL TABLE
 CREATE TABLE IF NOT EXISTS firewall (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ip_cidr VARCHAR(256) NOT NULL,
+    ip_cidr VARCHAR(256) NOT NULL UNIQUE,
     created_by VARCHAR(1000),
     comment VARCHAR(1000),
     date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -40,11 +50,12 @@ CREATE TABLE IF NOT EXISTS firewall (
 
 -- Default firewall rules
 INSERT INTO firewall (ip_cidr, created_by, comment)
-VALUES 
+VALUES
     ('127.0.0.1/32', 'System', 'private range'),
     ('10.0.0.0/8', 'System', 'private range'),
     ('172.16.0.0/12', 'System', 'private range'),
-    ('192.168.0.0/16', 'System', 'private range');
+    ('192.168.0.0/16', 'System', 'private range')
+ON CONFLICT(ip_cidr) DO NOTHING;
 
 -- CSP REPORTS TABLE
 CREATE TABLE IF NOT EXISTS csp_reports (
@@ -123,7 +134,7 @@ CREATE TABLE IF NOT EXISTS api_access_log (
 );
 
 -- UTM CAPTURES TABLE
-CREATE TABLE utm_captures (
+CREATE TABLE IF NOT EXISTS utm_captures (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ip_address TEXT NULL, 
     utm_source TEXT NULL,
