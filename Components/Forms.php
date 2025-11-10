@@ -170,7 +170,13 @@ class Forms
                 }
             }
         }
+
+        if (isset($options['csrf']) && $options['csrf'] === false) {
+            // Do nothing, CSRF is disabled
+        } else {
+            // By default, we will add a CSRF token
             $html .= CSRF::createTag();
+        }
             // Submit button now
         if (!isset($options['submitButton'])) {
             throw new \Exception('submitButton is a required form option');
