@@ -100,9 +100,9 @@ class Html
     public static function divBox($content, $extraClasses = []): string
     {
         if (!$extraClasses) {
-            return '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">' . $content . '</div>';
+            return '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700 break-all">' . $content . '</div>';
         } else {
-            return '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700 ' . implode(' ', $extraClasses) . '">' . $content . '</div>';
+            return '<div class="p-4 m-4 max-w-lg ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700 break-all ' . implode(' ', $extraClasses) . '">' . $content . '</div>';
         }
     }
     /* Form elements */
@@ -645,5 +645,10 @@ class Html
     public static function shareButton(string $theme): string
     {
         return '<button id="share-button" class="share-button my-2 mx-auto py-3 px-5 leading-5 text-white bg-' . $theme . '-500 hover:bg-' . $theme . '-600 font-medium text-center focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 border border-transparent rounded-md shadow-sm">' . translate('share_button_text') . '</button>';
+    }
+    public static function ImageFromPath(string $path, mixed $width, mixed $height, string $alt = '', string $title = '', array $extraClasses = []): string
+    {
+        $classString = implode(' ', $extraClasses);
+        return '<img src="' . htmlspecialchars($path) . '" width="' . htmlspecialchars((string)$width) . '" height="' . htmlspecialchars((string)$height) . '" alt="' . htmlspecialchars($alt) . '" title="' . htmlspecialchars($title) . '" class="' . $classString . '"/>';
     }
 }

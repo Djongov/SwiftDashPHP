@@ -94,7 +94,18 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
         }
         // scope should come in "https://management.azure.com/user_impersonation https://management.azure.com/.default" for example. Not sure if we need to do something about that
 
-        $usernameFromToken = JWT::parseTokenPayLoad($request['access_token'])['upn'];
+        // Becuase not all tokens will have upn, we can fallback to email, preferred_username, or unique_name claims if upn is not present
+        if (isset(JWT::parseTokenPayLoad($request['access_token'])['upn'])) {
+            $usernameFromToken = JWT::parseTokenPayLoad($request['access_token'])['upn'];
+        } elseif (isset(JWT::parseTokenPayLoad($request['access_token'])['email'])) {
+            $usernameFromToken = JWT::parseTokenPayLoad($request['access_token'])['email'];
+        } elseif (isset(JWT::parseTokenPayLoad($request['access_token'])['preferred_username'])) {
+            $usernameFromToken = JWT::parseTokenPayLoad($request['access_token'])['preferred_username'];
+        } elseif (isset(JWT::parseTokenPayLoad($request['access_token'])['unique_name'])) {
+            $usernameFromToken = JWT::parseTokenPayLoad($request['access_token'])['unique_name'];
+        } else {
+            Response::output('Anomaly detected: cannot find a suitable claim for username extraction in the token', 400);
+        }
 
         $usernameFromState = [];
 
@@ -104,11 +115,18 @@ if (isset($_POST['code'], $_POST['state'], $_POST['session_state'])) {
             Response::output('State should have username passed as query string');
         }
 
-        if ($usernameFromState['username'] !== $usernameFromToken) {
-            Response::output('Anomanly deceted: token username is different from the state username. usernameFromToken - ' . $usernameFromToken . ' while the usernameFromState - ' . $usernameFromState['username'], 400);
+        // Normalize both values to lowercase
+        if (strtolower($usernameFromState['username']) !== strtolower($usernameFromToken)) {
+            Response::output(
+                'Anomaly detected: token username is different from the state username. ' .
+                'usernameFromToken - ' . $usernameFromToken . 
+                ' while the usernameFromState - ' . $usernameFromState['username'],
+                400
+            );
         } else {
-            $username = $usernameFromToken;
+            $username = strtolower($usernameFromToken); // optional normalize downstream
         }
+
         try {
             AccessToken::save($request['access_token'], $username);
         } catch (Exception $e) {

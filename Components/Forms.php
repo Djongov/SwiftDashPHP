@@ -182,19 +182,35 @@ class Forms
             throw new \Exception('submitButton is a required form option');
         }
 
-            $additionalButtonClasses = [];
+        $additionalButtonClasses = [];
 
         if (!isset($options['submitButton']['size'])) {
-            $options['submitButton']['size'] = 'medium';
+            $options['submitButton']['size'] = 'small';
         }
 
-        if ($options['submitButton']['size'] === 'large') {
-            array_push($additionalButtonClasses, 'p-3', 'text-lg');
-        } elseif ($options['submitButton']['size'] === 'medium') {
-            array_push($additionalButtonClasses, 'px-2', 'py-1', 'text-md');
-        } elseif ($options['submitButton']['size'] === 'small') {
-            array_push($additionalButtonClasses, 'p-1', 'text-sm');
+        switch ($options['submitButton']['size']) {
+            case 'small':
+                $additionalButtonClasses = ['text-sm', 'min-w-[120px]'];
+                break;
+
+            case 'medium':
+                $additionalButtonClasses = ['p-1', 'text-base', 'min-w-[150px]'];
+                break;
+
+            case 'large':
+                $additionalButtonClasses = ['p-2', 'text-lg', 'min-w-[180px]'];
+                break;
+
+            case 'full':
+                $additionalButtonClasses = ['p-1', 'text-base', 'w-full'];
+                break;
+
+            default:
+                throw new \Exception(
+                    'submitButton size must be one of: small, medium, large, full'
+                );
         }
+        
         if (isset($options['submitButton']['disabled']) && $options['submitButton']['disabled'] === true) {
             array_push($additionalButtonClasses, 'opacity-50', 'cursor-not-allowed');
             $buttonDisabled = 'disabled';

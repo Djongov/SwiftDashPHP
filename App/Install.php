@@ -106,10 +106,12 @@ class Install
 
         // Insert CSP approved domain for the current host
         $this->createCSPApprovedDomain($conn, $_SERVER['HTTP_HOST']);
+
         if (IP::isPublicIp($ip)) {
             // Insert firewall rule for the current IP if it's not private IP (because we already insert private ranges by default)
             $this->createFirewallRule($conn, $ip);
         }
+
         // Insert administrator for first time login but only if local login is used
         if (LOCAL_USER_LOGIN) {
             $password = General::randomString(12);
@@ -153,7 +155,6 @@ class Install
     public function createFirewallRule($conn, $ip)
     {
         try {
-            
             $stmt = $conn->prepare("INSERT INTO firewall (ip_cidr, created_by, comment) VALUES (?, 'System', 'Initial Admin IP')");
             $stmt->execute([$ip . '/32']);
         } catch (PDOException $e) {

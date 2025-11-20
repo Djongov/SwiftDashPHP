@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 if (ENTRA_ID_LOGIN) {
     if (!isset($_ENV['ENTRA_ID_CLIENT_ID']) || !isset($_ENV['ENTRA_ID_TENANT_ID'])) {
         die('ENTRA_ID_CLIENT_ID, ENTRA_ID_TENANT_ID, must be set in the .env file if ENTRA_ID_LOGIN is set to true');
@@ -25,13 +24,15 @@ if (ENTRA_ID_LOGIN) {
 
     define('ENTRA_ID_ID_TOKEN_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure-ad');
 
+    $nonce = (isset($_SESSION['nonce'])) ? $_SESSION['nonce'] : bin2hex(random_bytes(16));
+    
     $idTokenData = [
         'client_id' => ENTRA_ID_CLIENT_ID,
         'response_type' => 'id_token',
         'redirect_uri' => ENTRA_ID_ID_TOKEN_REDIRECT_URI,
         'response_mode' => 'form_post',
         'scope' => 'openid profile email',
-        'nonce' => $_SESSION['nonce'] ?? null,
+        'nonce' => $nonce,
         'state' => $destination
     ];
 

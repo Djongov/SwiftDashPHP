@@ -36,7 +36,7 @@ echo '<div class="flex items-center justify-center mx-4">';
 if (ENTRA_ID_LOGIN || MICROSOFT_LIVE_LOGIN || GOOGLE_LOGIN) {
     echo Html::h3(translate('login_with_provider'), true, ['my-6']);
 }
-        // Azure
+// Azure
 if (ENTRA_ID_LOGIN) {
     echo '<div class="flex gap-4 item-center">';
         echo '<a class="mb-4 w-full ' . TEXT_COLOR_SCHEME . ' ' . TEXT_DARK_COLOR_SCHEME . ' font-medium text-center border border-gray-200 rounded-md shadow-sm hover:bg-gray-200 hover:dark:text-black" href="' . ENTRA_ID_LOGIN_BUTTON_URL . '">';

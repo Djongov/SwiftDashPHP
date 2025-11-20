@@ -46,6 +46,25 @@ function dd()
     );
     die;
 }
+function printR(mixed $data)
+{
+    if (is_array($data) || is_object($data)) {
+        $data = print_r($data, true);
+    } else {
+        $data = (string) $data;
+    }
+
+    echo '<div class="p-4 m-4 bg-gray-100 rounded-lg border border-gray-200 shadow-md dark:bg-gray-900 dark:border-gray-700">';
+        echo '<pre class="break-words whitespace-pre-wrap">';
+            echo '<span class="c0py break-words">'.htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').'</span>';
+        echo '</pre>';
+    echo '</div>';
+}
+function printRDie(mixed $data)
+{
+    printR($data);
+    die;
+}
 function isAssoc(array $array): bool
 {
     if ([] === $array) {

@@ -39,7 +39,10 @@ class IP
     // This method will check if a string is a private IP
     public static function isPrivateIp($ip): bool
     {
-        return (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) ? false : true;
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
+            return false;
+        }
+        return true;
     }
     // This method will check if a string is ipv6
     public static function isIpv6($ip): bool
