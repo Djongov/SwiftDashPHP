@@ -75,6 +75,9 @@ foreach ($accessLogsData as $log) {
     $groupedRequests[$date]++;
 }
 
+// Now the dates are from newest to oldest, we need to reverse them
+$groupedRequests = array_reverse($groupedRequests, true);
+
 $lineChartData = [
     'labels' => array_keys($groupedRequests),
     'datasets' => [
@@ -105,8 +108,8 @@ echo '<div id="doughnut-limits-holder" class="my-12 flex flex-wrap justify-start
             'data' => [
                 'parentDiv' => 'doughnut-limits-holder',
                 'title' => 'Line Chart',
-                'width' => 400,
-                'height' => 200,
+                'width' => 600,
+                'height' => 300,
                 'labels' => array_keys($groupedRequests),
                 'datasets' => [
                     [

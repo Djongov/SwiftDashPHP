@@ -510,7 +510,7 @@ const createGaugeChart = (title, parentDiv, width, height, min, max) => {
         gaugeColor = getGradientFillHelper(ctx, ["orange", "yellow"]);
     } else if (percentage >= 75 && percentage <= 85) {
         gaugeColor = getGradientFillHelper(ctx, ["yellow", "crimson"]);
-    } else if (percentage > 85 && percentage <= 100) {
+    } else if (percentage > 85 && percentage <= 100 || percentage > 100) {
         gaugeColor = getGradientFillHelper(ctx, ["crimson", "red"]);
     } else {
         gaugeColor = getGradientFillHelper(ctx, ["green", "lime"]);
