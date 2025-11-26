@@ -28,12 +28,6 @@ if (str_contains($query, 'DROP') || str_contains($query, 'TRUNCATE')) {
     return;
 }
 
-// JOIN not developed yet
-if (str_contains($query, 'JOIN')) {
-    echo Alerts::danger('You cannot execute JOIN queries as they are in development');
-    return;
-}
-
 $db = new DB();
 
 $pdo = $db->getConnection();

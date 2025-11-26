@@ -129,7 +129,8 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                                 'submitButton' => [
                                     'text' => '🗑️',
                                     'size' => 'small',
-                                    'title' => 'Delete Profile Picture'
+                                    'title' => 'Delete Profile Picture',
+                                    'style' => '🗑️'
                                 ],
                             ];
                             echo '<div class="absolute -bottom-2 -right-2">' . Forms::render($deleteProfilePictureForm) . '</div>';
@@ -160,7 +161,7 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                                 }
                                 // Regular text
                                 else {
-                                    echo '<span class="text-gray-600 dark:text-gray-400 break-all max-w-xs text-right">' . htmlspecialchars($setting) . '</span>';
+                                    echo '<span class="text-gray-600 dark:text-gray-400 break-all max-w-xs text-right">' . (is_string($setting) ? htmlspecialchars($setting) : $setting) . '</span>';
                                 }
                             echo '</div>';
                         }
