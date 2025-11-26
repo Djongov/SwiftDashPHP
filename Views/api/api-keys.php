@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
-    if ($_SERVER['CONTENT_LENGTH'] > 0) {
+    if (!empty($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
         Response::output('body must be empty in DELETE requests', 400);
     }
     // Let's check if the csrf token is passed as a query string in the DELETE request

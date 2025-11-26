@@ -37,9 +37,9 @@ $client->addScope("openid");
 $client->setPrompt('select_account consent');
 $client->setAccessType('offline');
 // Set the state too
-$client->setState($destination);
+$client->setState($state);
 // Set nonce
-$client->setLoginHint($googleNonce);
+$client->setLoginHint($_SESSION['nonce'] ?? '');
 $client->setHttpClient(new \GuzzleHttp\Client(['verify' => CURL_CERT, 'timeout' => 60, 'http_errors' => false]));
 // Exchange the code for an access token
 $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);

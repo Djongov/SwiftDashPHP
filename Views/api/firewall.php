@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 // api/firewall/{id}?csrf_token={} DELETE, empty body, param in path, csrf token in query string. The user making the request is taken from the router data
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     // Check if body is empty
-    if ($_SERVER['CONTENT_LENGTH'] > 0) {
+    if (!empty($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
         Response::output('body must be empty in DELETE requests', 400);
         exit();
     }

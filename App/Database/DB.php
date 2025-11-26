@@ -115,8 +115,7 @@ class DB
         }
         $options[\PDO::ATTR_EMULATE_PREPARES] = false;
         $options[\PDO::ATTR_TIMEOUT] = 15;
-        // DO not verify ssl
-        $options[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+        $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
         return $options;
     }
 

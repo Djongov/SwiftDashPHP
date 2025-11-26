@@ -5,10 +5,10 @@ declare(strict_types=1);
 define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']));
 
 if (ini_get('display_errors') == 1) {
-    error_reporting(E_ALL);
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
     define('ERROR_VERBOSE', true);
 } else {
-    error_reporting(0);
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_NOTICE & ~E_WARNING);
     define('ERROR_VERBOSE', false);
 }
 
@@ -60,7 +60,7 @@ class SystemConfig
         if (!$anyLoaded) {
             $envPath = ROOT . DIRECTORY_SEPARATOR . '.env';
             if (!file_exists($envPath)) {
-                die('The .env file is missing. Either set environment variables or create one in the root of the project.');
+                die('The .env file is missing. Either set environment variables or create one in the root of the project. Alternatively, go to /create-env to generate it.');
             }
 
             $dotenv = \Dotenv\Dotenv::createImmutable(ROOT);
