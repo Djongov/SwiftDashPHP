@@ -48,6 +48,9 @@ define(
     'Queries' => [
         'link' => '/adminx/queries',
     ],
+    'Migrate' => [
+        'link' => '/adminx/migrate',
+    ],
     'Access Logs' =>
     [
         'link' => '/adminx/access-logs'
