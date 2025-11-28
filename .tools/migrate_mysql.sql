@@ -4,8 +4,19 @@ CREATE TABLE IF NOT EXISTS app_settings (
     name VARCHAR(100) NOT NULL,
     value TEXT NOT NULL,
     type ENUM('string', 'int', 'float', 'bool', 'date', 'json') NOT NULL DEFAULT 'string',
+    admin_setting TINYINT(1) NOT NULL DEFAULT 0,   -- 0 = normal, 1 = admin only
+    owner VARCHAR(50) NOT NULL DEFAULT 'system',  -- 'system' or user id
+    description TEXT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
+VALUES 
+    (4, 'default_data_grid_engine', 'DataGrid', 'string', 'system', 1, 'AGGrid or DataGrid for values.'),
+    (3, 'auth_expiry', '3600', 'int', 'system', 1, 'Number in seconds for the JWT Token''s lifetime'),
+    (2, 'use_tailwind_cdn', '1', 'bool', 'system', 1, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
+    (1, 'color_scheme', 'amber', 'string', 'system', 1, 'The default tailwind color for theming')
+ON DUPLICATE KEY UPDATE name = name; -- does nothing if id already exists
 
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (

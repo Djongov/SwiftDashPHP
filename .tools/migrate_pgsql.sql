@@ -3,10 +3,20 @@ CREATE TABLE IF NOT EXISTS app_settings (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     value TEXT NOT NULL,
-    type TEXT NOT NULL DEFAULT 'string'
-        CHECK (type IN ('string', 'int', 'float', 'bool', 'date', 'json')),
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    type VARCHAR(10) NOT NULL DEFAULT 'string' CHECK (type IN ('string', 'int', 'float', 'bool', 'date', 'json')),
+    admin_setting BOOLEAN NOT NULL DEFAULT FALSE, -- true = admin only
+    owner VARCHAR(50) NOT NULL DEFAULT 'system', -- 'system' or user id
+    description TEXT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
+VALUES 
+    (4, 'default_data_grid_engine', 'DataGrid', 'string', 'system', TRUE, 'AGGrid or DataGrid for values.'),
+    (3, 'auth_expiry', '3600', 'int', 'system', TRUE, 'Number in seconds for the JWT Token''s lifetime'),
+    (2, 'use_tailwind_cdn', '1', 'bool', 'system', TRUE, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
+    (1, 'color_scheme', 'amber', 'string', 'system', TRUE, 'The default tailwind color for theming')
+ON CONFLICT (id) DO NOTHING;
 
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (

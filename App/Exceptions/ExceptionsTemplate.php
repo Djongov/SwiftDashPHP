@@ -6,6 +6,14 @@ namespace App\Exceptions;
 
 abstract class ExceptionsTemplate extends \Exception implements ExceptionInterface
 {
+    public function alreadyExists(): static
+    {
+        return new static('resource already exists', 409);
+    }
+    public function notFound(): static
+    {
+        return new static('resource not found', 404);
+    }
     public function genericError(string $message, int $code): static
     {
         return new static($message, $code);

@@ -1,8 +1,0 @@
-{
-    "useTailwindCDN": {
-        "value": true,
-        "label": "Use Tailwind CDN",
-        "description": "Enable or disable the use of Tailwind CSS via CDN",
-        "type": "boolean"
-    }
-}

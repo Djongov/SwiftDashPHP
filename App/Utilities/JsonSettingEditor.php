@@ -4,6 +4,24 @@ declare(strict_types=1);
 
 namespace App\Utilities;
 
+/*
+ Example json settings file:
+ {
+    "auth_expiry": {
+        "value": 150029,
+        "label": "Auth Expiry",
+        "description": "Duration in seconds for which the authentication is valid",
+        "type": "number"
+    },
+    "default_data_grid_engine": {
+        "value": "DataGrid",
+        "label": "Default Data Grid Engine",
+        "description": "The default data grid engine to use ('AGGrid', 'DataGrid')",
+        "type": "string"
+    }
+}
+*/
+
 class JsonSettingEditor
 {
     public static function editJsonFile(string $filePath, array $newData, bool $overwrite = false): bool

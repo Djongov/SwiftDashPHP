@@ -2,26 +2,75 @@
 
 declare(strict_types=1);
 
-use App\Utilities\JsonSettingEditor;
-use App\Security\Firewall;
-use App\Api\Response;
+use Components\Forms;
+use Components\Html;
+use Components\Alerts;
+use Models\AppSettings;
 
-// First firewall check
-Firewall::activate();
+$appSettings = new AppSettings();
+$allAppSettings = $appSettings->getAllByOwner('system');
+$settingNames = array_map(fn($s) => $s['name'], $allAppSettings);
 
-// Admin check
-if (!$isAdmin) {
-    Response::output('You are not an admin', 403);
+if (empty($allAppSettings)) {
+    echo Alerts::info('No App Settings found. You can create one below.');
+    return;
 }
 
-// Define system settings configuration
-$systemSettingsPath = ROOT . '/config/system-settings.json';
+echo Html::h2('Edit App Settings', true, ['mb-4', 'mt-8']);
 
-// Render the system settings editor (now uses self-describing JSON structure)
-echo JsonSettingEditor::renderJsonEditor($systemSettingsPath, $theme);
+try {
+    echo \Components\AppSetting::renderSettings($settingNames, $theme);
+} catch (Exception $e) {
+    echo Alerts::danger($e->getMessage());
+}
 
-// Define site settings configuration
-$siteSettingsPath = ROOT . '/config/site-settings.json';
+$allowedTypes = ['string', 'int', 'bool', 'float', 'json'];
 
-// Render the site settings editor (now uses self-describing JSON structure)
-echo JsonSettingEditor::renderJsonEditor($siteSettingsPath, $theme);
+$allowedTypesOptions = [];
+
+foreach ($allowedTypes as $type) {
+    $allowedTypesOptions[] = [
+        'value' => $type,
+        'text' => $type,
+    ];
+}
+
+$formOptions = [
+    'inputs' => [
+        'input' => [
+            [
+                'type'        => 'text',
+                'name'        => 'name',
+                'label'       => 'Setting Name',
+                'placeholder' => 'Enter setting name',
+                'required'    => true,
+            ],
+            [
+                'type'        => 'text',
+                'name'        => 'value',
+                'label'       => 'Setting Value',
+                'placeholder' => 'Enter setting value',
+                'required'    => true,
+            ],
+        ],
+        'select' => [
+            [
+                'name'     => 'type',
+                'label'    => 'Setting Type',
+                'options'  => $allowedTypesOptions,
+                'required' => true,
+            ],
+        ],
+    ],
+    'theme' => $theme,
+    'action' => '/api/app-settings',
+    'method' => 'POST',
+    'submitButton' => [
+        'text' => 'Create',
+    ]
+];
+echo Html::h2('Create New App Setting', true, ['mb-4', 'mt-8']);
+
+echo Html::divBox(Forms::render($formOptions, $theme));
+
+echo \Components\DataGrid::fromDBTable('app_settings', 'App Settings', $theme);

@@ -177,9 +177,9 @@ class SystemConfig
         
         // Service constants
         self::defineServiceConstants();
-        
-        // WAF settings constants (must be before auth constants)
-        self::configureJsonSettings();
+
+        // DB settings from AppSettings table
+        self::configureDBSettings();
 
         // Authentication constants
         self::defineAuthConstants();
@@ -258,38 +258,15 @@ class SystemConfig
         // QuickChart settings
         define("QUICKCHART_HOST", "quickchart.io");
     }
-
-    private static function configureJsonSettings() : void
-    {
-        // Load WAF settings from JSON file
-        $jsonSettingsPath = ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'system-settings.json';
-        if (!file_exists($jsonSettingsPath)) {
-            die('JSON settings file is missing. Please create ' . $jsonSettingsPath);
-        }
-
-        $jsonSettingsContent = file_get_contents($jsonSettingsPath);
-        $jsonSettings = json_decode($jsonSettingsContent, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            die('Error parsing JSON settings: ' . json_last_error_msg());
-        }
-
-        // Define WAF-related constants with defaults if not set
-        define('AUTH_EXPIRY', $jsonSettings['auth_expiry']['value'] ?? die('auth_expiry must be set in ' . $jsonSettingsPath));
-        define('DEFAULT_DATA_GRID_ENGINE', $jsonSettings['default_data_grid_engine']['value'] ?? die('default_data_grid_engine must be set in ' . $jsonSettingsPath));
-        if (!in_array(DEFAULT_DATA_GRID_ENGINE, ['AGGrid', 'DataGrid'], true)) {
-            die('default_data_grid_engine must be either "AGGrid", "DataGrid" in ' . $jsonSettingsPath);
-        }
-    }
     
     private static function defineAuthConstants(): void
     {
         // Authentication handler configuration
         define('AUTH_HANDLER', 'session'); // cookie/session
         define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
-        define('JWT_TOKEN_EXPIRY', AUTH_EXPIRY);
+        define('JWT_TOKEN_EXPIRY', (int) AUTH_EXPIRY);
         define('USE_REMOTE_ID_TOKEN', false);
-        define('AUTH_COOKIE_EXPIRY', AUTH_EXPIRY);
+        define('AUTH_COOKIE_EXPIRY', (int) AUTH_EXPIRY);
         define('SUPPORTED_AUTH_PROVIDERS', ['azure', 'mslive', 'google', 'local']);
 
         if (AUTH_HANDLER === 'cookie') {
@@ -354,6 +331,18 @@ class SystemConfig
             $destination = $GLOBALS['destination'];
             $protocol = $GLOBALS['protocol'];
             include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'google-auth-config.php';
+        }
+    }
+    private static function configureDBSettings(): void
+    {
+        $appSettings = new \Models\AppSettings();
+        $allAppSettings = $appSettings->getAllByOwner('system');
+        $requiredAppSettings = ['default_data_grid_engine', 'auth_expiry', 'use_tailwind_cdn', 'color_scheme'];
+        foreach ($allAppSettings as $setting) {
+            if (in_array($setting['name'], $requiredAppSettings)) {
+                $constantName = strtoupper($setting['name']);
+                define($constantName, $setting['value']);
+            }
         }
     }
 }
