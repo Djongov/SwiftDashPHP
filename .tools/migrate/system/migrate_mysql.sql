@@ -10,15 +10,6 @@ CREATE TABLE IF NOT EXISTS app_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE app_settings 
-    ADD COLUMN owner VARCHAR(50) NOT NULL DEFAULT 'system';
-
-ALTER TABLE app_settings 
-    ADD COLUMN admin_setting TINYINT(1) NOT NULL DEFAULT 0;
-
-ALTER TABLE app_settings 
-    ADD COLUMN description TEXT NULL;
-
 
 INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
 VALUES 

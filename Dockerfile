@@ -72,8 +72,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && chown www-data:www-data /var/www/html/public/assets/images/profile \
     && chmod 755 /var/www/html \
     && chmod 1733 /var/tmp \
-    && chown www-data:www-data /var/www/html/config/system-settings.json \
-    && chmod 664 /var/www/html/config/system-settings.json \
     # ========================================
     # Apache Custom Log Setup & Logrotate
     # ========================================

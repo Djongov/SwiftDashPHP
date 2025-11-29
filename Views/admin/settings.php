@@ -8,18 +8,11 @@ use Components\Alerts;
 use Models\AppSettings;
 
 $appSettings = new AppSettings();
-$allAppSettings = $appSettings->getAllByOwner('system');
-$settingNames = array_map(fn($s) => $s['name'], $allAppSettings);
-
-if (empty($allAppSettings)) {
-    echo Alerts::info('No App Settings found. You can create one below.');
-    return;
-}
 
 echo Html::h2('Edit App Settings', true, ['mb-4', 'mt-8']);
 
 try {
-    echo \Components\AppSetting::renderSettings($settingNames, $theme);
+    echo \Components\AppSetting::renderSettings('system', $theme);
 } catch (Exception $e) {
     echo Alerts::danger($e->getMessage());
 }
@@ -52,6 +45,21 @@ $formOptions = [
                 'placeholder' => 'Enter setting value',
                 'required'    => true,
             ],
+            [
+                'type'        => 'text',
+                'name'        => 'owner',
+                'label'       => 'Setting Owner',
+                'placeholder' => 'Enter setting owner',
+                'value'       => $usernameArray['username'] ?? 'system',
+                'required'    => false,
+            ],
+            [
+                'type'        => 'text',
+                'name'        => 'description',
+                'label'       => 'Setting Description',
+                'placeholder' => 'Enter setting description',
+                'required'    => false,
+            ]
         ],
         'select' => [
             [
@@ -72,5 +80,3 @@ $formOptions = [
 echo Html::h2('Create New App Setting', true, ['mb-4', 'mt-8']);
 
 echo Html::divBox(Forms::render($formOptions, $theme));
-
-echo \Components\DataGrid::fromDBTable('app_settings', 'App Settings', $theme);

@@ -10,9 +10,14 @@ use App\Security\CSRF;
 
 class AppSetting
 {
-    public static function renderSettings(array $names, string $theme): string
+    public static function renderSettings(string $owner, string $theme): string
     {
         $appSettingsModel = new AppSettings();
+
+        $settingsArray = $appSettingsModel->getAllByOwner($owner);
+
+        // Extract setting names
+        $names = array_map(fn($s) => $s['name'], $settingsArray);
         
         // Generate CSRF token for API requests
         $csrfToken = CSRF::create();
@@ -24,15 +29,15 @@ class AppSetting
         $html = '<div class="max-w-4xl mx-auto my-4 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">';
         
         // Header section
-        $html .= '<div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">';
-        $html .= '<div class="flex items-center gap-2 text-blue-800 dark:text-blue-200">';
+        $html .= '<div class="mb-6 p-4 bg-' . $theme . '-50 dark:bg-' . $theme . '-900/20 rounded-lg border border-' . $theme . '-200 dark:border-' . $theme . '-700">';
+        $html .= '<div class="flex items-center gap-2 text-' . $theme . '-800 dark:text-' . $theme . '-200">';
         $html .= '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
         $html .= '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>';
         $html .= '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>';
         $html .= '</svg>';
         $html .= '<span class="font-medium text-lg">Application Settings</span>';
         $html .= '</div>';
-        $html .= '<p class="text-sm text-blue-700 dark:text-blue-300 mt-2 ml-7">Configure your application settings below. Changes are saved individually.</p>';
+        $html .= '<p class="text-sm text-' . $theme . '-700 dark:text-' . $theme . '-300 mt-2 ml-7">Configure your ' . htmlspecialchars($owner) . ' settings below. Changes are saved individually.</p>';
         $html .= '</div>';
         
         // Settings container
@@ -201,7 +206,7 @@ class AppSetting
             // Setting type badge
             $typeBadgeColors = [
                 'string' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-                'int' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+                'int' => 'bg-' . $theme . '-100 text-' . $theme . '-800 dark:bg-' . $theme . '-900 dark:text-' . $theme . '-300',
                 'float' => 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300',
                 'bool' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
                 'date' => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
@@ -229,7 +234,7 @@ class AppSetting
             
             // Save button
             $html .= '<button type="button" ';
-            $html .= 'class="app-setting-save-btn px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-lg transition-colors duration-200 opacity-50 cursor-not-allowed" ';
+            $html .= 'class="app-setting-save-btn px-4 py-2 text-sm font-medium text-white bg-' . $theme . '-600 hover:bg-' . $theme . '-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-' . $theme . '-500 rounded-lg transition-colors duration-200 opacity-50 cursor-not-allowed" ';
             $html .= 'data-setting-id="' . $id . '" ';
             $html .= 'data-setting-name="' . htmlspecialchars($name) . '" ';
             $html .= 'data-setting-type="' . $type . '" ';
@@ -251,13 +256,19 @@ class AppSetting
         $html .= '</div>'; // Close settings container
         $html .= '</div>'; // Close main container
 
-        // Add comprehensive JavaScript for settings management
+        // Add comprehensive JavaScript for settings management (scoped per instance)
         $nonce = '1nL1n3JsRuN1192kwoko2k323WKE';
         $html .= '<script nonce="' . $nonce . '">';
-        $html .= 'const CSRF_TOKEN = "' . $csrfToken . '";' . "\n";
-        $html .= <<<'JAVASCRIPT'
+        $html .= <<<JAVASCRIPT
 (function() {
     'use strict';
+
+    const CSRF_TOKEN = "{$csrfToken}";
+    const theme = "{$theme}";
+    const settingsGroupId = "{$uniqueId}";
+
+    console.log("AppSettings: Initializing settings group:", settingsGroupId);
+    console.log("Current theme:", theme);
     
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
@@ -267,14 +278,20 @@ class AppSetting
     }
     
     function initAppSettings() {
-        console.log('AppSettings: Initializing settings management');
+        console.log('AppSettings: Initializing settings management for group:', settingsGroupId);
         
-        // Track original values for change detection
+        // Track original values for change detection (scoped to this instance)
         const originalValues = new Map();
         
-        // Initialize all settings
-        const settingCards = document.querySelectorAll('[data-setting-card]');
-        console.log('AppSettings: Found', settingCards.length, 'setting cards');
+        // Initialize settings ONLY within this settings group
+        const settingsGroup = document.querySelector('[data-settings-group="' + settingsGroupId + '"]');
+        if (!settingsGroup) {
+            console.error('AppSettings: Settings group not found:', settingsGroupId);
+            return;
+        }
+        
+        const settingCards = settingsGroup.querySelectorAll('[data-setting-card]');
+        console.log('AppSettings: Found', settingCards.length, 'setting cards in group:', settingsGroupId);
         
         settingCards.forEach(card => {
             const settingId = card.dataset.settingCard;
@@ -353,7 +370,7 @@ class AppSetting
             if (hasChanged) {
                 console.log('AppSettings: Enabling save button for', settingId);
                 saveBtn.dataset.isChanged = 'true';
-                saveBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'opacity-50', 'cursor-not-allowed');
+                saveBtn.classList.remove('bg-' + theme + '-600', 'hover:bg-' + theme + '-700', 'opacity-50', 'cursor-not-allowed');
                 saveBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'cursor-pointer');
                 saveBtn.innerHTML = `
                     <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,7 +382,7 @@ class AppSetting
                 console.log('AppSettings: Disabling save button for', settingId);
                 saveBtn.dataset.isChanged = 'false';
                 saveBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'cursor-pointer');
-                saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'opacity-50', 'cursor-not-allowed');
+                saveBtn.classList.add('bg-' + theme + '-600', 'hover:bg-' + theme + '-700', 'opacity-50', 'cursor-not-allowed');
                 saveBtn.innerHTML = `
                     <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
@@ -375,8 +392,8 @@ class AppSetting
             }
         }
         
-        // Handle reset buttons
-        document.querySelectorAll('.app-setting-reset-btn').forEach(btn => {
+        // Handle reset buttons (scoped to this instance)
+        settingsGroup.querySelectorAll('.app-setting-reset-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const settingId = this.dataset.settingId;
                 const inputId = this.dataset.inputId;
@@ -410,9 +427,9 @@ class AppSetting
             });
         });
         
-        // Handle save buttons
-        document.querySelectorAll('.app-setting-save-btn').forEach(btn => {
-            console.log('AppSettings: Attaching click handler to save button', btn.dataset.settingId);
+        // Handle save buttons (scoped to this instance)
+        settingsGroup.querySelectorAll('.app-setting-save-btn').forEach(btn => {
+            console.log('AppSettings: Attaching click handler to save button', btn.dataset.settingId, 'in group:', settingsGroupId);
             btn.addEventListener('click', function(e) {
                 console.log('AppSettings: Save button clicked!', this.dataset.settingId);
                 console.log('AppSettings: Button isChanged state:', this.dataset.isChanged);
@@ -509,7 +526,7 @@ class AppSetting
             .then(({ ok, status, result }) => {
                 if (!ok) {
                     // Use the actual error message from the API
-                    const errorMessage = result.data || result.message || `HTTP error! status: ${status}`;
+                    const errorMessage = result.data || result.message || `HTTP error! status: \${status}`;
                     throw new Error(errorMessage);
                 }
                 
@@ -530,7 +547,7 @@ class AppSetting
                     // Reset button state
                     btn.dataset.isChanged = 'false';
                     btn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'cursor-pointer');
-                    btn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'opacity-50', 'cursor-not-allowed');
+                    btn.classList.add('bg-' + theme + '-600', 'hover:bg-' + theme + '-700', 'opacity-50', 'cursor-not-allowed');
                     btn.innerHTML = originalBtnHtml;
                     
                     // Show success message
@@ -555,14 +572,14 @@ class AppSetting
         
         // Function to show status messages
         function showStatus(settingId, message, type) {
-            const statusEl = document.querySelector(`.app-setting-status[data-setting-id="${settingId}"]`);
+            const statusEl = document.querySelector(`.app-setting-status[data-setting-id="\${settingId}"]`);
             if (!statusEl) return;
             
             // Set colors based on type
             const colors = {
                 success: 'text-green-600 dark:text-green-400',
                 error: 'text-red-600 dark:text-red-400',
-                info: 'text-blue-600 dark:text-blue-400'
+                info: 'text-' + theme + '-600 dark:text-' + theme + '-400'
             };
             
             const icons = {
