@@ -10,6 +10,16 @@ CREATE TABLE IF NOT EXISTS app_settings (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE app_settings 
+    ADD COLUMN owner VARCHAR(50) NOT NULL DEFAULT 'system';
+
+ALTER TABLE app_settings 
+    ADD COLUMN admin_setting BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE app_settings 
+    ADD COLUMN description TEXT;
+
+
 INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
 VALUES 
     (4, 'default_data_grid_engine', 'DataGrid', 'string', 'system', TRUE, 'AGGrid or DataGrid for values.'),

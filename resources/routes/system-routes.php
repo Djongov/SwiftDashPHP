@@ -51,6 +51,7 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('POST', '/api/admin/api-keys', [$viewsFolder . '/api/admin/api-keys.php']);
     $router->addRoute('POST', '/api/admin/request-id', [$viewsFolder . '/api/admin/request-id.php']);
     $router->addRoute(['GET', 'POST', 'PUT', 'DELETE'], '/api/app-settings[/{id:\d+}]', [$viewsFolder . '/api/admin/app-settings.php']);
+    $router->addRoute('POST', '/api/admin/db-migrate', [$viewsFolder . '/api/admin/db-migrate.php']);
 
     // Tools API
     $router->addRoute('POST', '/api/tools/get-error-file', [$viewsFolder . '/api/tools/get-error-file.php']);

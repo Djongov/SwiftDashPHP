@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Components\Alerts;
-use App\Database\DB;
 use App\Security\Firewall;
 use App\Api\Response;
+use Components\Forms;
+use Components\Html;
 
 // First firewall check
 Firewall::activate();
@@ -14,20 +14,30 @@ Firewall::activate();
 if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
+// /api/admin/db-system-migrate or /api/admin/db-project-migrate
+$formOptions = [
+    'inputs' => [],
+    'theme' => $theme,
+    'action' => '/api/admin/db-migrate',
+    'confirm' => true,
+    'confirmText' => 'Are you sure you want to run the migration? This action cannot be undone.',
+    'submitButton' => [
+        'text' => 'Run',
+        'size' => 'small'
+    ]
+];
 
-$dbTables = [];
+$formTypes = ['system', 'project'];
 
-$db = new DB();
-$pdo = $db->getConnection();
+foreach ($formTypes as $formType) {
+    $formOptions['inputs']['hidden'] = [
+        [
+                'name' => 'migrate_type',
+                'value' => $formType
+        ]
+    ];
 
-// Read and execute queries from the SQL file to create tables. We have a different migrate file for different database drivers
-$migrateFile = ROOT . '/.tools/migrate_' . DB_DRIVER . '.sql';
-$migrate = file_get_contents($migrateFile);
-
-try {
-    // Execute multiple queries
-    $pdo->exec($migrate);
-    echo Alerts::success('Database migration completed successfully.');
-} catch (PDOException $e) {
-    echo Alerts::danger('Error in migrate file: ' . $e->getMessage(), 400);
+    echo Html::divBox(Html::h2('Run ' .  $formType . ' Migration') . Forms::render($formOptions, $theme));
 }
+
+

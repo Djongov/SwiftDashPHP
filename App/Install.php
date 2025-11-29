@@ -92,7 +92,7 @@ class Install
         }
 
         // Read and execute queries from the SQL file to create tables. We have a different migrate file for different database drivers
-        $migrateFile = ROOT . '/.tools/migrate_' . DB_DRIVER . '.sql';
+        $migrateFile = ROOT . '/.tools/migrate/system/migrate_' . DB_DRIVER . '.sql';
         $migrate = file_get_contents($migrateFile);
 
         try {
