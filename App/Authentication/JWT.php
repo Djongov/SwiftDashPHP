@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Authentication;
 
 use App\Utilities\General;
-use App\Api\Response;
 use App\Core\Session;
 use App\Authentication\AuthToken;
-use Models\Core\DBCache;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
@@ -291,6 +289,16 @@ class JWT
         // Token is valid if not expired and (no nbf claim OR nbf time has passed)
         return $payload['exp'] >= $currentTime &&
                (!isset($payload['nbf']) || $payload['nbf'] <= $currentTime);
+    }
+    public static function checkForAdministrator(string $token): bool
+    {
+        $payload = self::parseTokenPayLoad($token);
+        
+        if (empty($payload) || !isset($payload['roles']) || !is_array($payload['roles'])) {
+            return false;
+        }
+        
+        return in_array('administrator', $payload['roles'], true);
     }
     // A method to check the combined validity of a token
     public static function checkToken(string $token): bool

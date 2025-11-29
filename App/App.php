@@ -9,7 +9,40 @@ use App\Api\Response;
 
 class App
 {
+    private array $skipRoutingUrls = [
+        '/robots.txt',
+        '/favicon.ico',
+        '/health',
+        '/ping',
+        '/migrate'
+    ];
+
+    private array $skipBuildUrls = [
+        '/migrate'
+    ];
+
     public function init(): void
+    {
+        // Bootstrap: Load configuration and start session
+        $this->bootstrap();
+
+        // Get current URI
+        $uri = $this->getCurrentUri();
+
+        // Early exit for URLs that don't need routing
+        if ($this->shouldSkipRouting($uri)) {
+            $this->handleDirectUri($uri);
+            return;
+        }
+
+        // Capture analytics (UTM parameters)
+        $this->captureUtmParameters();
+
+        // Handle routing
+        $this->handleRouting($uri);
+    }
+
+    private function bootstrap(): void
     {
         // Load system settings first (required for AUTH_EXPIRY in Session)
         require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
@@ -37,57 +70,10 @@ class App
         if (MULTILINGUAL && !isset($_SESSION['lang'])) {
             $_SESSION['lang'] = DEFAULT_LANG;
         }
+    }
 
-        // Capture UTM parameters if present in the URL
-        $utmSources = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
-
-        $currentUtms = [];
-        foreach ($utmSources as $source) {
-
-            if (isset($_GET[$source])) {
-                $currentUtms[$source] = $_GET[$source];
-            }
-        }
-
-        if (!empty($currentUtms)) {
-            // Capture UTM parameters
-            $captureUtm = new \Models\UtmCapturer();
-            $data = [
-                'ip_address' => currentIP(),
-                'utm_source' => $currentUtms['utm_source'] ?? null,
-                'utm_medium' => $currentUtms['utm_medium'] ?? null,
-                'utm_campaign' => $currentUtms['utm_campaign'] ?? null,
-                'utm_term' => $currentUtms['utm_term'] ?? null,
-                'utm_content' => $currentUtms['utm_content'] ?? null,
-                'referrer_url' => $_SERVER['HTTP_REFERER'] ?? null,
-                'landing_page' => isset($_SERVER['REQUEST_URI'])
-                    ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
-                    : null
-            ];
-
-            try {
-                $captureUtm->create($data);
-            } catch (\Exception $e) {
-                // Log the error or handle it as needed
-                //throw new \Exception("Failed to capture UTM parameters: " . $e->getMessage());
-                error_log("Failed to capture UTM parameters: " . $e->getMessage());
-            }
-            
-        }
-
-        /*
-            Now Routing
-        */
-        // Location of the routes definition
-        $routesDefinition = require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/routes.php';
-        // Ensure that $routesDefinition is a callable
-        if (!is_callable($routesDefinition)) {
-            throw new \RuntimeException('Invalid routes definition');
-        }
-        $dispatcher = \FastRoute\simpleDispatcher($routesDefinition);
-
-        // Fetch method and URI from somewhere
-        $httpMethod = $_SERVER['REQUEST_METHOD'];
+    private function getCurrentUri(): string
+    {
         $uri = $_SERVER['REQUEST_URI'];
         
         // Strip query string (?foo=bar) and decode URI
@@ -95,102 +81,192 @@ class App
             $uri = substr($uri, 0, $pos);
         }
 
-        $uri = rawurldecode($uri);
+        return rawurldecode($uri);
+    }
 
-        $isApi = str_contains($uri, '/api/') ?? false;
+    private function shouldSkipRouting(string $uri): bool
+    {
+        foreach ($this->skipRoutingUrls as $skipUrl) {
+            if ($uri === $skipUrl || str_starts_with($uri, $skipUrl)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function shouldSkipBuild(string $uri): bool
+    {
+        foreach ($this->skipBuildUrls as $skipUrl) {
+            if ($uri === $skipUrl || str_starts_with($uri, $skipUrl)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function handleDirectUri(string $uri): void
+    {
+        // Handle URLs that bypass routing
+        switch ($uri) {
+            case '/health':
+            case '/ping':
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'ok', 'timestamp' => time()]);
+                break;
+            case '/robots.txt':
+                if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/robots.txt')) {
+                    header('Content-Type: text/plain');
+                    readfile($_SERVER['DOCUMENT_ROOT'] . '/robots.txt');
+                }
+                break;
+            default:
+                http_response_code(404);
+                echo '404 Not Found';
+        }
+    }
+
+    private function captureUtmParameters(): void
+    {
+        $utmSources = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+
+        $currentUtms = [];
+        foreach ($utmSources as $source) {
+            if (isset($_GET[$source])) {
+                $currentUtms[$source] = $_GET[$source];
+            }
+        }
+
+        if (empty($currentUtms)) {
+            return;
+        }
+
+        // Capture UTM parameters
+        $captureUtm = new \Models\UtmCapturer();
+        $data = [
+            'ip_address' => currentIP(),
+            'utm_source' => $currentUtms['utm_source'] ?? null,
+            'utm_medium' => $currentUtms['utm_medium'] ?? null,
+            'utm_campaign' => $currentUtms['utm_campaign'] ?? null,
+            'utm_term' => $currentUtms['utm_term'] ?? null,
+            'utm_content' => $currentUtms['utm_content'] ?? null,
+            'referrer_url' => $_SERVER['HTTP_REFERER'] ?? null,
+            'landing_page' => isset($_SERVER['REQUEST_URI'])
+                ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+                : null
+        ];
+
+        try {
+            $captureUtm->create($data);
+        } catch (\Exception $e) {
+            error_log("Failed to capture UTM parameters: " . $e->getMessage());
+        }
+    }
+
+    private function handleRouting(string $uri): void
+    {
+        // Location of the routes definition
+        $routesDefinition = require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/routes.php';
+        
+        // Ensure that $routesDefinition is a callable
+        if (!is_callable($routesDefinition)) {
+            throw new \RuntimeException('Invalid routes definition');
+        }
+        
+        $dispatcher = \FastRoute\simpleDispatcher($routesDefinition);
+
+        // Fetch method and URI
+        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        $isApi = str_contains($uri, '/api/');
 
         // Go through the login check
         $loginInfo = \App\RequireLogin::check($isApi);
 
-        extract($loginInfo);
-
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+        
         switch ($routeInfo[0]) {
-            /* Handle 404 Not Found */
             case \FastRoute\Dispatcher::NOT_FOUND:
-                if ($httpMethod === 'GET' && !$isApi) {
-                    // Theme
-                    $theme = (isset($loginInfo['usernameArray']['theme'])) ? $loginInfo['usernameArray']['theme'] : COLOR_SCHEME;
-                    $errorPage = new Page();
-                    echo $errorPage->build(
-                        '404 Not Found', // Title
-                        'The page you are looking for was not found', // Description
-                        ['404, Not Found'], // Keywords
-                        OG_LOGO, // Thumbimage
-                        $theme, // Theme
-                        MAIN_MENU, // Menu
-                        $loginInfo['usernameArray'], // Username array
-                        ROOT . '/Views/errors/error.php', // Controller
-                        $loginInfo['isAdmin'], // isAdmin
-                        $routeInfo
-                    );
-                } else {
-                    // For non-GET requests, provide an API response
-                    Response::output('api endpoint (' . $uri . ') not found', 404);
-                }
+                $this->handle404($httpMethod, $isApi, $loginInfo);
                 break;
-            /* Handle 405 Method Not Allowed */
+                
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $routeInfo[1];
-                // Handle 405 Method Not Allowed
-                Response::output('Method not allowed. Allowed methods are: ' . implode(',', $allowedMethods), 405);
+                $this->handle405($routeInfo[1]);
                 break;
-            /* Handle FOUND ROUTE OK */
+                
             case \FastRoute\Dispatcher::FOUND:
-                $controllerInfo = $routeInfo[1];
-                $controllerName = $controllerInfo[0]; // Path to controller file
-                // Extract route parameters if any
-                $params = $controllerInfo[1] ?? [];
-
-                if (!file_exists($controllerName)) {
-                    throw new \Exception("Controller file ($controllerName) not found");
-                }
-
-                // Check login status
-                // $loginInfo['usernameArray'] = $loginInfo['usernameArray'];
-                // $loginInfo['isAdmin'] = $loginInfo['isAdmin'];
-                // $loginInfo['loggedIn'] = $loginInfo['loggedIn'];
-
-                // // Set theme (fallback to default if not set)
-                // $loginInfo['theme'] = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-
-                // API Endpoints: Directly include and run
-                if ($isApi) {
-                    // Add those variables so they are available for API calls too before the include
-                    $usernameArray = $loginInfo['usernameArray'];
-                    $isAdmin = $loginInfo['isAdmin'];
-                    $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-                    $loggedIn = $loginInfo['loggedIn'];
-
-                    include_once $controllerName;
-
-                    break;
-                }
-                // Non-API Endpoints
-                if ($httpMethod === 'GET' && !empty($params) && !$isApi) {
-                    $menuArray = $params['menu'] ?? [];
-                    $page = new Page();
-                    echo $page->build(
-                        $params['title'],
-                        $params['description'],
-                        $params['keywords'],
-                        $params['thumbimage'],
-                        $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME,
-                        $menuArray,
-                        $loginInfo['usernameArray'],
-                        $controllerName,
-                        $loginInfo['isAdmin'],
-                        $routeInfo // Pass route info to the controllers that are GET and build a page
-                    );
-                } else {
-                    $usernameArray = $loginInfo['usernameArray'];
-                    $isAdmin = $loginInfo['isAdmin'];
-                    $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
-                    $loggedIn = $loginInfo['loggedIn'];
-                    // Include the controller file
-                    include_once $controllerName;
-                }
+                $this->handleFoundRoute($routeInfo, $httpMethod, $uri, $isApi, $loginInfo);
                 break;
         }
+    }
+
+    private function handle404(string $httpMethod, bool $isApi, array $loginInfo): void
+    {
+        if ($httpMethod === 'GET' && !$isApi) {
+            $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+            $errorPage = new Page();
+            echo $errorPage->build(
+                '404 Not Found',
+                'The page you are looking for was not found',
+                ['404, Not Found'],
+                OG_LOGO,
+                $theme,
+                MAIN_MENU,
+                $loginInfo['usernameArray'],
+                ROOT . '/Views/errors/error.php',
+                $loginInfo['isAdmin'],
+                []
+            );
+        } else {
+            Response::output('api endpoint (' . $_SERVER['REQUEST_URI'] . ') not found', 404);
+        }
+    }
+
+    private function handle405(array $allowedMethods): void
+    {
+        Response::output('Method not allowed. Allowed methods are: ' . implode(',', $allowedMethods), 405);
+    }
+
+    private function handleFoundRoute(array $routeInfo, string $httpMethod, string $uri, bool $isApi, array $loginInfo): void
+    {
+        $controllerInfo = $routeInfo[1];
+        $controllerName = $controllerInfo[0];
+        $params = $controllerInfo[1] ?? [];
+
+        if (!file_exists($controllerName)) {
+            throw new \Exception("Controller file ($controllerName) not found");
+        }
+
+        // Prepare common variables for controllers
+        $usernameArray = $loginInfo['usernameArray'];
+        $isAdmin = $loginInfo['isAdmin'];
+        $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
+        $loggedIn = $loginInfo['loggedIn'];
+
+        // API Endpoints: Directly include and run
+        if ($isApi) {
+            include_once $controllerName;
+            return;
+        }
+
+        // Non-API GET Endpoints with full page build
+        if ($httpMethod === 'GET' && !empty($params) && !$this->shouldSkipBuild($uri)) {
+            $menuArray = $params['menu'] ?? [];
+            $page = new Page();
+            echo $page->build(
+                $params['title'],
+                $params['description'],
+                $params['keywords'],
+                $params['thumbimage'],
+                $theme,
+                $menuArray,
+                $usernameArray,
+                $controllerName,
+                $isAdmin,
+                $routeInfo
+            );
+            return;
+        }
+
+        // Direct controller execution (skip Page::build wrapper)
+        include_once $controllerName;
     }
 }

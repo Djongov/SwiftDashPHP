@@ -179,7 +179,7 @@ class SystemConfig
         self::defineServiceConstants();
 
         // DB settings from AppSettings table
-        self::configureDBSettings();
+        self::configureDBAppSettings();
 
         // Authentication constants
         self::defineAuthConstants();
@@ -333,7 +333,7 @@ class SystemConfig
             include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'google-auth-config.php';
         }
     }
-    private static function configureDBSettings(): void
+    private static function configureDBAppSettings(): void
     {
         $appSettings = new \Models\AppSettings();
         $allAppSettings = $appSettings->getAllByOwner('system');
