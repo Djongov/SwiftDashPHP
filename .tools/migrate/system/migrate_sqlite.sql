@@ -3,19 +3,19 @@ CREATE TABLE IF NOT EXISTS app_settings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     value TEXT NOT NULL,
-    type TEXT NOT NULL DEFAULT 'string', -- 'string', 'int', 'float', 'bool', 'date', 'json'
-    admin_setting INTEGER NOT NULL DEFAULT 0, -- 0 = normal, 1 = admin only
-    owner TEXT NOT NULL DEFAULT 'system', -- 'system' or user id
-    description TEXT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    type TEXT NOT NULL DEFAULT 'string',
+    admin_setting INTEGER NOT NULL DEFAULT 0,
+    owner TEXT NOT NULL DEFAULT 'system',
+    description TEXT,
+    updated_at TEXT DEFAULT (datetime('now'))
 );
 
-INSERT INTO app_settings (name, value, type, owner, admin_setting, description)
+INSERT OR IGNORE INTO app_settings (name, value, type, owner, admin_setting, description)
 VALUES 
-    ('default_data_grid_engine', 'DataGrid', 'string', 'system', 1, 'AGGrid or DataGrid for values.'),
-    ('auth_expiry', '3600', 'int', 'system', 1, 'Number in seconds for the JWT Token''s lifetime'),
-    ('use_tailwind_cdn', '1', 'bool', 'system', 1, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
-    ('color_scheme', 'amber', 'string', 'system', 1, 'The default tailwind color for theming');
+    ('default_data_grid_engine', 'DataGrid', 'string', 'system', TRUE, 'AGGrid or DataGrid for values.'),
+    ('auth_expiry', '3600', 'int', 'system', TRUE, 'Number in seconds for the JWT Token''s lifetime'),
+    ('use_tailwind_cdn', '1', 'bool', 'system', TRUE, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
+    ('color_scheme', 'amber', 'string', 'system', TRUE, 'The default tailwind color for theming');
 
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
@@ -58,13 +58,12 @@ CREATE TABLE IF NOT EXISTS firewall (
 );
 
 -- Default firewall rules
-INSERT INTO firewall (ip_cidr, created_by, comment)
+INSERT OR IGNORE INTO firewall (ip_cidr, created_by, comment)
 VALUES
     ('127.0.0.1/32', 'System', 'private range'),
     ('10.0.0.0/8', 'System', 'private range'),
     ('172.16.0.0/12', 'System', 'private range'),
-    ('192.168.0.0/16', 'System', 'private range')
-ON CONFLICT(ip_cidr) DO NOTHING;
+    ('192.168.0.0/16', 'System', 'private range');
 
 -- CSP REPORTS TABLE
 CREATE TABLE IF NOT EXISTS csp_reports (
@@ -151,9 +150,7 @@ CREATE TABLE IF NOT EXISTS utm_captures (
     utm_campaign TEXT NULL,
     utm_term TEXT NULL,
     utm_content TEXT NULL,
-
     referrer_url TEXT NULL,
     landing_page TEXT NULL,
-
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

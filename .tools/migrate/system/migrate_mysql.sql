@@ -1,15 +1,14 @@
 -- App Settings TABLE
 CREATE TABLE IF NOT EXISTS app_settings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     value TEXT NOT NULL,
-    type ENUM('string', 'int', 'float', 'bool', 'date', 'json') NOT NULL DEFAULT 'string',
-    admin_setting TINYINT(1) NOT NULL DEFAULT 0,   -- 0 = normal, 1 = admin only
-    owner VARCHAR(50) NOT NULL DEFAULT 'system',  -- 'system' or user id
+    type ENUM('string','int','float','bool','date','json') NOT NULL DEFAULT 'string',
+    admin_setting TINYINT(1) NOT NULL DEFAULT 0,
+    owner VARCHAR(50) NOT NULL DEFAULT 'system',
     description TEXT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
 VALUES 

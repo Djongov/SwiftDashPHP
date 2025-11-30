@@ -14,7 +14,8 @@ class App
         '/favicon.ico',
         '/health',
         '/ping',
-        '/migrate'
+        '/migrate',
+        '/install'
     ];
 
     private array $skipBuildUrls = [
@@ -119,9 +120,61 @@ class App
                     readfile($_SERVER['DOCUMENT_ROOT'] . '/robots.txt');
                 }
                 break;
+            case '/install':
+                // Check if installation is needed before proceeding
+                if ($this->isInstallationComplete()) {
+                    header('Location: /');
+                    exit;
+                }
+                // Installation requires minimal bootstrap
+                $install = new \App\Install();
+                echo $install->start();
+                break;
             default:
                 http_response_code(404);
                 echo '404 Not Found';
+        }
+    }
+
+    private function isInstallationComplete(): bool
+    {
+        try {
+            $options = [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_EMULATE_PREPARES => false,
+            ];
+
+            switch (DB_DRIVER) {
+                case 'mysql':
+                    $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8';
+                    if (defined("DB_SSL") && DB_SSL) {
+                        $options[\PDO::MYSQL_ATTR_SSL_CA] = DB_CA_CERT;
+                    }
+                    break;
+                case 'pgsql':
+                    $dsn = 'pgsql:host=' . DB_HOST . ';dbname=' . DB_NAME;
+                    if (defined("DB_SSL") && DB_SSL) {
+                        $dsn .= ';sslmode=require;sslrootcert=' . DB_CA_CERT;
+                    }
+                    break;
+                case 'sqlite':
+                    $dsn = 'sqlite:' . ROOT . '/.tools/' . DB_NAME . '.db';
+                    break;
+                default:
+                    return false;
+            }
+
+            $pdo = new \PDO($dsn, DB_USER, DB_PASS, $options);
+            
+            // Check if users table exists and has at least one user
+            $stmt = $pdo->query("SELECT COUNT(*) as count FROM users");
+            $result = $stmt->fetch();
+            
+            return $result['count'] > 0;
+        } catch (\PDOException $e) {
+            // If we can't connect or table doesn't exist, installation is not complete
+            return false;
         }
     }
 

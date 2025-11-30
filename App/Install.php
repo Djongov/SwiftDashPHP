@@ -99,7 +99,7 @@ class Install
             // Execute multiple queries
             $conn->exec($migrate);
         } catch (PDOException $e) {
-            Response::output('Error in migrate file: ' . $e->getMessage(), 400);
+            Response::output('Error in system migrate file: ' . $e->getMessage(), 400);
         }
 
         $ip = IP::currentIP();
@@ -110,6 +110,18 @@ class Install
         if (IP::isPublicIp($ip)) {
             // Insert firewall rule for the current IP if it's not private IP (because we already insert private ranges by default)
             $this->createFirewallRule($conn, $ip);
+        }
+        
+        // Now project migrations
+        $projectMigrateFile = ROOT . '/.tools/migrate/project/migrate_' . DB_DRIVER . '.sql';
+        if (file_exists($projectMigrateFile)) {
+            $projectMigrate = file_get_contents($projectMigrateFile);
+            try {
+                // Execute multiple queries
+                $conn->exec($projectMigrate);
+            } catch (PDOException $e) {
+                Response::output('Error in project migrate file: ' . $e->getMessage(), 400);
+            }
         }
 
         // Insert administrator for first time login but only if local login is used
@@ -138,6 +150,15 @@ class Install
     public function createAdminUser($conn, $hashedPassword, $ip, $countryCode)
     {
         try {
+            // Check if admin user already exists
+            $check = $conn->prepare("SELECT 1 FROM users WHERE username = 'admin' LIMIT 1");
+            $check->execute();
+            
+            if ($check->fetchColumn()) {
+                // Admin already exists, skip creation
+                return;
+            }
+
             $now = (DB_DRIVER === 'sqlite') ? 'CURRENT_TIMESTAMP' : 'NOW()';
             $enabled = (DB_DRIVER === 'mysql') ? 1 : 'TRUE';
 
@@ -154,16 +175,44 @@ class Install
     }
     public function createFirewallRule($conn, $ip)
     {
+        $cidr = $ip . '/32';
+
         try {
-            $stmt = $conn->prepare("INSERT INTO firewall (ip_cidr, created_by, comment) VALUES (?, 'System', 'Initial Admin IP')");
-            $stmt->execute([$ip . '/32']);
+            // Check if rule already exists (works on all DBs)
+            $check = $conn->prepare("SELECT 1 FROM firewall WHERE ip_cidr = ?");
+            $check->execute([$cidr]);
+
+            if ($check->fetchColumn()) {
+                // It exists, so just exit silently
+                return;
+            }
+
+            // Insert new rule
+            $stmt = $conn->prepare(
+                "INSERT INTO firewall (ip_cidr, created_by, comment)
+                VALUES (?, 'System', 'Initial Admin IP')"
+            );
+            $stmt->execute([$cidr]);
+
         } catch (PDOException $e) {
-            Response::output('Inserting firewall rule for IP ' . $ip . ' error: ' . $e->getMessage(), 400);
+            Response::output(
+                'Inserting firewall rule for IP ' . $ip . ' error: ' . $e->getMessage(),
+                400
+            );
         }
     }
     public function createCSPApprovedDomain($conn, $domain)
     {
         try {
+            // Check if domain already exists
+            $check = $conn->prepare("SELECT 1 FROM csp_approved_domains WHERE domain = ? LIMIT 1");
+            $check->execute([$domain]);
+            
+            if ($check->fetchColumn()) {
+                // Domain already exists, skip creation
+                return;
+            }
+
             $stmt = $conn->prepare("INSERT INTO csp_approved_domains (domain, created_by) VALUES (?, 'System')");
             $stmt->execute([$domain]);
         } catch (PDOException $e) {

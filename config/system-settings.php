@@ -335,14 +335,22 @@ class SystemConfig
     }
     private static function configureDBAppSettings(): void
     {
-        $appSettings = new \Models\AppSettings();
-        $allAppSettings = $appSettings->getAllByOwner('system');
-        $requiredAppSettings = ['default_data_grid_engine', 'auth_expiry', 'use_tailwind_cdn', 'color_scheme'];
-        foreach ($allAppSettings as $setting) {
-            if (in_array($setting['name'], $requiredAppSettings)) {
-                $constantName = strtoupper($setting['name']);
-                define($constantName, $setting['value']);
+        try {
+            $appSettings = new \Models\AppSettings();
+            $allAppSettings = $appSettings->getAllByOwner('system');
+            $requiredAppSettings = ['default_data_grid_engine', 'auth_expiry', 'use_tailwind_cdn', 'color_scheme'];
+            foreach ($allAppSettings as $setting) {
+                if (in_array($setting['name'], $requiredAppSettings) && defined(strtoupper($setting['name'])) === false) {
+                    $constantName = strtoupper($setting['name']);
+                    define($constantName, $setting['value']);
+                }
             }
+        } catch (\PDOException $e) {
+            // Database doesn't exist yet or table not created - use defaults
+            define('DEFAULT_DATA_GRID_ENGINE', 'aggrid');
+            define('AUTH_EXPIRY', 3600);
+            define('USE_TAILWIND_CDN', true);
+            define('COLOR_SCHEME', 'blue');
         }
     }
 }
