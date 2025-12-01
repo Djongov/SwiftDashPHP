@@ -234,6 +234,11 @@ class DB
 
     private static function normalizeDataType($type): string
     {
+        // Handle ENUM types - they should be treated as strings
+        if (str_starts_with(strtolower($type), 'enum(')) {
+            return 'string';
+        }
+
         // Convert common MySQL/PostgreSQL data types to PHP types
         $typeMap = [
             'tinyint' => 'int',

@@ -1,7 +1,7 @@
 -- App Settings TABLE
 CREATE TABLE IF NOT EXISTS app_settings (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     value TEXT NOT NULL,
     type ENUM('string','int','float','bool','date','json') NOT NULL DEFAULT 'string',
     admin_setting TINYINT(1) NOT NULL DEFAULT 0,
@@ -160,18 +160,18 @@ CREATE TABLE IF NOT EXISTS utm_captures (
 
 
 -- BACKGROUND CLEANUP EVENT FOR CACHE
-SET GLOBAL event_scheduler = ON;
+-- SET GLOBAL event_scheduler = ON;
 
-CREATE EVENT IF NOT EXISTS cleanup_cache_event
-ON SCHEDULE EVERY 10 MINUTE
-DO
-  DELETE FROM cache WHERE expiration < NOW();
+-- CREATE EVENT IF NOT EXISTS cleanup_cache_event
+-- ON SCHEDULE EVERY 10 MINUTE
+-- DO
+--   DELETE FROM cache WHERE expiration < NOW();
 
--- RESETTING THE DAILY EXECUTIONS OF API KEYS
-CREATE EVENT IF NOT EXISTS reset_api_key_executions
-ON SCHEDULE EVERY 1 DAY
-STARTS (CURRENT_DATE + INTERVAL 1 DAY)
-DO
-  UPDATE api_keys SET executions = 0;
+-- -- RESETTING THE DAILY EXECUTIONS OF API KEYS
+-- CREATE EVENT IF NOT EXISTS reset_api_key_executions
+-- ON SCHEDULE EVERY 1 DAY
+-- STARTS (CURRENT_DATE + INTERVAL 1 DAY)
+-- DO
+--   UPDATE api_keys SET executions = 0;
 
 -- END of MySQL migration script

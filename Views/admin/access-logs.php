@@ -32,9 +32,13 @@ if (!is_dir($filePath)) {
     return;
 }
 
-// Check if the directory is readable
 if (!is_readable($filePath)) {
     echo Alerts::danger('The access logs directory (' . $filePath . ') is not readable');
+    return;
+}
+
+if (!is_readable($filePath)) {
+    echo Alerts::danger('The access log file (' . $filePath . ') is not readable');
     return;
 }
 

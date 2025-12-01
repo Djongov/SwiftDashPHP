@@ -86,7 +86,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && echo "    notifempty" >> /etc/logrotate.d/apache2-custom \
     && echo "    create 0640 www-data adm" >> /etc/logrotate.d/apache2-custom \
     && echo "}" >> /etc/logrotate.d/apache2-custom \
-    && echo "export ACCESS_LOG='/var/log/apache2/custom_access.log'" >> /etc/apache2/envvars \
+    && echo "export ACCESS_LOG='/var/log/apache2'" >> /etc/apache2/envvars \
     \
     # ========================================
     # Cleanup
