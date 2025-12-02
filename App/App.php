@@ -178,6 +178,57 @@ class App
         }
     }
 
+    /**
+     * Load custom data from project-specific configuration
+     * 
+     * This method allows projects to inject custom data into routes without modifying core App class.
+     * Create a file at config/custom-data.php that returns an array or callable.
+     * 
+     * Example config/custom-data.php:
+     * <?php
+     * return [
+     *     'feature_flags' => ['new_ui' => true],
+     *     'app_config' => ['maintenance_mode' => false],
+     *     'custom_menu' => ['items' => [...]]
+     * ];
+     * 
+     * Or use a callable for dynamic data (receives $loginInfo as parameter):
+     * <?php
+     * return function($loginInfo) {
+     *     return [
+     *         'user_characters' => \Models\Character\CharaterUtility::findByUserId($loginInfo['usernameArray']['id'] ?? null),
+     *         'dynamic_data' => time()
+     *     ];
+     * };
+     * 
+     * @param array $loginInfo Login information from RequireLogin::check()
+     * @return array Custom data from config or empty array if not configured
+     */
+    private function loadCustomData(array $loginInfo = []): array
+    {
+        $customDataPath = dirname($_SERVER['DOCUMENT_ROOT']) . '/config/custom-data.php';
+        
+        if (!file_exists($customDataPath)) {
+            return [];
+        }
+        
+        try {
+            $customData = require $customDataPath;
+            
+            // If the config returns a callable, execute it with loginInfo to get the data
+            if (is_callable($customData)) {
+                $customData = $customData($loginInfo);
+            }
+            
+            // Ensure we always return an array
+            return is_array($customData) ? $customData : [];
+        } catch (\Exception $e) {
+            // Log error but don't break the application
+            error_log("Failed to load custom data: " . $e->getMessage());
+            return [];
+        }
+    }
+
     private function captureUtmParameters(): void
     {
         $utmSources = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
@@ -234,11 +285,14 @@ class App
         // Go through the login check
         $loginInfo = \App\RequireLogin::check($isApi);
 
+        // Load custom data for the route (pass loginInfo for dynamic data loading)
+        $customData = $this->loadCustomData($loginInfo);
+
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:
-                $this->handle404($httpMethod, $isApi, $loginInfo);
+                $this->handle404($httpMethod, $isApi, $loginInfo, $customData);
                 break;
                 
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
@@ -246,12 +300,12 @@ class App
                 break;
                 
             case \FastRoute\Dispatcher::FOUND:
-                $this->handleFoundRoute($routeInfo, $httpMethod, $uri, $isApi, $loginInfo);
+                $this->handleFoundRoute($routeInfo, $httpMethod, $uri, $isApi, $loginInfo, $customData);
                 break;
         }
     }
 
-    private function handle404(string $httpMethod, bool $isApi, array $loginInfo): void
+    private function handle404(string $httpMethod, bool $isApi, array $loginInfo, array $customData): void
     {
         if ($httpMethod === 'GET' && !$isApi) {
             $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
@@ -266,7 +320,8 @@ class App
                 $loginInfo['usernameArray'],
                 ROOT . '/Views/errors/error.php',
                 $loginInfo['isAdmin'],
-                []
+                [],
+                $customData
             );
         } else {
             Response::output('api endpoint (' . $_SERVER['REQUEST_URI'] . ') not found', 404);
@@ -278,7 +333,7 @@ class App
         Response::output('Method not allowed. Allowed methods are: ' . implode(',', $allowedMethods), 405);
     }
 
-    private function handleFoundRoute(array $routeInfo, string $httpMethod, string $uri, bool $isApi, array $loginInfo): void
+    private function handleFoundRoute(array $routeInfo, string $httpMethod, string $uri, bool $isApi, array $loginInfo, array $customData): void
     {
         $controllerInfo = $routeInfo[1];
         $controllerName = $controllerInfo[0];
@@ -314,7 +369,8 @@ class App
                 $usernameArray,
                 $controllerName,
                 $isAdmin,
-                $routeInfo
+                $routeInfo,
+                $customData
             );
             return;
         }
