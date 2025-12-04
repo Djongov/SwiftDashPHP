@@ -265,7 +265,10 @@ class SystemConfig
         define('AUTH_HANDLER', 'session'); // cookie/session
         define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
         define('JWT_TOKEN_EXPIRY', (int) AUTH_EXPIRY);
-        define('USE_REMOTE_ID_TOKEN', false);
+        
+        // USE_REMOTE_ID_TOKEN: if true, use provider's ID token; if false, generate our own JWT
+        define('USE_REMOTE_ID_TOKEN', filter_var($_ENV['USE_REMOTE_ID_TOKEN'] ?? 'false', FILTER_VALIDATE_BOOLEAN));
+        
         define('AUTH_COOKIE_EXPIRY', (int) AUTH_EXPIRY);
         define('SUPPORTED_AUTH_PROVIDERS', ['azure', 'mslive', 'google', 'local']);
 
@@ -280,6 +283,10 @@ class SystemConfig
         // Set variables needed by auth config files
         $GLOBALS['destination'] = (isset($_GET['destination'])) ? $_GET['destination'] : $_SERVER['REQUEST_URI'];
         $GLOBALS['protocol'] = (str_contains($_SERVER['HTTP_HOST'], 'localhost')) ? 'http' : 'https';
+        // Configure JWT keys if we're using our own tokens (not remote ID tokens)
+        if (!USE_REMOTE_ID_TOKEN) {
+            self::configureJWTKeys();
+        }
 
         // Set up authentication providers
         self::configureLocalAuth();
@@ -288,15 +295,24 @@ class SystemConfig
         self::configureGoogleAuth();
     }
     
+    private static function configureJWTKeys(): void
+    {
+        if (!isset($_ENV['JWT_PUBLIC_KEY']) || !isset($_ENV['JWT_PRIVATE_KEY'])) {
+            die('JWT_PUBLIC_KEY and JWT_PRIVATE_KEY must be set in the .env file when USE_REMOTE_ID_TOKEN is false');
+        }
+        define("JWT_PUBLIC_KEY", $_ENV['JWT_PUBLIC_KEY']);
+        define("JWT_PRIVATE_KEY", $_ENV['JWT_PRIVATE_KEY']);
+    }
+    
     private static function configureLocalAuth(): void
     {
         define('LOCAL_USER_LOGIN', filter_var($_ENV['LOCAL_LOGIN_ENABLED'], FILTER_VALIDATE_BOOLEAN));
         if (LOCAL_USER_LOGIN) {
-            if (!isset($_ENV['JWT_PUBLIC_KEY']) || !isset($_ENV['JWT_PRIVATE_KEY'])) {
-                die('JWT_PUBLIC_KEY and JWT_PRIVATE_KEY must be set in the .env file');
+            // JWT keys are already configured if USE_REMOTE_ID_TOKEN is false
+            // Only define them here if they weren't already defined
+            if (!defined('JWT_PUBLIC_KEY')) {
+                self::configureJWTKeys();
             }
-            define("JWT_PUBLIC_KEY", $_ENV['JWT_PUBLIC_KEY']);
-            define("JWT_PRIVATE_KEY", $_ENV['JWT_PRIVATE_KEY']);
             define('MANUAL_REGISTRATION', true);
         }
     }
