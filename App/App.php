@@ -24,13 +24,24 @@ class App
 
     public function init(): void
     {
+        // Get current URI first (before bootstrap)
+        $uri = $this->getCurrentUri();
+
+        // Early exit for /install route with minimal bootstrap
+        if ($uri === '/install') {
+            // Load minimal config needed for installation check
+            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
+            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
+            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
+            
+            $this->handleDirectUri($uri);
+            return;
+        }
+
         // Bootstrap: Load configuration and start session
         $this->bootstrap();
 
-        // Get current URI
-        $uri = $this->getCurrentUri();
-
-        // Early exit for URLs that don't need routing
+        // Early exit for other URLs that don't need routing
         if ($this->shouldSkipRouting($uri)) {
             $this->handleDirectUri($uri);
             return;
@@ -126,7 +137,7 @@ class App
                     header('Location: /');
                     exit;
                 }
-                // Installation requires minimal bootstrap
+                // system-settings.php already loaded in init() for /install route
                 $install = new \App\Install();
                 echo $install->start();
                 break;
