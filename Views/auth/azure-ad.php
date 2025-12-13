@@ -76,7 +76,7 @@ if ($userModel->exists($idTokenArray['preferred_username'])) {
 }
 
 // Issue a local JWT token if not using remote ID token
-if (!USE_REMOTE_ID_TOKEN && LOCAL_USER_LOGIN) {
+if (!USE_REMOTE_ID_TOKEN) {
     $idToken = JWT::generateToken(
         [
         'provider' => 'azure',

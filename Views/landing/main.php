@@ -7,7 +7,6 @@ use Components\Html;
 use App\Markdown\Page;
 
 define('INSTALL_PATH', '/install');
-
 try {
     $db = new App\Database\DB(); // Initialize the DB object
     $pdo = $db->getConnection(); // Retrieve the PDO connection object

@@ -78,7 +78,7 @@ if ($userModel->exists($idTokenArray['email'])) {
 }
 
 // Issue a local JWT token if not using remote ID token
-if (!USE_REMOTE_ID_TOKEN && LOCAL_USER_LOGIN) {
+if (!USE_REMOTE_ID_TOKEN) {
     $idToken = JWT::generateToken(
         [
         'provider' => 'google',
