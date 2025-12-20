@@ -17,6 +17,21 @@ VALUES
     ('use_tailwind_cdn', '1', 'bool', 'system', TRUE, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
     ('color_scheme', 'amber', 'string', 'system', TRUE, 'The default tailwind color for theming');
 
+-- Email App Settings
+INSERT OR IGNORE INTO app_settings (name, value, type, owner, admin_setting, description)
+VALUES
+    ('email_smtp_host', '', 'string', 'smtp', TRUE, 'SMTP server host'),
+    ('email_smtp_port', '587', 'int', 'smtp', TRUE, 'SMTP server port'),
+    ('email_smtp_ssl', '1', 'bool', 'smtp', TRUE, 'SMTP server encryption (tls/ssl)'),
+    ('email_smtp_verify_peer', '1', 'bool', 'smtp', TRUE, 'Verify SSL peer certificate'),
+    ('email_smtp_verify_peer_name', '1', 'bool', 'smtp', TRUE, 'Verify SSL peer certificate name'),
+    ('email_smtp_allow_self_signed', '0', 'bool', 'smtp', TRUE, 'Allow self-signed SSL certificates'),
+    ('email_smtp_username', '', 'string', 'smtp', TRUE, 'SMTP server username'),
+    ('email_smtp_password', '', 'string', 'smtp', TRUE, 'SMTP server password'),
+    ('email_smtp_from_address', '', 'string', 'smtp', TRUE, 'Default from email address'),
+    ('email_smtp_from_name', 'No Reply', 'string', 'smtp', TRUE, 'Default from name'),
+    ('email_smtp_administrator_email', '', 'string', 'smtp', TRUE, 'Administrator email for system notifications');
+
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

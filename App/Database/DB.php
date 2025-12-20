@@ -313,7 +313,10 @@ class DB
             $type = 'json';
         }
 
-        // Additional considerations specific to your application or SQLite usage
+        // If no type was matched, default to string to prevent empty type errors
+        if (empty($type)) {
+            $type = 'string';
+        }
 
         return $type;
     }

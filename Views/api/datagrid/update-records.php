@@ -47,15 +47,23 @@ $db = new DB();
 
 $db->checkDBColumns($columns, $table);
 
+// Get column information to check which columns allow NULL
+$columnInfo = $db->describe($table);
+
 $updates = [];
+$values = [];
 
 // Check if all keys in $_POST match the columns
 foreach ($_POST as $key => $value) {
-    if ($value === '') {
-        // Set to NULL or a default value as needed
-        $updates[] = "$key = NULL"; // or "$key = DEFAULT"
+    if ($value === null) {
+        // Only set to NULL if the column allows null values
+        if (isset($columnInfo[$key]) && $columnInfo[$key]['nullable']) {
+            $updates[] = "$key = NULL";
+        }
+        // If column doesn't allow null, skip updating it (keep existing value)
     } else {
         $updates[] = "$key = ?";
+        $values[] = $value; // Only add non-null values to the values array
     }
 }
 // Combine the SET clauses with commas
@@ -63,11 +71,6 @@ $sql .= implode(', ', $updates);
 
 // Add a WHERE clause to specify which organization to update
 $sql .= " WHERE id = ?";
-
-// Prepare and execute the query using queryPrepared
-$values = array_values($_POST);
-
-unset($values['id']);
 
 $values[] = $id; // Add the 'id' for the WHERE clause
 

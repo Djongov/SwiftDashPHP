@@ -77,6 +77,15 @@ $formOptions = [
         'text' => 'Create',
     ]
 ];
+
+echo Html::h2('Edit SMTP Settings', true, ['mb-4', 'mt-8']);
+
+try {
+    echo \Components\AppSetting::renderSettings('smtp', $theme);
+} catch (Exception $e) {
+    echo Alerts::danger($e->getMessage());
+}
+
 echo Html::h2('Create New App Setting', true, ['mb-4', 'mt-8']);
 
 echo Html::divBox(Forms::render($formOptions, $theme));

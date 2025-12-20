@@ -24,19 +24,15 @@ Good to knows:
     ];
 */
 
-class Send
+class SendGridWrapper
 {
-    public static function send(array $to, string $subject, string $body, string $from = FROM, string $fromName = FROM_NAME): string
+    public static function send(array $to, string $subject, string $body, string $from , string $fromName): string
     {
         if (!SENDGRID) {
             throw new Exception('Sendgrid is not enabled');
         }
         // Check structure of the $to array
         self::validateRecipients($to);
-        // Do a FROM check
-        if ($fromName !== FROM_NAME) {
-            throw new Exception('Currently setting a FROM is not allowed');
-        }
         // Set up FROM
         $from = new From($from, $fromName);
 
@@ -89,7 +85,7 @@ class Send
                 [
                     "email"
                 ]=>
-            string(23) "dimitar.djongov@uefa.ch"
+            string(23) "example@example.com"
             }
         [
                 1
@@ -98,7 +94,7 @@ class Send
                 [
                     "email"
                 ]=>
-            string(18) "ict.secops@uefa.ch"
+            string(18) "example2@example.com"
             }
         }
 

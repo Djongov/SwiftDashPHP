@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Mail\Send;
+use \App\Mail\SendGridWrapper;
 use App\Api\Checks;
 
 $checks = new Checks($loginInfo, $_POST);
@@ -25,4 +25,4 @@ $recipients = array_map(
 );
 
 // Now let's send the email
-echo Send::send($recipients, $_POST['subject'], $_POST['body']);
+echo SendGridWrapper::send($recipients, $_POST['subject'], $_POST['body'], FROM, FROM_NAME);

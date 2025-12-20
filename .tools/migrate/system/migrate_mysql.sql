@@ -18,6 +18,22 @@ VALUES
     (1, 'color_scheme', 'amber', 'string', 'system', 1, 'The default tailwind color for theming')
 ON DUPLICATE KEY UPDATE name = name; -- does nothing if id already exists
 
+-- Email App Settings
+INSERT INTO app_settings (name, value, type, owner, admin_setting, description)
+VALUES
+    ('email_smtp_host', '', 'string', 'smtp', 1, 'SMTP server host'),
+    ('email_smtp_port', '587', 'int', 'smtp', 1, 'SMTP server port'),
+    ('email_smtp_ssl', '1', 'bool', 'smtp', 1, 'SMTP server encryption (tls/ssl)'),
+    ('email_smtp_verify_peer', '1', 'bool', 'smtp', 1, 'Verify SSL peer certificate'),
+    ('email_smtp_verify_peer_name', '1', 'bool', 'smtp', 1, 'Verify SSL peer certificate name'),
+    ('email_smtp_allow_self_signed', '0', 'bool', 'smtp', 1, 'Allow self-signed SSL certificates'),
+    ('email_smtp_username', '', 'string', 'smtp', 1, 'SMTP server username'),
+    ('email_smtp_password', '', 'string', 'smtp', 1, 'SMTP server password'),
+    ('email_smtp_from_address', '', 'string', 'smtp', 1, 'Default from email address'),
+    ('email_smtp_from_name', 'No Reply', 'string', 'smtp', 1, 'Default from name'),
+    ('email_smtp_administrator_email', '', 'string', 'smtp', 1, 'Administrator email for system notifications')
+ON DUPLICATE KEY UPDATE name = name; -- does nothing if name already exists
+
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,

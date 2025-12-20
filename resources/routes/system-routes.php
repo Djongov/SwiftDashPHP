@@ -38,7 +38,8 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute(['GET', 'POST'], '/adminx/access-logs', [$viewsFolder . '/admin/access-logs.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/firewall', [$viewsFolder . '/admin/firewall.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/queries', [$viewsFolder . '/admin/queries.php', $metadataArray['admin']]);
-    $router->addRoute('GET', '/adminx/mailer', [$viewsFolder . '/admin/mailer.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/sendgrid-mailer', [$viewsFolder . '/admin/sendgrid-mailer.php', $metadataArray['admin']]);
+    $router->addRoute('GET', '/adminx/smtp-mailer', [$viewsFolder . '/admin/smtp-mailer.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/base64', [$viewsFolder . '/admin/tools/base64.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/db-table', [$viewsFolder . '/admin/db-table.php', $metadataArray['admin']]);
     $router->addRoute('GET', '/adminx/apim', [$viewsFolder . '/admin/apim.php', $metadataArray['admin']]);
@@ -67,7 +68,8 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     /* API Routes */
     $router->addRoute(['GET','PUT','DELETE','POST'], '/api/user[/{id:[^/]+}]', [$viewsFolder . '/api/user.php']);
     $router->addRoute(['GET','PUT','DELETE','POST'], '/api/firewall[/{id:\d+}]', [$viewsFolder . '/api/firewall.php']);
-    $router->addRoute('POST', '/api/mail/send', [$viewsFolder . '/api/mail/send.php']);
+    $router->addRoute('POST', '/api/mail/sendgrid', [$viewsFolder . '/api/mail/sendgrid.php']);
+    $router->addRoute('POST', '/api/mail/smtp', [$viewsFolder . '/api/mail/smtp.php']);
     $router->addRoute('POST', '/api/set-lang', [$viewsFolder . '/api/set-lang.php']);
     $router->addRoute('POST', '/api/cookie-consent', [$viewsFolder . '/api/consent-cookie.php']);
 
