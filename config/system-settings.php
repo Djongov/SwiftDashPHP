@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']));
+define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']) ?? dirname(__DIR__));
 
 if (ini_get('display_errors') == 1) {
     error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
@@ -58,12 +58,12 @@ class SystemConfig
 
         // If none of the critical env vars are set, try loading the .env file
         if (!$anyLoaded) {
-            $envPath = ROOT . DIRECTORY_SEPARATOR . '.env';
+            $envPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
             if (!file_exists($envPath)) {
-                die('The .env file is missing. Either set environment variables or create one in the root of the project. Alternatively, go to /create-env to generate it.');
+                die('The .env file is missing in ' . $envPath . '. Either set environment variables or create one in the root of the project. Alternatively, go to /create-env to generate it.');
             }
 
-            $dotenv = \Dotenv\Dotenv::createImmutable(ROOT);
+            $dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__), '.env');
             try {
                 $dotenv->safeLoad();
             } catch (\Exception $e) {
@@ -167,7 +167,7 @@ class SystemConfig
             ]
         );
         
-        define('VERSION', trim(file_get_contents(ROOT . DIRECTORY_SEPARATOR . 'version.txt')));
+        define('VERSION', trim(file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'version.txt')));
         
         // Database constants
         self::defineDatabaseConstants();
@@ -263,7 +263,8 @@ class SystemConfig
     {
         // Authentication handler configuration
         define('AUTH_HANDLER', 'session'); // cookie/session
-        define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
+        $httpHost = $_SERVER['HTTP_HOST'] ?? '';
+        define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$httpHost");
         define('JWT_TOKEN_EXPIRY', (int) AUTH_EXPIRY);
         
         // USE_REMOTE_ID_TOKEN: if true, use provider's ID token; if false, generate our own JWT
@@ -281,8 +282,8 @@ class SystemConfig
         }
 
         // Set variables needed by auth config files
-        $GLOBALS['destination'] = (isset($_GET['destination'])) ? $_GET['destination'] : $_SERVER['REQUEST_URI'];
-        $GLOBALS['protocol'] = (str_contains($_SERVER['HTTP_HOST'], 'localhost')) ? 'http' : 'https';
+        $GLOBALS['destination'] = (isset($_GET['destination'])) ? $_GET['destination'] : $_SERVER['REQUEST_URI'] ?? '/';
+        $GLOBALS['protocol'] = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost')) ? 'http' : 'https';
         // Configure JWT keys if we're using our own tokens (not remote ID tokens)
         if (!USE_REMOTE_ID_TOKEN) {
             self::configureJWTKeys();
@@ -324,7 +325,7 @@ class SystemConfig
             // Extract variables for the included config file
             $destination = $GLOBALS['destination'];
             $protocol = $GLOBALS['protocol'];
-            include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'azure-ad-auth-config.php';
+            include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'azure-ad-auth-config.php';
         }
     }
     
@@ -335,7 +336,7 @@ class SystemConfig
             // Extract variables for the included config file
             $destination = $GLOBALS['destination'];
             $protocol = $GLOBALS['protocol'];
-            include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'microsoft-live-auth-config.php';
+            include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'microsoft-live-auth-config.php';
         }
     }
     
@@ -346,7 +347,7 @@ class SystemConfig
             // Extract variables for the included config file
             $destination = $GLOBALS['destination'];
             $protocol = $GLOBALS['protocol'];
-            include_once ROOT . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'google-auth-config.php';
+            include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'google-auth-config.php';
         }
     }
     private static function configureDBAppSettings(): void
@@ -389,5 +390,5 @@ class SystemConfig
 
 // Initialize the system configuration
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-$destination = (isset($_GET['destination'])) ? $_GET['destination'] : $_SERVER['REQUEST_URI'];
+$destination = (isset($_GET['destination'])) ? $_GET['destination'] : $_SERVER['REQUEST_URI'] ?? '/';
 SystemConfig::load();

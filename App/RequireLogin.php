@@ -101,11 +101,12 @@ class RequireLogin
                 Do not redirect to /login if uri is in the list or exempt urls
                 !str_contains($_SERVER['REQUEST_URI'], '/login') is to prevent infinite redirects
             */
-            if (!General::matchRequestURI($loginExemptions) && !str_contains($_SERVER['REQUEST_URI'], '/login') && !str_contains($_SERVER['REQUEST_URI'], '/auth/azure-ad') && !str_contains($_SERVER['REQUEST_URI'], '/auth/google') && !str_contains($_SERVER['REQUEST_URI'], '/auth/local')) {
+            if (!General::matchRequestURI($loginExemptions) && !str_contains($_SERVER['REQUEST_URI'] ?? '', '/login') && !str_contains($_SERVER['REQUEST_URI'] ?? '', '/auth/azure-ad') && !str_contains($_SERVER['REQUEST_URI'] ?? '', '/auth/google') && !str_contains($_SERVER['REQUEST_URI'] ?? '', '/auth/local')) {
                 if ($apiRoute) {
                     Response::output('missing token', 401);
                 } else {
-                    header('Location: /login?destination=' . $_SERVER['REQUEST_URI']);
+                    $destination = $_SERVER['REQUEST_URI'] ?? '';
+                    header('Location: /login?destination=' . $destination);
                     exit();
                 }
             }

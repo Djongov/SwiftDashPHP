@@ -11,12 +11,12 @@ if (MICROSOFT_LIVE_LOGIN) {
     define('MS_LIVE_CLIENT_SECRET', $_ENV['MS_LIVE_CLIENT_SECRET']);
     // Set the protocol to http:// if hostname contains localhost
     // This is how we form the redirect URL. Note that https:// is hardcoded, which is fine as app registrations do not allow for http:// unless it's http://localhost.
-    define('MS_LIVE_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure-ad');
+    define('MS_LIVE_REDIRECT_URI', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') . '/auth/azure-ad');
     // Let's build the oauth URL which includes the tenant. This is where we will be sending the request to login
     //define('OAUTHURL', 'https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?');
     define('MS_LIVE_OAUTH_URL', 'https://login.live.com/oauth20_authorize.srf?');
 
-    define('MS_LIVE_CODE_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure/mslive-code-exchange');
+    define('MS_LIVE_CODE_REDIRECT_URI', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') . '/auth/azure/mslive-code-exchange');
     define('MS_LIVE_TOKEN_URL', 'https://login.microsoftonline.com/' . MS_LIVE_TENANT_ID . '/oauth2/v2.0/token');
 
     $authenticationData = [
@@ -35,5 +35,5 @@ if (MICROSOFT_LIVE_LOGIN) {
     // Let's form what the login url will be
     define('MS_LIVE_LOGIN_BUTTON_URL', $msLiveRequestTokenUrl);
     // For this one, the logout will be our own script
-    define('MS_LIVE_LOGOUT_BUTTON_URL', 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=https://' . $_SERVER['HTTP_HOST']);
+    define('MS_LIVE_LOGOUT_BUTTON_URL', 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=https://' . ($_SERVER['HTTP_HOST'] ?? ''));
 }

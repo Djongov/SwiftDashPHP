@@ -31,18 +31,23 @@ $phpIniSettings = [
     'max_input_time' => 60,
 ];
 
-foreach ($phpIniSettings as $setting => $value) {
-    $current = ini_get($setting);
+if (php_sapi_name() !== 'cli') {
+    foreach ($phpIniSettings as $setting => $value) {
+        $current = ini_get($setting);
 
-    // For time settings, compare as int
-    if (in_array($setting, ['max_execution_time', 'max_input_time'])) {
-        if ((int)$current < (int)$value) {
-            die("$setting should be at least $value");
-        }
-    } else {
-        // For size settings, parse sizes to bytes
-        if (parseIniSize($current) < parseIniSize($value)) {
-            die("$setting should be at least $value");
+        // For time settings, compare as int
+        if (in_array($setting, ['max_execution_time', 'max_input_time'])) {
+            if ((int)$current < (int)$value) {
+                die("$setting should be at least $value. Current value is $current");
+            }
+        } else {
+            // Ensure both are strings before size parsing
+            $currentStr = (string) $current;
+            $valueStr = (string) $value;
+
+            if (parseIniSize($currentStr) < parseIniSize($valueStr)) {
+                die("$setting should be at least $valueStr. Current value is $currentStr");
+            }
         }
     }
 }
@@ -104,7 +109,7 @@ Branding & SEO Settings
 // Whether to show the loading screen on page load
 define("SHOW_LOADING_SCREEN", true);
 
-define('SYSTEM_USER_AGENT', SITE_TITLE . '/' . VERSION . ' (+https://' . $_SERVER['HTTP_HOST'] . ')');
+define('SYSTEM_USER_AGENT', SITE_TITLE . '/' . VERSION . ' (+https://' . ($_SERVER['HTTP_HOST'] ?? '') . ')');
 
 // Key words for SEO
 define(
@@ -122,7 +127,7 @@ define("LOGO_SVG", '<svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" vi
 define("LOGO", "/assets/images/logo.svg");
 
 // Logo for the SEO OG tags
-define("OG_LOGO", 'https://' . $_SERVER['HTTP_HOST'] . '/assets/images/logo.svg');
+define("OG_LOGO", 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . '/assets/images/logo.svg');
 
 // MSFT Logo
 define('MS_LOGO', '<svg class="w-10 h-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23"><path fill="#f3f3f3" d="M0 0h23v23H0z"/><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>');

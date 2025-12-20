@@ -30,9 +30,9 @@ class App
         // Early exit for /install route with minimal bootstrap
         if ($uri === '/install') {
             // Load minimal config needed for installation check
-            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
-            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
-            require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
+            require_once dirname(__DIR__) . '/config/functions.php';
+            require_once dirname(__DIR__) . '/config/system-settings.php';
+            require_once dirname(__DIR__) . '/config/site-settings.php';
             
             $this->handleDirectUri($uri);
             return;
@@ -57,9 +57,9 @@ class App
     private function bootstrap(): void
     {
         // Load system settings first (required for AUTH_EXPIRY in Session)
-        require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/functions.php';
-        require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/system-settings.php';
-        require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/config/site-settings.php';
+        require_once dirname(__DIR__) . '/config/functions.php';
+        require_once dirname(__DIR__) . '/config/system-settings.php';
+        require_once dirname(__DIR__) . '/config/site-settings.php';
 
         // Start session (now AUTH_EXPIRY is available)
         \App\Core\Session::start();
@@ -86,7 +86,12 @@ class App
 
     private function getCurrentUri(): string
     {
-        $uri = $_SERVER['REQUEST_URI'];
+        if (php_sapi_name() === 'cli') {
+            // CLI context — return a dummy URI
+            return '/cli';
+        }
+
+        $uri = $_SERVER['REQUEST_URI'] ?? '/';
         
         // Strip query string (?foo=bar) and decode URI
         if ($pos = strpos($uri, '?')) {
@@ -217,7 +222,7 @@ class App
      */
     private function loadCustomData(array $loginInfo = []): array
     {
-        $customDataPath = dirname($_SERVER['DOCUMENT_ROOT']) . '/config/custom-data.php';
+        $customDataPath = dirname(__DIR__) . '/config/custom-data.php';
         
         if (!file_exists($customDataPath)) {
             return [];
@@ -280,7 +285,7 @@ class App
     private function handleRouting(string $uri): void
     {
         // Location of the routes definition
-        $routesDefinition = require_once dirname($_SERVER['DOCUMENT_ROOT']) . '/resources/routes.php';
+        $routesDefinition = require_once dirname(__DIR__) . '/resources/routes.php';
         
         // Ensure that $routesDefinition is a callable
         if (!is_callable($routesDefinition)) {
@@ -290,7 +295,7 @@ class App
         $dispatcher = \FastRoute\simpleDispatcher($routesDefinition);
 
         // Fetch method and URI
-        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        $httpMethod = $_SERVER['REQUEST_METHOD'] ?? '';
         $isApi = str_contains($uri, '/api/');
 
         // Go through the login check

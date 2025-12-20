@@ -11,11 +11,11 @@ class Session
         // Only start session if the consent cookie is set and the value is accept
         //if (isset($_COOKIE['cookie-consent']) && $_COOKIE['cookie-consent'] === 'accept') {
             $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
-            $secure = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? false : $httpsActive;
+            $secure = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? false : $httpsActive;
             // Session name based on secure connection
             $sesstionName = $secure ? '__Secure-SSID' : 'SSID';
             // Define the domain based on localhost or actual host
-            $domain = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'];
+            $domain = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'] ?? '';
             // Set session name
             session_name($sesstionName);
             // Set session cookie parameters

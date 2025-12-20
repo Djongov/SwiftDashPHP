@@ -6,17 +6,16 @@ use FastRoute\RouteCollector;
 
 return function (RouteCollector $router) {
     // Common resources
-    require_once ROOT . '/resources/menus/menus.php';
+    require_once dirname(__DIR__) . '/resources/menus/menus.php';
 
     // Include route groups
-    require_once ROOT . '/resources/routes/system-routes.php';
-    require_once ROOT . '/resources/routes/project-routes.php';
+    require_once dirname(__DIR__) . '/resources/routes/system-routes.php';
+    require_once dirname(__DIR__) . '/resources/routes/project-routes.php';
 
+    $viewsFolder = dirname(__DIR__) . '/Views';
+    $controllersFolder = dirname(__DIR__) . '/Controllers';
 
-    $viewsFolder = ROOT . '/Views';
-    $controllersFolder = ROOT . '/Controllers';
-
-    $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
+    $title = ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'] ?? '')));
 
     // remove query string from title
     if (strpos($title, '?') !== false) {

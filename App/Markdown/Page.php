@@ -75,7 +75,7 @@ class Page
     {
         $yamlData = self::readMetaDataFromMd($file, $folder);
 
-        $title = $yamlData['title'] ?? ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'])));
+        $title = $yamlData['title'] ?? ucfirst(str_replace('-', ' ', basename($_SERVER['REQUEST_URI'] ?? '')));
         $description = $yamlData['description'] ?? GENERIC_DESCRIPTION;
         $keywords = (isset($yamlData['keywords'])) ? explode(',', $yamlData['keywords']) : GENERIC_KEYWORDS;
         $thumbimage = $yamlData['thumbimage'] ?? OG_LOGO;

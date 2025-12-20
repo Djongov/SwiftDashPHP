@@ -22,7 +22,7 @@ if (ENTRA_ID_LOGIN) {
 
     /* ID Token */
 
-    define('ENTRA_ID_ID_TOKEN_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure-ad');
+    define('ENTRA_ID_ID_TOKEN_REDIRECT_URI', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') . '/auth/azure-ad');
 
     $nonce = (isset($_SESSION['nonce'])) ? $_SESSION['nonce'] : bin2hex(random_bytes(16));
     
@@ -40,13 +40,12 @@ if (ENTRA_ID_LOGIN) {
 
     /* Code exchange */
 
-    define('ENTRA_ID_CODE_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure/azure-ad-code-exchange');
+    define('ENTRA_ID_CODE_REDIRECT_URI', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') . '/auth/azure/azure-ad-code-exchange');
 
     /* Access Token */
 
-    //define('ENTRA_ID_ACCESS_TOKEN_REDIRECT_URI', $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/azure/receive-access-token');
-
+    //define('ENTRA_ID_ACCESS_TOKEN_REDIRECT_URI', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') . '/auth/azure/receive-access-token');
     /* Logout */
 
-    define('ENTRA_ID_LOGOUT_BUTTON_URL', 'https://login.microsoftonline.com/' . ENTRA_ID_TENANT_ID . '/oauth2/v2.0/logout?post_logout_redirect_uri=' . $protocol . '://' . $_SERVER['HTTP_HOST']);
+    define('ENTRA_ID_LOGOUT_BUTTON_URL', 'https://login.microsoftonline.com/' . ENTRA_ID_TENANT_ID . '/oauth2/v2.0/logout?post_logout_redirect_uri=' . $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') );
 }

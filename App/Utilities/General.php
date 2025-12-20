@@ -22,7 +22,7 @@ class General
     // This method catches if current uri is in the array of uris including wildcards
     public static function matchRequestURI(array $patterns): bool
     {
-        $currentURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); // remove query string
+        $currentURI = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH); // remove query string
 
         foreach ($patterns as $pattern) {
             // Convert wildcard patterns to regex
