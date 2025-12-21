@@ -237,7 +237,7 @@ class SystemConfig
         define('WEBHOOK_SECRET', $_ENV['WEBHOOK_SECRET'] ?? '');
         
         // Session storage - 'file' or 'database' (database recommended for distributed environments)
-        define('SESSION_STORAGE', $_ENV['SESSION_STORAGE'] ?? 'database');
+        define('SESSION_STORAGE', $_ENV['SESSION_STORAGE'] ?? 'file');
     }
     
     private static function defineServiceConstants(): void

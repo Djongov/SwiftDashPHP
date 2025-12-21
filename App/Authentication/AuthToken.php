@@ -38,7 +38,7 @@ class AuthToken
         // Only regenerate session ID if we're using database sessions
         // With file-based sessions, regenerate_id is safe, but with database
         // sessions it can create duplicate entries if called too frequently
-        $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'database';
+        $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'file';
         
         // Only regenerate if enough time has passed since last regeneration
         // to avoid creating too many session entries

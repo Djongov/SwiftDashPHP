@@ -20,7 +20,7 @@ class Session
             $domain = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'] ?? '';
             
             // Use database session handler for distributed environments
-            $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'database';
+            $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'file';
             if ($sessionStorage === 'database') {
                 self::$handler = new DatabaseSessionHandler();
                 session_set_save_handler(self::$handler, true);
