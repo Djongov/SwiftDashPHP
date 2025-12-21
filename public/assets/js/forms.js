@@ -207,8 +207,17 @@ const handleFormFetch = (form, currentEvent, resultType) => {
 
     // Adjusting based on method:
     if (formMethod === 'POST') {
-        // For POST, handle with FormData to allow file uploads
-        fetchOptions.body = formData;
+        // Check if the form contains any file inputs
+        const hasFileInputs = form.querySelector('input[type="file"]') !== null;
+        
+        if (hasFileInputs) {
+            // For POST with file uploads, use FormData (multipart/form-data)
+            fetchOptions.body = formData;
+        } else {
+            // For POST without files, use URL-encoded format
+            fetchOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            fetchOptions.body = new URLSearchParams(formData);
+        }
     } else if (formMethod === 'PUT') {
         // For PUT, handle with JSON, but no file uploads (as per your original logic)
         fetchOptions.headers['Content-Type'] = 'application/json';
