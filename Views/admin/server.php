@@ -74,8 +74,77 @@ if (empty($errorLog)) {
     echo '</div>';
 }
 
-//echo DataGrid::fromData('Server Info', $_SERVER, $theme);
-echo \Components\AGGrid::fromData('Server Info (AG Grid)', $_SERVER, $theme);
+// User sessions
+echo Html::h2('Active User Sessions', true);
+
+if (SESSION_STORAGE === 'database') {
+    // Only show session management if using database sessions
+    try {
+        $sessionsModel = new \Models\Sessions();
+        $activeCount = $sessionsModel->countActive();
+        
+        echo Alerts::info("Active sessions: <strong>$activeCount</strong>");
+        
+        // Button to load sessions
+        $loadSessionsFormArray = [
+            'inputs' => [
+                'hidden' => [
+                    [
+                        'name' => 'api-action',
+                        'value' => 'get-sessions'
+                    ]
+                ]
+            ],
+            'theme' => $theme,
+            'action' => '/api/admin/sessions',
+            'resultType' => 'html',
+            'reloadOnSubmit' => false,
+            'submitButton' => [
+                'text' => 'Load Active Sessions',
+                'size' => 'medium',
+            ],
+        ];
+        
+        // Button to clear all sessions
+        $clearAllSessionsFormArray = [
+            'inputs' => [
+                'hidden' => [
+                    [
+                        'name' => 'api-action',
+                        'value' => 'clear-all-sessions'
+                    ]
+                ]
+            ],
+            'theme' => $theme,
+            'action' => '/api/admin/sessions',
+            'resultType' => 'text',
+            'reloadOnSubmit' => true,
+            'confirm' => true,
+            'confirmText' => 'Confirm Clear All Sessions except the current one?',
+            'submitButton' => [
+                'text' => 'Clear All Sessions',
+                'size' => 'medium',
+                'color' => 'red'
+            ],
+            'confirmMessage' => 'Are you sure you want to clear all sessions? This will log out all users.'
+        ];
+        
+        echo '<div class="flex space-x-2 mb-4">';
+            echo Forms::render($loadSessionsFormArray);
+            echo Forms::render($clearAllSessionsFormArray);
+        echo '</div>';
+        
+    } catch (\Exception $e) {
+        echo Alerts::danger('Error loading sessions: ' . $e->getMessage());
+    }
+} else {
+    echo Alerts::warning('Session management is only available when using database session storage. Current storage: <strong>' . SESSION_STORAGE . '</strong>');
+}
+
+// Display Server Info
+$engine = DEFAULT_DATA_GRID_ENGINE;
+$componentClass = "\\Components\\$engine";
+echo $componentClass::fromData('Server Info (' . $engine . ')', $_SERVER, $theme);
 
 echo Html::h2('PHP Info', true);
 

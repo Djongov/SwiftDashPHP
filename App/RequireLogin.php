@@ -135,12 +135,22 @@ class RequireLogin
             // Now we search for the administrator role as role is an array of roles
 
             $username = ($loggedIn) ? $idTokenInfoArray["username"] : null;
+            
+            // Store username in session for session management
+            if ($username) {
+                $_SESSION['username'] = $username;
+            }
         }
 
         if ($provider === 'local') {
             $username = $tokenPayload['username'];
             $usernameArray = $tokenPayload;
             $idTokenInfoArray = $tokenPayload;
+            
+            // Store username in session for session management
+            if ($username) {
+                $_SESSION['username'] = $username;
+            }
         }
 
         // Now Google
@@ -164,6 +174,16 @@ class RequireLogin
             // Now we search for the administrator role as role is an array of roles
 
             $username = ($loggedIn) ? $idTokenInfoArray["username"] : null;
+            
+            // Store username in session for session management
+            if ($username) {
+                $_SESSION['username'] = $username;
+            }
+            
+            // Store username in session for session management
+            if ($username) {
+                $_SESSION['username'] = $username;
+            }
         }
         // Microsoft LIVE
         if ($loggedIn && AuthToken::get() !== null && $provider === 'mslive') {

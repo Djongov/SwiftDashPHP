@@ -189,3 +189,14 @@ CREATE TABLE IF NOT EXISTS utm_captures (
 
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+-- SESSIONS TABLE (for distributed session management)
+CREATE TABLE IF NOT EXISTS sessions (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    data TEXT NOT NULL,
+    expires_at TIMESTAMP NULL,
+    last_activity TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_expires ON sessions (expires_at);
+CREATE INDEX IF NOT EXISTS idx_last_activity ON sessions (last_activity);

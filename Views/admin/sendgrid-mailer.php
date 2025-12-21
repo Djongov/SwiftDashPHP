@@ -48,7 +48,7 @@ $formOptions = [
 ];
 
 // Let's wrap it
-echo '<div class="container mx-auto">';
+echo '<div class="m-4 p-2 rounded-md bg-gray-100 dark:bg-gray-900 shadow-md">';
     echo Html::h2('Mailer (SendGrid)', true);
     echo Html::p('Send an email via SendGrid and TinyMCE as editor.', ['text-center']);
     echo Forms::render($formOptions);

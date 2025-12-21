@@ -190,4 +190,14 @@ CREATE TABLE IF NOT EXISTS utm_captures (
 -- DO
 --   UPDATE api_keys SET executions = 0;
 
+-- SESSIONS TABLE (for distributed session management)
+CREATE TABLE IF NOT EXISTS sessions (
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    data TEXT NOT NULL,
+    expires_at DATETIME NULL,
+    last_activity DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_expires (expires_at),
+    INDEX idx_last_activity (last_activity)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- END of MySQL migration script

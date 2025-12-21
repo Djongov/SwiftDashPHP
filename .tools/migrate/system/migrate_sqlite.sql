@@ -169,3 +169,14 @@ CREATE TABLE IF NOT EXISTS utm_captures (
     landing_page TEXT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- SESSIONS TABLE (for distributed session management)
+CREATE TABLE IF NOT EXISTS sessions (
+    id TEXT NOT NULL PRIMARY KEY,
+    data TEXT NOT NULL,
+    expires_at TEXT NULL,
+    last_activity TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_expires ON sessions (expires_at);
+CREATE INDEX IF NOT EXISTS idx_last_activity ON sessions (last_activity);

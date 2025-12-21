@@ -29,7 +29,7 @@ $formOptionsEncode = [
 ];
 
 // Let's wrap it
-echo '<div class="container mx-auto">';
+echo '<div class="m-4 p-2 rounded-md bg-gray-100 dark:bg-gray-900 shadow-md">';
     echo Forms::render($formOptionsEncode, $theme);
 echo '</div>';
 
@@ -55,6 +55,6 @@ $formOptionsDecode = [
 ];
 
 // Let's wrap it
-echo '<div class="container mx-auto">';
+echo '<div class="m-4 p-2 rounded-md bg-gray-100 dark:bg-gray-900 shadow-md">';
     echo Forms::render($formOptionsDecode, $theme);
 echo '</div>';

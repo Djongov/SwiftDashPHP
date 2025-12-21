@@ -25,8 +25,9 @@ class AuthToken
         } elseif (AUTH_HANDLER === 'session') {
             $_SESSION[AUTH_SESSION_NAME] = $value;
             
-            // If cookieDuration is different from default, extend the session cookie lifetime
-            if ($cookieDuration !== AUTH_COOKIE_EXPIRY) {
+            // Only extend cookie if duration is significantly different (to avoid extending on every request)
+            // Check if cookie needs extending (more than 1 minute difference)
+            if (abs($cookieDuration - AUTH_COOKIE_EXPIRY) > 60) {
                 self::extendSessionCookie($cookieDuration);
             }
         }
@@ -34,8 +35,25 @@ class AuthToken
 
     private static function extendSessionCookie(int $cookieDuration): void
     {
-        // Regenerate session ID for security
-        session_regenerate_id(true);
+        // Only regenerate session ID if we're using database sessions
+        // With file-based sessions, regenerate_id is safe, but with database
+        // sessions it can create duplicate entries if called too frequently
+        $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'database';
+        
+        // Only regenerate if enough time has passed since last regeneration
+        // to avoid creating too many session entries
+        if ($sessionStorage === 'file') {
+            // For file-based sessions, always regenerate for security
+            session_regenerate_id(true);
+        } else {
+            // For database sessions, only regenerate if it hasn't been done recently
+            // Check if we've regenerated in the last 5 minutes
+            $lastRegeneration = $_SESSION['_last_regeneration'] ?? 0;
+            if (time() - $lastRegeneration > 300) { // 5 minutes
+                session_regenerate_id(true);
+                $_SESSION['_last_regeneration'] = time();
+            }
+        }
         
         // Determine security settings
         $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';

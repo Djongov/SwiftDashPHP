@@ -15,11 +15,13 @@ class App
         '/health',
         '/ping',
         '/migrate',
-        '/install'
+        '/install',
+        '/api/csp-report'  // CSP reports don't include cookies
     ];
 
     private array $skipBuildUrls = [
-        '/migrate'
+        '/migrate',
+        '/api/csp-report'  // CSP reports don't need session
     ];
 
     public function init(): void
@@ -30,6 +32,17 @@ class App
         // Early exit for /install route with minimal bootstrap
         if ($uri === '/install') {
             // Load minimal config needed for installation check
+            require_once dirname(__DIR__) . '/config/functions.php';
+            require_once dirname(__DIR__) . '/config/system-settings.php';
+            require_once dirname(__DIR__) . '/config/site-settings.php';
+            
+            $this->handleDirectUri($uri);
+            return;
+        }
+        
+        // Early exit for CSP reports - no session needed
+        if ($uri === '/api/csp-report') {
+            // Load minimal config
             require_once dirname(__DIR__) . '/config/functions.php';
             require_once dirname(__DIR__) . '/config/system-settings.php';
             require_once dirname(__DIR__) . '/config/site-settings.php';
@@ -145,6 +158,10 @@ class App
                 // system-settings.php already loaded in init() for /install route
                 $install = new \App\Install();
                 echo $install->start();
+                break;
+            case '/api/csp-report':
+                // Handle CSP reports without session
+                require_once dirname(__DIR__) . '/Views/api/csp-report.php';
                 break;
             default:
                 http_response_code(404);

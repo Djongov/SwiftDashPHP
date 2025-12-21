@@ -6,6 +6,8 @@ namespace App\Core;
 
 class Session
 {
+    private static ?DatabaseSessionHandler $handler = null;
+    
     public static function start(): void
     {
         // Only start session if the consent cookie is set and the value is accept
@@ -16,6 +18,15 @@ class Session
             $sesstionName = $secure ? '__Secure-SSID' : 'SSID';
             // Define the domain based on localhost or actual host
             $domain = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'] ?? '';
+            
+            // Use database session handler for distributed environments
+            $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'database';
+            if ($sessionStorage === 'database') {
+                self::$handler = new DatabaseSessionHandler();
+                session_set_save_handler(self::$handler, true);
+            }
+            // If 'file', use PHP's default file-based session handling
+            
             // Set session name
             session_name($sesstionName);
             // Set session cookie parameters
