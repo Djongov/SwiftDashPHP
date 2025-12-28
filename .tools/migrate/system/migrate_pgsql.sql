@@ -21,6 +21,9 @@ ALTER TABLE app_settings
 ALTER TABLE app_settings 
     ADD COLUMN description TEXT;
 
+-- Add unique constraint on name to prevent duplicates
+ALTER TABLE app_settings 
+    ADD CONSTRAINT unique_app_setting_name UNIQUE (name);
 
 INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
 VALUES 
