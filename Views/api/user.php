@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // htmlspecialchars to prevent XSS
     //$data = array_map('htmlspecialchars', $data);
     $data['last_ips'] = currentIP();
-    $data['origin_country'] = getUserCountry();
+    $data['origin_country'] = getUserCountry() ?? 'EN';
     $data['role'] = 'user'; // Default role
     $data['theme'] = COLOR_SCHEME; // Default theme
     $data['provider'] = 'local'; // Default provider
@@ -124,3 +124,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         Response::output('Error deleting user: ' . $e->getMessage(), 400);
     }
 }
+
+Response::output('Invalid api action', 400);

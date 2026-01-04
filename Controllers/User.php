@@ -168,7 +168,6 @@ class User
 
         $checks->checkParams($allowedData, $data);
 
-
         if ($data['password'] !== $data['confirm_password']) {
             Response::output('Passwords do not match', 400);
         }

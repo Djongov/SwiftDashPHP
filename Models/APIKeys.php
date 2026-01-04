@@ -10,32 +10,14 @@ class APIKeys extends BasicModel
 {
     protected DB $_db;
     protected string $_table = 'api_keys';
-    protected string $_primaryKey = 'id';
+    protected string $_mainColumn = 'id';
 
-    public function __construct()
+    public function __construct(?string $table = null)
     {
-        $this->_db = new DB();
+        parent::__construct($this->_table);
+        $this->setter($this->_table, $this->_mainColumn);
     }
-    public function get(string $apiKey): array
-    {
-        $pdo = $this->_db->getConnection();
-        $query = "SELECT * FROM {$this->_table} WHERE api_key = :apiKey";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindValue(':apiKey', $apiKey);
-        $stmt->execute();
-        try {
-            $stmt->execute();
-            $array = $stmt->fetch(\PDO::FETCH_ASSOC);
-            return $array ?: [];
-        } catch (\PDOException $e) {
-            // Handle exception
-            if (ERROR_VERBOSE) {
-                throw new \Exception('Database error: ' . $e->getMessage(), 500);
-            } else {
-                throw new \Exception('Database error', 500);
-            }
-        }
-    }
+
     public function getApiKeyByNote(string $note): ?string
     {
         $pdo = $this->_db->getConnection();
@@ -46,33 +28,6 @@ class APIKeys extends BasicModel
             $stmt->execute();
             $result = $stmt->fetchColumn();
             return $result ?: null; // Return null if no API key found
-        } catch (\PDOException $e) {
-            // Handle exception
-            if (ERROR_VERBOSE) {
-                throw new \Exception('Database error: ' . $e->getMessage(), 500);
-            } else {
-                throw new \Exception('Database error', 500);
-            }
-        }
-    }
-    public function create(string $access, string $note, string $createdBy, int $executionLimit): string
-    {
-        $accessAllowedValues = ['read', 'write'];
-        if (!in_array($access, $accessAllowedValues, true)) {
-            throw new \InvalidArgumentException('Invalid access level provided. Allowed values are: ' . implode(', ', $accessAllowedValues));
-        }
-        $pdo = $this->_db->getConnection();
-        $apiKey = bin2hex(random_bytes(32)); // Generate a random API key
-        $query = "INSERT INTO {$this->_table} (api_key, access, note, created_by, executions_limit) VALUES (:apiKey, :access, :note, :createdBy, :executionLimit)";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindValue(':apiKey', $apiKey);
-        $stmt->bindValue(':access', $access);
-        $stmt->bindValue(':note', $note);
-        $stmt->bindValue(':createdBy', $createdBy);
-        $stmt->bindValue(':executionLimit', $executionLimit, \PDO::PARAM_INT);
-        try {
-            $stmt->execute();
-            return $apiKey; // Return the generated API key
         } catch (\PDOException $e) {
             // Handle exception
             if (ERROR_VERBOSE) {
@@ -117,24 +72,6 @@ class APIKeys extends BasicModel
             $stmt->execute();
             $logs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             return $logs ?: [];
-        } catch (\PDOException $e) {
-            // Handle exception
-            if (ERROR_VERBOSE) {
-                throw new \Exception('Database error: ' . $e->getMessage(), 500);
-            } else {
-                throw new \Exception('Database error', 500);
-            }
-        }
-    }
-    public function delete(string $apiKey): bool
-    {
-        $pdo = $this->_db->getConnection();
-        $query = "DELETE FROM {$this->_table} WHERE api_key = :apiKey";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindValue(':apiKey', $apiKey);
-        try {
-            $stmt->execute();
-            return $stmt->rowCount() > 0; // Return true if a row was deleted
         } catch (\PDOException $e) {
             // Handle exception
             if (ERROR_VERBOSE) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Api;
 
-use Controllers\AccessLog;
+use Models\BasicModel;
 
 class Response
 {
@@ -94,11 +94,15 @@ class Response
         $apiKey = getApiKeyFromHeaders();
 
         // Record the request in the access log
-        (new AccessLog())->add(
+        (new BasicModel('api_access_log'))->create(
             [
-            'request_id' => $requestId,
-            'api_key' => ($apiKey) ? $apiKey : 'no api key',
-            'status_code' => $statusCode
+                'request_id' => $requestId,
+                'api_key' => ($apiKey) ? $apiKey : 'no api key',
+                'status_code' => $statusCode,
+                'client_ip' => currentIP(),
+                'uri' => currentUrl(),
+                'method' => $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN',
+                'user_agent' => currentBrowser()
             ]
         );
         // Determine the response method to use

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Models\BasicModel;
 use App\Database\DB;
 use App\Api\Response;
 use App\Api\Checks;
@@ -23,16 +24,10 @@ $selectColumnsString = '' . implode(', ', $selectColumnsArray) . '';
 
 $db = new DB();
 
+$model = new BasicModel($_POST['table']);
+
 // Check if the columns exist in the database
 $db->checkDBColumns($selectColumnsArray, $_POST['table']);
-
-$pdo = $db->getConnection();
-
-$query = "SELECT $selectColumnsString FROM " . $_POST['table'] . " WHERE id=?";
-
-$stmt = $pdo->prepare($query);
-
-$stmt->execute([ (int) $_POST['id']]);
 
 $dataTypes = $db->describe($_POST['table']);
 
@@ -50,7 +45,7 @@ foreach ($dataTypes as $column => $dataType) {
     }
 }
 
-$dataArray = $stmt->fetch(\PDO::FETCH_ASSOC);
+$dataArray = $model->get((int) $_POST['id']);
 
 if (!$dataArray) {
     Response::output('No data found', 400);

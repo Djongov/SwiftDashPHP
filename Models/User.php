@@ -11,34 +11,26 @@ use Models\BasicModel;
 
 class User extends BasicModel
 {
-    public string $table = 'users';
+    public string $_table = 'users';
+    public string $_mainColumn = 'username';
     protected DB $_db;
-    public function __construct()
-    {
-        $this->_db = new DB();
-    }
-    // Existence checks
-    public function exists(string|int $param): bool
-    {
-        // If it is an integer, we'll assume it's an id, otherwise we'll assume it's an api key
-        $column = is_int($param) ? 'id' : 'username';
-        $pdo = $this->_db->getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE $column=?");
-        $stmt->execute([$param]);
-        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-
-        return count($result) > 0;
+    public function __construct(?string $table = null)
+    {
+        parent::__construct($this->_table);
+        $this->setter($this->_table, $this->_mainColumn);
     }
+
     // User get
-    public function get(string|int|null $param = null): array
+    public function get(string|int|null $param = null, ?string $sort = null, ?int $limit = null, ?string $orderBy = null): array
     {
         $pdo = $this->_db->getConnection();
         if ($param === null) {
             // Let's pull all
             try {
-                $result = $pdo->query("SELECT * FROM users");
-
+                $query = "SELECT * FROM users";
+                $query = self::applySortingAndLimiting($query, $orderBy, $sort, $limit);
+                $result = $pdo->query($query);
                 $array = $result->fetchAll(\PDO::FETCH_ASSOC);
             } catch (\PDOException $e) {
                 throw (new UserExceptions())->genericError($e->getMessage(), 500);
@@ -82,12 +74,12 @@ class User extends BasicModel
         return $result;
     }
     // User creator
-    public function create(array $data): int|string
+    public function create(array $data): int
     {
         unset($data['csrf_token']);
         unset($data['confirm_password']);
 
-        $tableColumns = $this->getColumns($this->table);
+        $tableColumns = $this->getColumns($this->_table);
 
         // Now let's check if the structure of the data matches the table
         foreach ($data as $key => $value) {
@@ -171,8 +163,6 @@ class User extends BasicModel
                 throw (new UserExceptions())->genericError('Could not update user', 500);
             }
         }
-
-        return $stmt->rowCount();
     }
     // User Deleter
     public function delete(string|int $param): bool

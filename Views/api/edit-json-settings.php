@@ -24,3 +24,5 @@ try {
     error_log('JSON Editor API Error: ' . $e->getMessage());
     Response::output('An error occurred while processing the request: ' . $e->getMessage(), 500);
 }
+
+Response::output('Invalid api action', 400);

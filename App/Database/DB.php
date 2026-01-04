@@ -529,4 +529,119 @@ class DB
         return $dbColumns;
     }
 
+    /**
+     * Prepare local/POST data for database insertion/update by converting string values 
+     * to their appropriate types based on the table schema
+     * 
+     * @param array $data The local data (typically from $_POST) to prepare
+     * @param string $table The table name to validate against
+     * @param bool $validateColumns Whether to validate that columns exist in the table (default: true)
+     * @return array The prepared data with correct types
+     * @throws \Exception If validation fails
+     */
+    public function prepareLocalDataForDB(array $data, string $table, bool $validateColumns = true): array
+    {
+        $tableSchema = $this->describe($table);
+        $preparedData = [];
+
+        foreach ($data as $key => $value) {
+            // Validate column exists if required
+            if ($validateColumns && !array_key_exists($key, $tableSchema)) {
+                throw new \Exception("Column '$key' does not exist in table '$table'");
+            }
+
+            // Skip if column doesn't exist and validation is disabled
+            if (!array_key_exists($key, $tableSchema)) {
+                continue;
+            }
+
+            $columnInfo = $tableSchema[$key];
+            $expectedType = self::normalizeDataType($columnInfo['type']);
+            $isNullable = $columnInfo['nullable'];
+
+            // Handle empty strings and null values
+            if ($value === '' || $value === null) {
+                if (!$isNullable) {
+                    throw new \Exception("Column '$key' cannot be null or empty");
+                }
+                $preparedData[$key] = null;
+                continue;
+            }
+
+            // Convert value based on expected type
+            switch ($expectedType) {
+                case 'int':
+                    if ($value === 'true' || $value === 'false' || $value === true || $value === false) {
+                        // Handle boolean to int conversion
+                        $preparedData[$key] = ($value === 'true' || $value === true) ? 1 : 0;
+                    } elseif (is_numeric($value)) {
+                        $preparedData[$key] = (int) $value;
+                    } else {
+                        throw new \Exception("Column '$key' expects an integer value, got: " . var_export($value, true));
+                    }
+                    break;
+
+                case 'float':
+                    if (is_numeric($value)) {
+                        $preparedData[$key] = (float) $value;
+                    } else {
+                        throw new \Exception("Column '$key' expects a float value, got: " . var_export($value, true));
+                    }
+                    break;
+
+                case 'bool':
+                    // Handle various boolean representations
+                    if (in_array($value, ['1', '0', 1, 0, true, false, 'true', 'false'], true)) {
+                        if ($value === 'true' || $value === '1' || $value === 1 || $value === true) {
+                            $preparedData[$key] = true;
+                        } else {
+                            $preparedData[$key] = false;
+                        }
+                    } else {
+                        throw new \Exception("Column '$key' expects a boolean value, got: " . var_export($value, true));
+                    }
+                    break;
+
+                case 'datetime':
+                    // Validate and normalize date/datetime format
+                    if (General::isValidDatetime($value)) {
+                        // Convert to MySQL datetime format (Y-m-d H:i:s)
+                        $formats = [
+                            'Y-m-d H:i:s',
+                            'Y-m-d H:i:s.u',
+                            'Y-m-d\TH:i:s',
+                            'Y-m-d\TH:i',
+                        ];
+                        
+                        $dateTime = null;
+                        foreach ($formats as $format) {
+                            $dt = \DateTime::createFromFormat($format, $value);
+                            if ($dt && $dt->format($format) === $value) {
+                                $dateTime = $dt;
+                                break;
+                            }
+                        }
+                        
+                        if ($dateTime) {
+                            $preparedData[$key] = $dateTime->format('Y-m-d H:i:s');
+                        } else {
+                            throw new \Exception("Column '$key' expects a date/datetime value, got: " . var_export($value, true));
+                        }
+                    } else {
+                        throw new \Exception("Column '$key' expects a date/datetime value, got: " . var_export($value, true));
+                    }
+                    break;
+
+                case 'string':
+                case 'json':
+                default:
+                    // Keep as string
+                    $preparedData[$key] = (string) $value;
+                    break;
+            }
+        }
+
+        return $preparedData;
+    }
+
 }

@@ -6,15 +6,8 @@ use App\Api\Response;
 
 sleep(1);
 
-//Response::output('This is a test response', 400);
-//Response::output('This is a test response');
-
 // Run htmlspecialchars on $_POST with array_map intead of array_filter to avoid removing empty values
-$_POST = array_map(
-    function ($value) {
-    return htmlspecialchars($value);
-    }, $_POST
-);
+$_POST = array_map('htmlspecialchars', $_POST);
 
 if (isset($_POST['terms']) && $_POST['terms'] === "0") {
     Response::output('You must agree to the terms and conditions', 409);

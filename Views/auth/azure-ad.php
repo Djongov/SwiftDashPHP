@@ -54,7 +54,7 @@ if ($userModel->exists($idTokenArray['preferred_username'])) {
         Response::output('User exists but is not an Entra ID or MS Live account', 400);
     }
     //$user->updateLastLogin($idTokenArray['preferred_username']);
-    $updateUserLastLoginInfo = $userModel->update(['last_login' => date('Y-m-d H:i', time())], $userDetailsArray['id']);
+    $updateUserLastLoginInfo = $userModel->update(['last_login' => date('Y-m-d H:i:s', time())], $userDetailsArray['id']);
     if ($updateUserLastLoginInfo !== 1) {
         // We could stop the process here and return an error message or because this is not a critical error, we could just log it and continue
         SystemLog::write('Could not update last login for user: ' . $userDetailsArray['username'] . '. Result of update is ' . gettype($updateUserLastLoginInfo), 'User Update Error');

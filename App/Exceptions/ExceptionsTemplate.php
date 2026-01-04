@@ -6,6 +6,10 @@ namespace App\Exceptions;
 
 abstract class ExceptionsTemplate extends \Exception implements ExceptionInterface
 {
+    public function genericError(string $message, int $code): static
+    {
+        return new static($message, $code);
+    }
     public function alreadyExists(): static
     {
         return new static('resource already exists', 409);
@@ -14,11 +18,6 @@ abstract class ExceptionsTemplate extends \Exception implements ExceptionInterfa
     {
         return new static('resource not found', 404);
     }
-    public function genericError(string $message, int $code): static
-    {
-        return new static($message, $code);
-    }
-
     public function emptyData(): static
     {
         return new static('no data provided', 400);
@@ -52,5 +51,9 @@ abstract class ExceptionsTemplate extends \Exception implements ExceptionInterfa
     public function notSaved(): static
     {
         return new static('data not saved', 500);
+    }
+    public function dataMissmatch($errorMessage): static
+    {
+        return new static($errorMessage, 400);
     }
 }

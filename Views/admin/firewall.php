@@ -23,7 +23,7 @@ $firewallAddForm = [
         'input' => [
             [
                 'type' => 'text',
-                'name' => 'cidr',
+                'name' => 'ip_cidr',
                 'label' => 'IP (can be in CIDR notation)',
                 'required' => true,
                 'placeholder' => '1.1.1.1/32',

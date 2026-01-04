@@ -4,7 +4,25 @@ declare(strict_types=1);
 
 use App\Api\Response;
 use App\Api\Checks;
-use Controllers\Firewall;
+use Models\BasicModel;
+use App\Utilities\IP;
+
+function formatIp(string $ip): string
+{
+    // Now let's format the IP to CIDR notation
+    $ipExplode = explode('/', $ip);
+    $ip = $ipExplode[0];
+    // First run through the validation
+    if (!IP::isValidIp($ip)) {
+        throw new Exception('invalid IP address format - ' . $ip . '', 400);
+    }
+    if (!isset($ipExplode[1])) {
+        $mask = 32;
+    } else {
+        $mask = $ipExplode[1];
+    }
+    return $ip . '/' . $mask;
+}
 
 // This is the API view for the firewall. It allows to add, update, delete and get IPs from the firewall
 
@@ -12,24 +30,43 @@ use Controllers\Firewall;
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // This endpoint is for creating a new local user. Cloud users are create in /auth-verify
 
-    // We only allow either an empty GET or a GET with a "cidr" parameter
-    if (!empty($_GET) && !isset($_GET['cidr'])) {
-        Response::output('parameters accepted are "cidr" or empty GET', 400);
-    }
-
     $checks = new Checks($loginInfo, $_GET);
     $checks->apiChecksNoCSRF();
 
-    // check if cidr has been passed
-    if (!isset($_GET['cidr'])) {
-        $ip = '';
-    } else {
-        $ip = $_GET['cidr'];
+    if (empty($_GET)) {
+        // Return all firewall entries
+        $firewall = new BasicModel('firewall');
+
+        // Do an admin check for this one
+        $checks->adminCheck();
+
+        try {
+            $result = $firewall->getAll();
+            Response::output($result);
+        } catch (Exception $e) {
+            Response::output($e->getMessage(), (int) $e->getCode());
+        }
     }
 
-    $firewall = new Firewall();
+    $ip = $_GET['cidr'] ?? Response::output('missing cidr parameter', 400);
 
-    echo $firewall->get($ip);
+    try {
+        $ip = formatIp($ip);
+    } catch (Exception $e) {
+        Response::output($e->getMessage(), (int) $e->getCode());
+    }
+
+    $firewall = new BasicModel('firewall');
+
+    // need to set the main column to ip_cidr for the exists check
+    $firewall->setter('firewall', 'ip_cidr');
+
+    try {
+        $result = $firewall->get($ip);
+        Response::output($result);
+    } catch (Exception $e) {
+        Response::output($e->getMessage(), (int) $e->getCode());
+    }
 }
 
 // api/firewall POST, accepts form data with the "cidr" parameter and optional "comment". The user making the request is taken from the router data
@@ -37,17 +74,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $checks = new Checks($loginInfo, $_POST);
     $checks->apiChecks();
 
-    $checks->checkParams(['cidr'], $_POST);
+    $checks->checkParams(['ip_cidr'], $_POST);
 
     $comment = $_POST['comment'] ?? '';
 
     $createdBy = $loginInfo['usernameArray']['username'];
 
-    $ip = $_POST['cidr'];
+    $ip = $_POST['ip_cidr'];
 
-    $save = new Firewall();
+    try {
+        $ip = formatIp($ip);
+    } catch (Exception $e) {
+        Response::output($e->getMessage(), (int) $e->getCode());
+    }
 
-    echo $save->add($ip, $createdBy, $comment);
+    $save = new BasicModel('firewall');
+
+    $data = [
+        'ip_cidr' => $ip,
+        'comment' => $comment,
+    ];
+
+    try {
+        $result = $save->create($data, $createdBy);
+        Response::output($result);
+    } catch (Exception $e) {
+        Response::output($e->getMessage(), (int) $e->getCode());
+    }
 }
 
 // api/firewall/{id} PUT, accepts json body wit the data to update, id in the path. The user making the request is taken from the router data
@@ -66,11 +119,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         exit();
     }
 
-    $update = new Firewall();
+    if (isset($data['ip_cidr'])) {
+        try {
+            $data['ip_cidr'] = formatIp($data['ip_cidr']);
+        } catch (Exception $e) {
+            Response::output($e->getMessage(), (int) $e->getCode());
+        }
+    }
 
-    $updatedBy = $loginInfo['usernameArray']['username'];
+    $update = new BasicModel('firewall');
 
-    echo $update->update($data, $routeInfo[2]['id'], $updatedBy);
+    try {
+        $result = $update->update($data, $routeInfo[2]['id']);
+        Response::output($result);
+    } catch (Exception $e) {
+        Response::output($e->getMessage(), (int) $e->getCode());
+    }
 }
 
 // api/firewall/{id}?csrf_token={} DELETE, empty body, param in path, csrf token in query string. The user making the request is taken from the router data
@@ -98,9 +162,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $id = $routeInfo[2]['id'];
 
-    $delete = new Firewall();
+    $delete = new BasicModel('firewall');
 
-    $deletedBy = $loginInfo['usernameArray']['username'];
-
-    echo $delete->delete($id, $deletedBy);
+    try {
+        $result = $delete->delete($id);
+        Response::output($result);
+    } catch (Exception $e) {
+        Response::output($e->getMessage(), (int) $e->getCode());
+    }
 }
+
+Response::output('Invalid api action', 400);

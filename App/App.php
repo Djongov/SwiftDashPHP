@@ -278,7 +278,7 @@ class App
         }
 
         // Capture UTM parameters
-        $captureUtm = new \Models\UtmCapturer();
+        $captureUtm = new \Models\BasicModel('utm_captures');
         $data = [
             'ip_address' => currentIP(),
             'utm_source' => $currentUtms['utm_source'] ?? null,

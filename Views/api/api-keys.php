@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // First let's check if the user already has an API key
     try {
-    $existingKey = $apiKeyModel->getApiKeyByNote($loginInfo['usernameArray']['username']);
+        $existingKey = $apiKeyModel->getApiKeyByNote($loginInfo['usernameArray']['username']);
     } catch (Exception $e) {
         if (ERROR_VERBOSE) {
             Response::output('Failed to fetch existing API key: ' . $e->getMessage(), 500);
@@ -31,21 +31,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         Response::output(['api_key' => $existingKey]);
     }
 
+    $data = [
+        'note' => $loginInfo['usernameArray']['username'],
+        'type' => 'read',
+        'created_by' => $loginInfo['usernameArray']['username'],
+        'owner' => $loginInfo['usernameArray']['username'],
+        'daily_execution_limit' => FREE_TIER_DAILY_EXECUTION_LIMIT ?? 1000,
+    ];
+
     // If no existing key, create a new one
     try {
-        $save = $apiKeyModel->create('read', $loginInfo['usernameArray']['username'], $loginInfo['usernameArray']['username'], FREE_TIER_DAILY_EXECUTION_LIMIT);
+        $save = $apiKeyModel->create($data);
+        // Ok we get back an id from create, we need to fetch the api_key value to return it
+        try {
+            $newApiKey = $apiKeyModel->get((int) $save);
+        } catch (Exception $e) {
+            if (ERROR_VERBOSE) {
+                Response::output('Failed to fetch new API key: ' . $e->getMessage(), 500);
+            } else {
+                Response::output('Failed to fetch new API key', 500);
+            }
+        }
+
+        Response::output(['api_key' => $newApiKey['api_key']]);
     } catch (Exception $e) {
         if (ERROR_VERBOSE) {
             Response::output('Failed to create API key: ' . $e->getMessage(), 500);
         } else {
             Response::output('Failed to create API key', 500);
         }
-    }
-
-    if ($save) {
-        Response::output($save);
-    } else {
-        Response::output('Failed to create API key', 500);
     }
 }
 
@@ -82,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     // If the user has an API key, delete it
     try {
-        $delete = $apiKeyModel->delete($existingKey);
+        $delete = $apiKeyModel->delete((int) $existingKey['id']);
         Response::output('API key deleted successfully');
     } catch (Exception $e) {
         if (ERROR_VERBOSE) {
@@ -92,3 +106,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         }
     }
 }
+
+Response::output('Invalid api action', 400);

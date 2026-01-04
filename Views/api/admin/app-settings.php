@@ -26,11 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $owner = $loginInfo['usernameArray']['username'] ?? 'system';
         $adminSetting = isset($_POST['admin_setting']) ? (bool)$_POST['admin_setting'] : false;
         $description = isset($_POST['description']) ? htmlspecialchars($_POST['description']) : null;
+
+        $data = [
+            'name' => htmlspecialchars($_POST['name']),
+            'value' => htmlspecialchars($_POST['value']),
+            'type' => htmlspecialchars($_POST['type'])
+        ];
         
-        $appSetting = $appSettingModel->create(
-            htmlspecialchars($_POST['name']),
-            htmlspecialchars($_POST['value']),
-            htmlspecialchars($_POST['type']),
+        $appSetting = $appSettingModel->create($data,
             $owner,
             $adminSetting,
             $description
