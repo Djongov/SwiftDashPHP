@@ -207,12 +207,14 @@ class DB
             } elseif (in_array($data, ['0', '1', 'true', 'false', true, false, 1, 0], true)) {
                 $dataType = $this->isBooleanColumn($expectedType) ? 'bool' : 'int';
             } elseif (is_numeric($data)) {
-                $dataType = 'int';
+                // Check if the value is a float or if it's an integer
+                $dataType = is_float($data) || str_contains((string)$data, '.') ? 'float' : 'int';
             } else {
                 $dataType = gettype($data);
             }
 
-            if ($dataType !== $expectedType) {
+            // Allow integers for float columns (integers can be safely converted to floats)
+            if ($dataType !== $expectedType && !($dataType === 'int' && $expectedType === 'float')) {
                 throw new \Exception("Data type mismatch for column '$column'. Expected '$expectedType', got '$dataType'");
             }
         }
