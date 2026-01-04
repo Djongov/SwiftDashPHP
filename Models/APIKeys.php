@@ -10,7 +10,7 @@ class APIKeys extends BasicModel
 {
     protected DB $_db;
     protected string $_table = 'api_keys';
-    protected string $_mainColumn = 'id';
+    protected string $_mainColumn = 'api_key';
 
     public function __construct(?string $table = null)
     {

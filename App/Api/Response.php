@@ -94,17 +94,22 @@ class Response
         $apiKey = getApiKeyFromHeaders();
 
         // Record the request in the access log
-        (new BasicModel('api_access_log'))->create(
-            [
-                'request_id' => $requestId,
-                'api_key' => ($apiKey) ? $apiKey : 'no api key',
-                'status_code' => $statusCode,
-                'client_ip' => currentIP(),
-                'uri' => currentUrl(),
-                'method' => $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN',
-                'user_agent' => currentBrowser()
-            ]
-        );
+        try {
+            (new BasicModel('api_access_log'))->create(
+                [
+                    'request_id' => $requestId,
+                    'api_key' => ($apiKey) ? $apiKey : 'no api key',
+                    'status_code' => $statusCode,
+                    'client_ip' => currentIP(),
+                    'uri' => currentUrl(),
+                    'method' => $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN',
+                    'user_agent' => currentBrowser()
+                ]
+            );
+        } catch (\Exception $e) {
+            // If logging fails, we silently ignore to not disrupt the API response
+        }
+        
         // Determine the response method to use
         $responseMethod = $contentType === 'application/xml' ? 'responseXml' : 'responseJson';
 

@@ -7,6 +7,7 @@ use FastRoute\RouteCollector;
 return function (RouteCollector $router) {
     // Common resources
     require_once dirname(__DIR__) . '/resources/menus/menus.php';
+    require_once dirname(__DIR__) . '/resources/menus/admin-menu.php';
 
     // Include route groups
     require_once dirname(__DIR__) . '/resources/routes/system-routes.php';

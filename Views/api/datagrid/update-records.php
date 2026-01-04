@@ -28,6 +28,7 @@ unset($_POST['csrf_token']); // CSRF token is not part of the data
 // Use the DB class to prepare local data for database insertion
 // This will validate columns exist, check nullability, and convert types appropriately
 $db = new \App\Database\DB();
+
 try {
     $preparedData = $db->prepareLocalDataForDB($_POST, $table);
 } catch (\Exception $e) {

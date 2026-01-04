@@ -12,26 +12,26 @@ CREATE TABLE IF NOT EXISTS app_settings (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE app_settings 
-    ADD COLUMN owner VARCHAR(50) NOT NULL DEFAULT 'system';
+-- Ensure unique constraint exists for ON CONFLICT to work
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER TABLE app_settings ADD CONSTRAINT app_settings_name_key UNIQUE (name);
+    EXCEPTION
+        WHEN duplicate_table THEN
+            -- Constraint already exists, do nothing
+        WHEN duplicate_object THEN
+            -- Constraint already exists, do nothing
+    END;
+END $$;
 
-ALTER TABLE app_settings 
-    ADD COLUMN admin_setting BOOLEAN NOT NULL DEFAULT FALSE;
-
-ALTER TABLE app_settings 
-    ADD COLUMN description TEXT;
-
--- Add unique constraint on name to prevent duplicates
-ALTER TABLE app_settings 
-    ADD CONSTRAINT unique_app_setting_name UNIQUE (name);
-
-INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
+INSERT INTO app_settings (name, value, type, owner, admin_setting, description)
 VALUES 
-    (4, 'default_data_grid_engine', 'DataGrid', 'string', 'system', TRUE, 'AGGrid or DataGrid for values.'),
-    (3, 'auth_expiry', '3600', 'int', 'system', TRUE, 'Number in seconds for the JWT Token''s lifetime'),
-    (2, 'use_tailwind_cdn', '1', 'bool', 'system', TRUE, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
-    (1, 'color_scheme', 'amber', 'string', 'system', TRUE, 'The default tailwind color for theming')
-ON CONFLICT (id) DO NOTHING;
+    ('default_data_grid_engine', 'DataGrid', 'string', 'system', TRUE, 'AGGrid or DataGrid for values.'),
+    ('auth_expiry', '3600', 'int', 'system', TRUE, 'Number in seconds for the JWT Token''s lifetime'),
+    ('use_tailwind_cdn', '1', 'bool', 'system', TRUE, 'Whether to use Tailwind CDN or local. Local is huge because of themes'),
+    ('color_scheme', 'amber', 'string', 'system', TRUE, 'The default tailwind color for theming')
+ON CONFLICT (name) DO NOTHING;
 
 -- Email App Settings
 INSERT INTO app_settings (name, value, type, owner, admin_setting, description)
@@ -82,12 +82,25 @@ CREATE TABLE IF NOT EXISTS cache (
 -- FIREWALL TABLE
 CREATE TABLE IF NOT EXISTS firewall (
     id SERIAL PRIMARY KEY,
-    ip_cidr VARCHAR(256) NOT NULL UNIQUE,
+    ip_cidr VARCHAR(256) NOT NULL,
     created_by VARCHAR(1000),
     comment VARCHAR(1000),
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Ensure unique constraint exists for ON CONFLICT to work
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER TABLE firewall ADD CONSTRAINT firewall_ip_cidr_key UNIQUE (ip_cidr);
+    EXCEPTION
+        WHEN duplicate_table THEN
+            -- Constraint already exists, do nothing
+        WHEN duplicate_object THEN
+            -- Constraint already exists, do nothing
+    END;
+END $$;
 
 -- Default firewall entries
 INSERT INTO firewall (ip_cidr, created_by, comment)
@@ -143,7 +156,7 @@ CREATE TABLE IF NOT EXISTS system_log (
 );
 
 -- API KEYS TABLE
-CREATE TABLE public.api_keys
+CREATE TABLE IF NOT EXISTS public.api_keys
 (
     id SERIAL PRIMARY KEY,
     api_key TEXT NOT NULL,
