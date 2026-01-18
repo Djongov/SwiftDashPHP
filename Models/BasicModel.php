@@ -30,6 +30,14 @@ class BasicModel implements BasicModelInterface
         }
         return $columns;
     }
+    public function rowCount(): int
+    {
+        $pdo = $this->_db->getConnection();
+        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM $this->_table");
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return (int)$result['count'];
+    }
     public static function applySortingAndLimiting(string $query, ?string $orderBy = null, ?string $sort = null, ?int $limit = null): string
     {
         if ($orderBy) {
@@ -68,12 +76,26 @@ class BasicModel implements BasicModelInterface
         $rowCount = count($rows);
         return ($rowCount > 0) ? true : false;
     }
-    public function getAll(?string $sort = null, ?int $limit = null, ?string $orderBy = null): array
-    {
+    public function getAll(
+        ?array $where = null,
+        ?string $orderBy = null,
+        ?string $sort = null,
+        ?int $limit = null
+    ): array {
         $pdo = $this->_db->getConnection();
-        $query = "SELECT * FROM $this->_table";
+        $query = "SELECT * FROM {$this->_table}";
+        $params = [];
+
+        if ($where) {
+            [$whereSql, $params] = self::buildWhere($where);
+            $query .= $whereSql;
+        }
+
         $query = self::applySortingAndLimiting($query, $orderBy, $sort, $limit);
-        $stmt = $pdo->query($query);
+
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
     public function get(string|int|null $param = null, ?string $sort = null, ?int $limit = null, ?string $orderBy = null): array
@@ -95,6 +117,31 @@ class BasicModel implements BasicModelInterface
             $stmt->execute([$param]);
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         }
+    }
+    private static function buildWhere(array $where): array
+    {
+        $clauses = [];
+        $params  = [];
+
+        foreach ($where as $column => $value) {
+            // Handle array values with IN clause
+            if (is_array($value)) {
+                $placeholders = [];
+                foreach ($value as $i => $val) {
+                    $param = ':' . $column . '_' . $i;
+                    $placeholders[] = $param;
+                    $params[$param] = $val;
+                }
+                $clauses[] = "$column IN (" . implode(', ', $placeholders) . ")";
+            } else {
+                // Handle single value with = operator
+                $param = ':' . $column;
+                $clauses[] = "$column = $param";
+                $params[$param] = $value;
+            }
+        }
+
+        return [' WHERE ' . implode(' AND ', $clauses), $params];
     }
     public function create(array $data): int
     {
@@ -129,10 +176,10 @@ class BasicModel implements BasicModelInterface
             $stmt->execute(array_values($data));
         } catch (\PDOException $e) {
             // Skip throwing exception if the error is database unknown
-            if ($e->getCode() === 'HY000') {
-                return 0;
-            }
-            throw (new BasicModelExceptions())->genericError($e->getMessage(), 500);
+            throw (new BasicModelExceptions())->genericError(
+                'DB INSERT FAILED: ' . $e->getMessage(),
+                500
+            );
         }
 
         return (int)$pdo->lastInsertId();
@@ -180,13 +227,13 @@ class BasicModel implements BasicModelInterface
         $values = array_values($data);
         $values[] = $id; // Add the id for the WHERE clause
         $pdo = $this->_db->getConnection();
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($values);
 
-        if ($stmt->rowCount() === 1) {
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($values);
             return $stmt->rowCount();
-        } else {
-            throw (new BasicModelExceptions())->notSaved($this->_mainColumn . ' not saved');
+        } catch (\PDOException $e) {
+            throw (new BasicModelExceptions())->genericError($e->getMessage(), 500);
         }
     }
     public function delete(int $id): bool
