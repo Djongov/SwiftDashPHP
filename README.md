@@ -144,13 +144,13 @@ API endpoint for sending mails and a TinyMCE endpoint for sending manually.
 
 ## Docker
 
-### Azure ACR
-
-Login to Azure ACR, build and push
-
 ```bash
 DOCKER_BUILDKIT=1 docker build -t swiftdashphp:v1.6.1 .
 ```
+
+### Azure ACR
+
+Login to Azure ACR, build and push
 
 ```bash
 ACR="XXXX"
@@ -170,4 +170,26 @@ docker push $ACR.azurecr.io/swiftdashphp:v1.6.1
 
 ```bash
 docker run -dp 8080:80 --env-file .env swiftdashphp:v1.6.1
+```
+
+### Github Container Registry
+
+```bash
+USER='XXX'
+```
+
+```bash
+USER_LOWER=${USER,,}
+```
+
+```bash
+docker login ghcr.io -u $USER
+```
+
+```bash
+docker tag swiftdashphp:v1.6.1 ghcr.io/$USER_LOWER/swiftdashphp:v1.6.1
+```
+
+```bash
+docker push ghcr.io/$USER_LOWER/swiftdashphp:v1.6.1
 ```
