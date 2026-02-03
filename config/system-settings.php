@@ -270,7 +270,12 @@ class SystemConfig
         define('JWT_ISSUER', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$httpHost");
         define('JWT_TOKEN_EXPIRY', (int) AUTH_EXPIRY);
         
-        // USE_REMOTE_ID_TOKEN: if true, use provider's ID token; if false, generate our own JWT
+        // USE_REMOTE_ID_TOKEN: Controls which token is stored for authentication
+        // - false (RECOMMENDED): Generate our own JWT with AUTH_EXPIRY from AppSettings
+        //   This allows you to control session duration (e.g., 4 months) via AppSettings
+        // - true: Use provider's original ID token (Google, Azure, etc.)
+        //   Provider tokens typically expire after 1 hour, ignoring your AUTH_EXPIRY setting
+        //   Only use this if you want to rely on the provider's token expiration
         define('USE_REMOTE_ID_TOKEN', filter_var($_ENV['USE_REMOTE_ID_TOKEN'] ?? 'false', FILTER_VALIDATE_BOOLEAN));
         
         define('AUTH_COOKIE_EXPIRY', (int) AUTH_EXPIRY);
@@ -355,13 +360,22 @@ class SystemConfig
     }
     private static function configureDBAppSettings(): void
     {
+        // Initialize defaults map
+        $defaults = [
+            'default_data_grid_engine' => 'aggrid',
+            'auth_expiry' => 3600,
+            'use_tailwind_cdn' => true,
+            'color_scheme' => 'blue'
+        ];
+
         try {
             $appSettings = new \Models\AppSettings();
             $allAppSettings = $appSettings->getAllByOwner('system');
-            $requiredAppSettings = ['default_data_grid_engine', 'auth_expiry', 'use_tailwind_cdn', 'color_scheme'];
+            $loadedSettings = [];
+            
             foreach ($allAppSettings as $setting) {
                 $constantName = strtoupper($setting['name']);
-                if (in_array($setting['name'], $requiredAppSettings)) {
+                if (in_array($setting['name'], array_keys($defaults))) {
                     if (!defined($constantName)) {
                         // Cast to appropriate type based on the setting type from database
                         $value = match($setting['type'] ?? 'string') {
@@ -370,22 +384,25 @@ class SystemConfig
                             default => $setting['value']
                         };
                         define($constantName, $value);
+                        $loadedSettings[$setting['name']] = true;
                     }
+                }
+            }
+            
+            // Define any settings that weren't found in the database with their defaults
+            foreach ($defaults as $settingName => $defaultValue) {
+                $constantName = strtoupper($settingName);
+                if (!isset($loadedSettings[$settingName]) && !defined($constantName)) {
+                    define($constantName, $defaultValue);
                 }
             }
         } catch (\PDOException $e) {
             // Database doesn't exist yet or table not created - use defaults
-            if (!defined('DEFAULT_DATA_GRID_ENGINE')) {
-                define('DEFAULT_DATA_GRID_ENGINE', 'aggrid');
-            }
-            if (!defined('AUTH_EXPIRY')) {
-                define('AUTH_EXPIRY', 3600);
-            }
-            if (!defined('USE_TAILWIND_CDN')) {
-                define('USE_TAILWIND_CDN', true);
-            }
-            if (!defined('COLOR_SCHEME')) {
-                define('COLOR_SCHEME', 'blue');
+            foreach ($defaults as $settingName => $defaultValue) {
+                $constantName = strtoupper($settingName);
+                if (!defined($constantName)) {
+                    define($constantName, $defaultValue);
+                }
             }
         }
     }

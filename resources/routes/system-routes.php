@@ -67,7 +67,7 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
     $router->addRoute('POST', '/api/edit-json-settings', [$viewsFolder . '/api/edit-json-settings.php']);
 
     /* API Routes */
-    $router->addRoute(['GET','PUT','DELETE','POST'], '/api/user[/{id:[^/]+}]', [$viewsFolder . '/api/user.php']);
+    $router->addRoute(['PUT','DELETE','POST'], '/api/user[/{id:[^/]+}]', [$viewsFolder . '/api/user.php']);
     $router->addRoute(['GET','PUT','DELETE','POST'], '/api/firewall[/{id:\d+}]', [$viewsFolder . '/api/firewall.php']);
     $router->addRoute('POST', '/api/mail/sendgrid', [$viewsFolder . '/api/mail/sendgrid.php']);
     $router->addRoute('POST', '/api/mail/smtp', [$viewsFolder . '/api/mail/smtp.php']);

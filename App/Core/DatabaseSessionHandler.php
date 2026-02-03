@@ -28,8 +28,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface
         
         $this->pdo = $db->getConnection();
         
-        // Set max lifetime from ini or use default
-        $this->maxLifetime = (int) ini_get('session.gc_maxlifetime') ?: 1440;
+        // Use AUTH_EXPIRY if defined, otherwise fall back to ini setting or default
+        $this->maxLifetime = defined('AUTH_EXPIRY') ? (int) \AUTH_EXPIRY : ((int) ini_get('session.gc_maxlifetime') ?: 1440);
     }
     
     /**

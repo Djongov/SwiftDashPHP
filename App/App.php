@@ -74,7 +74,17 @@ class App
         require_once dirname(__DIR__) . '/config/system-settings.php';
         require_once dirname(__DIR__) . '/config/site-settings.php';
 
-        // Start session (now AUTH_EXPIRY is available)
+        // Set session ini parameters early, BEFORE Session::start()
+        // This is critical because these must be set before headers are sent
+        // session.cookie_lifetime: How long the session cookie persists in seconds
+        // session.gc_maxlifetime: How long before session data is garbage collected
+        if (php_sapi_name() !== 'cli' && defined('AUTH_EXPIRY')) {
+            // Use @ to suppress headers-already-sent warnings in case they occur
+            @ini_set('session.cookie_lifetime', (string) \AUTH_EXPIRY);
+            @ini_set('session.gc_maxlifetime', (string) \AUTH_EXPIRY);
+        }
+
+        // Start session (now AUTH_EXPIRY is available and ini settings are configured)
         \App\Core\Session::start();
 
         // Create a nonce for the session, that can be used for Azure AD authentication

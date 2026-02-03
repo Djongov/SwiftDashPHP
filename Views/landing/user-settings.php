@@ -313,22 +313,19 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                     echo Html::h3(translate('theme'));
                     echo '<div class="space-y-4">';
                         echo '<p class="text-sm text-gray-600 dark:text-gray-400">Choose your preferred color theme</p>';
-                        echo '<form class="select-submitter" data-reload="true" method="PUT" action="/api/user/' . $usernameArray['id'] . '">';
-                            echo '<div class="grid grid-cols-2 md:grid-cols-3 gap-3">';
-                            foreach (THEME_COLORS as $color) {
-                                $isSelected = ($usernameArray['theme'] === $color);
-                                echo '<label class="relative cursor-pointer">';
-                                    echo '<input type="radio" name="theme" value="' . $color . '" ' . ($isSelected ? 'checked' : '') . ' class="sr-only theme-radio" data-auto-submit="true">';
-                                    echo '<div class="theme-option p-4 rounded-lg border-2 ' . ($isSelected ? 'border-' . $color . '-500 bg-' . $color . '-50 dark:bg-' . $color . '-900' : 'border-gray-200 dark:border-gray-700') . ' hover:border-' . $color . '-300 transition-colors">';
-                                        echo '<div class="w-8 h-8 bg-' . $color . '-500 rounded-full mx-auto mb-2"></div>';
-                                        echo '<p class="text-sm font-medium text-center capitalize">' . $color . '</p>';
-                                    echo '</div>';
-                                echo '</label>';
-                            }
-                            echo '</div>';
-                            echo '<input type="hidden" name="username" value="' . $usernameArray['username'] . '">';
-                            echo App\Security\CSRF::createTag();
-                        echo '</form>';
+                        echo App\Security\CSRF::createTag();
+                        echo '<div id="theme-selector" class="grid grid-cols-2 md:grid-cols-3 gap-3">';
+                        foreach (THEME_COLORS as $color) {
+                            $isSelected = ($usernameArray['theme'] === $color);
+                            echo '<label class="relative cursor-pointer">';
+                                echo '<input type="radio" name="theme" value="' . $color . '" ' . ($isSelected ? 'checked' : '') . ' class="sr-only theme-radio">';
+                                echo '<div class="theme-option p-4 rounded-lg border-2 ' . ($isSelected ? 'border-' . $color . '-500 bg-' . $color . '-50 dark:bg-' . $color . '-900' : 'border-gray-200 dark:border-gray-700') . ' hover:border-' . $color . '-300 transition-colors">';
+                                    echo '<div class="w-8 h-8 bg-' . $color . '-500 rounded-full mx-auto mb-2"></div>';
+                                    echo '<p class="text-sm font-medium text-center capitalize">' . $color . '</p>';
+                                echo '</div>';
+                            echo '</label>';
+                        }
+                        echo '</div>';
                     echo '</div>';
                 echo '</div>';
                 
@@ -414,11 +411,35 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
     
-    // Handle theme radio button changes
-    document.querySelectorAll('.theme-radio').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.getAttribute('data-auto-submit') === 'true') {
-                this.form.submit();
+    // Handle theme radio button changes with PUT request
+    document.querySelectorAll('#theme-selector .theme-radio').forEach(radio => {
+        radio.addEventListener('change', async function() {
+            const selectedTheme = this.value;
+            const userId = <?php echo $usernameArray['id']; ?>;
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+            
+            try {
+                const response = await fetch('/api/user/' + userId, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        secretheader: 'badass'
+                    },
+                    body: JSON.stringify({
+                        theme: selectedTheme,
+                        username: '<?php echo htmlspecialchars($usernameArray['username']); ?>',
+                        csrf_token: csrfToken,
+                    })
+                });
+                
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to update theme: ' + response.status);
+                }
+            } catch (error) {
+                alert('Error updating theme: ' + error.message);
             }
         });
     });

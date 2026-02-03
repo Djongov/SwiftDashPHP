@@ -19,6 +19,17 @@ class Session
             // Define the domain based on localhost or actual host
             $domain = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'] ?? '';
             
+            // Set session garbage collection and cookie lifetime to match AUTH_EXPIRY
+            // This ensures sessions aren't deleted before the auth token expires
+            // CRITICAL: Must be done before session_start() is called
+            if (php_sapi_name() !== 'cli') {
+                // session.cookie_lifetime: How long the session cookie persists (non-zero = persistent cookie)
+                // session.gc_maxlifetime: How long until session data is garbage collected
+                // Both must be set to AUTH_EXPIRY for proper long-lived sessions
+                @ini_set('session.cookie_lifetime', (string) \AUTH_EXPIRY);
+                @ini_set('session.gc_maxlifetime', (string) \AUTH_EXPIRY);
+            }
+            
             // Use database session handler for distributed environments
             $sessionStorage = defined('SESSION_STORAGE') ? SESSION_STORAGE : 'file';
             if ($sessionStorage === 'database') {
@@ -41,6 +52,14 @@ class Session
                 ]
             );
             session_start();
+            
+            // For file-based sessions, touch the session file to update its mtime
+            // This prevents premature garbage collection based on file age
+            if ($sessionStorage === 'file' && session_status() === PHP_SESSION_ACTIVE) {
+                // Force session data to be written, updating the file's modification time
+                // This is critical for long-lived sessions with file storage
+                $_SESSION['_last_activity'] = time();
+            }
         //}
     }
     // Reset the session
