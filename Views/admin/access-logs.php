@@ -18,13 +18,15 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-// Get the file path from the environment variable
-if (!isset($_ENV['ACCESS_LOGS'])) {
-    echo Alerts::danger('No access logs directory set in .env file (ACCESS_LOGS)');
+// Prefer apache_getenv for mod_php
+$accessLogDir = apache_getenv('ACCESS_LOGS') ?: getenv('ACCESS_LOGS');
+
+if (!$accessLogDir) {
+    echo Alerts::danger('No access logs directory set in environment (ACCESS_LOGS)');
     return;
 }
 
-$filePath = $_ENV['ACCESS_LOGS'];
+$filePath = $accessLogDir;
 
 // Check if the directory exists
 if (!is_dir($filePath)) {
@@ -133,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $isAccessLogsDirWritable = is_writable($filePath);
 
 echo Html::h1('Access Logs', true);
-echo Html::p($_ENV['ACCESS_LOGS'], ['text-center']);
+echo Html::p($accessLogDir, ['text-center']);
 echo Html::p('Log files in the directory:', ['text-center']);
 
 // Sort by latest

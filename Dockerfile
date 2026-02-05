@@ -21,6 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     iputils-ping \
     libgmp-dev \
     libicu-dev \
+    libpq-dev \
     libssl-dev \
     net-tools \
     openssh-server \
@@ -36,7 +37,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     # PHP Extensions Configuration
     # ========================================
     && docker-php-ext-configure intl \
-    && docker-php-ext-install -j$(nproc) intl pdo_mysql mysqli \
+    && docker-php-ext-install -j$(nproc) intl pdo_mysql mysqli pdo_pgsql \
     \
     # ========================================
     # Apache Configuration
@@ -86,7 +87,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && echo "    notifempty" >> /etc/logrotate.d/apache2-custom \
     && echo "    create 0640 www-data adm" >> /etc/logrotate.d/apache2-custom \
     && echo "}" >> /etc/logrotate.d/apache2-custom \
-    && echo "export ACCESS_LOG='/var/log/apache2'" >> /etc/apache2/envvars \
     \
     # ========================================
     # Cleanup
