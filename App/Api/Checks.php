@@ -264,15 +264,19 @@ class Checks
     {
         // get all headers
         $headers = getallheaders();
-        $lowercaseHeaders = array_change_key_case($headers);
-        // Check if the secret header is set
-        $expectedSecretHeader = WEBHOOK_SECRET_NAME;
+        $normalized = [];
+        foreach ($headers as $key => $value) {
+            // strip HTTP_ prefix if it exists and lowercase
+            $key = strtolower(preg_replace('/^HTTP_/', '', $key));
+            $key = str_replace('_', '-', $key); // convert underscores to dashes
+            $normalized[$key] = $value;
+        }
 
-        if (!isset($lowercaseHeaders[$expectedSecretHeader])) {
+        if (!isset($normalized[WEBHOOK_SECRET_NAME])) {
             Response::output('Missing webhook secret', $this->defaultStatusCode);
         }
 
-        if (trim($lowercaseHeaders[$expectedSecretHeader]) !== WEBHOOK_SECRET) {
+        if (trim($normalized[WEBHOOK_SECRET_NAME]) !== WEBHOOK_SECRET) {
             Response::output('Invalid webhook secret value', $this->defaultStatusCode);
         }
     }

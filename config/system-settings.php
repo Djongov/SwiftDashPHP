@@ -233,8 +233,14 @@ class SystemConfig
         define('API_KEY_HEADER_NAME', 'X-API-Key');
         
         // Webhook security
-        define('WEBHOOK_SECRET_NAME', 'webhook-secret');
-        define('WEBHOOK_SECRET', $_ENV['WEBHOOK_SECRET'] ?? '');
+        define(
+            'WEBHOOK_SECRET_NAME',
+            strtolower(str_replace('_', '-', getenv('WEBHOOK_SECRET_NAME') ?: 'x-webhook-secret'))
+        );
+        
+        define(
+            'WEBHOOK_SECRET', getenv('WEBHOOK_SECRET') ?: ''
+        );
         
         // Session storage - 'file' or 'database' (database recommended for distributed environments)
         define('SESSION_STORAGE', $_ENV['SESSION_STORAGE'] ?? 'file');
