@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App;
 
-use Components\Alerts;
 use Components\Page\Head;
 use Components\Page\Menu;
 use Components\Page\Footer;
@@ -31,26 +30,30 @@ class Page
             ],
             '/assets/js/datagrid.js' => [
                 'defer' => 'true',
-                'cache' => false
+                'cache' => true
             ],
             '/assets/js/c0py.js' => [
                 'defer' => 'true',
                 'cache' => true
             ],
             '/assets/js/forms.js' => [
-                'defer' => 'true'
+                'defer' => 'true',
+                'cache' => true
             ],
             '/assets/js/charts.js' => [
-                'defer' => 'true'
+                'defer' => 'true',
+                'cache' => true
             ],
             'https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js' => [
                 'cache' => true
             ],
             '/assets/js/lang.js' => [
-                'defer' => 'true'
+                'defer' => 'true',
+                'cache' => true
             ],
             '/assets/js/main.js' => [
-                'defer' => 'true'
+                'defer' => 'true',
+                'cache' => true
             ],
         ];
         if (USE_TAILWIND_CDN) {
@@ -68,7 +71,7 @@ class Page
         // Load these styles
         $cssArray = [
             '/assets/css/main.css' => [
-                'cache' => false
+                'cache' => true
             ]
         ];
         if (!USE_TAILWIND_CDN) {
