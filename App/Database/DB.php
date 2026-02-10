@@ -111,6 +111,7 @@ class DB
     {
         // You can add any default PDO options here if needed
         $options = [];
+        $options[\PDO::ATTR_PERSISTENT] = true; // Use persistent connections for better performance
         if (defined("DB_SSL") && DB_SSL) {
             $options[\PDO::MYSQL_ATTR_SSL_CA] = DB_CA_CERT;
         }
