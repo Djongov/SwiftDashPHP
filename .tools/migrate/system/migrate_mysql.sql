@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS app_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Clean up any existing duplicates (keep the first occurrence of each name)
+DELETE t1 FROM app_settings t1
+INNER JOIN app_settings t2 
+WHERE t1.id > t2.id AND t1.name = t2.name;
+
 INSERT INTO app_settings (id, name, value, type, owner, admin_setting, description)
 VALUES 
     (4, 'default_data_grid_engine', 'DataGrid', 'string', 'system', 1, 'AGGrid or DataGrid for values.'),
@@ -19,20 +24,24 @@ VALUES
 ON DUPLICATE KEY UPDATE name = name; -- does nothing if id already exists
 
 -- Email App Settings
+-- Only insert if the name doesn't already exist
 INSERT INTO app_settings (name, value, type, owner, admin_setting, description)
-VALUES
-    ('email_smtp_host', '', 'string', 'smtp', 1, 'SMTP server host'),
-    ('email_smtp_port', '587', 'int', 'smtp', 1, 'SMTP server port'),
-    ('email_smtp_ssl', '1', 'bool', 'smtp', 1, 'SMTP server encryption (tls/ssl)'),
-    ('email_smtp_verify_peer', '1', 'bool', 'smtp', 1, 'Verify SSL peer certificate'),
-    ('email_smtp_verify_peer_name', '1', 'bool', 'smtp', 1, 'Verify SSL peer certificate name'),
-    ('email_smtp_allow_self_signed', '0', 'bool', 'smtp', 1, 'Allow self-signed SSL certificates'),
-    ('email_smtp_username', '', 'string', 'smtp', 1, 'SMTP server username'),
-    ('email_smtp_password', '', 'string', 'smtp', 1, 'SMTP server password'),
-    ('email_smtp_from_address', '', 'string', 'smtp', 1, 'Default from email address'),
-    ('email_smtp_from_name', 'No Reply', 'string', 'smtp', 1, 'Default from name'),
-    ('email_smtp_administrator_email', '', 'string', 'smtp', 1, 'Administrator email for system notifications')
-ON DUPLICATE KEY UPDATE name = name; -- does nothing if name already exists
+SELECT * FROM (
+    SELECT 'email_smtp_host' as name, '' as value, 'string' as type, 'smtp' as owner, 1 as admin_setting, 'SMTP server host' as description
+    UNION ALL SELECT 'email_smtp_port', '587', 'int', 'smtp', 1, 'SMTP server port'
+    UNION ALL SELECT 'email_smtp_ssl', '1', 'bool', 'smtp', 1, 'SMTP server encryption (tls/ssl)'
+    UNION ALL SELECT 'email_smtp_verify_peer', '1', 'bool', 'smtp', 1, 'Verify SSL peer certificate'
+    UNION ALL SELECT 'email_smtp_verify_peer_name', '1', 'bool', 'smtp', 1, 'Verify SSL peer certificate name'
+    UNION ALL SELECT 'email_smtp_allow_self_signed', '0', 'bool', 'smtp', 1, 'Allow self-signed SSL certificates'
+    UNION ALL SELECT 'email_smtp_username', '', 'string', 'smtp', 1, 'SMTP server username'
+    UNION ALL SELECT 'email_smtp_password', '', 'string', 'smtp', 1, 'SMTP server password'
+    UNION ALL SELECT 'email_smtp_from_address', '', 'string', 'smtp', 1, 'Default from email address'
+    UNION ALL SELECT 'email_smtp_from_name', 'No Reply', 'string', 'smtp', 1, 'Default from name'
+    UNION ALL SELECT 'email_smtp_administrator_email', '', 'string', 'smtp', 1, 'Administrator email for system notifications'
+) AS tmp
+WHERE NOT EXISTS (
+    SELECT 1 FROM app_settings WHERE app_settings.name = tmp.name
+);
 
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (

@@ -235,11 +235,11 @@ class SystemConfig
         // Webhook security
         define(
             'WEBHOOK_SECRET_NAME',
-            strtolower(str_replace('_', '-', getenv('WEBHOOK_SECRET_NAME') ?: 'x-webhook-secret'))
+            strtolower(str_replace('_', '-', $_ENV['WEBHOOK_SECRET_NAME'] ?? 'x-webhook-secret'))
         );
         
         define(
-            'WEBHOOK_SECRET', getenv('WEBHOOK_SECRET') ?: ''
+            'WEBHOOK_SECRET', $_ENV['WEBHOOK_SECRET'] ?? ''
         );
         
         // Session storage - 'file' or 'database' (database recommended for distributed environments)
