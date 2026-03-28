@@ -9,7 +9,7 @@ use Models\ContentSecurityPolicy\CSPApprovedDomains;
 use App\Exceptions\ContentSecurityPolicyExceptions;
 
 //First of all check if Content-Type is application/csp-report
-if ($_SERVER['CONTENT_TYPE'] !== 'application/csp-report') {
+if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] !== 'application/csp-report') {
     Response::output('Incorrect Content-Type', 400);
 }
 
