@@ -8,15 +8,28 @@ class IP
 {
     public static function currentIP(): string
     {
-        if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-            $clientIp = $_SERVER["HTTP_CF_CONNECTING_IP"];
-        } elseif (isset($_SERVER['HTTP_clientIp'])) {
-            $clientIp = str_replace(strstr($_SERVER['HTTP_clientIp'], ':'), '', $_SERVER['HTTP_clientIp']);
-        } else {
-            // or just use the normal remote addr
-            $clientIp = $_SERVER['REMOTE_ADDR'];
+        $headers = [
+            'HTTP_CF_CONNECTING_IP',      // Cloudflare
+            'HTTP_X_CLIENT_IP',           // Azure App Service / Front Door
+            'HTTP_X_FORWARDED_FOR',       // Standard proxy header (may contain multiple IPs)
+            'HTTP_X_REAL_IP',             // Nginx proxy
+            'HTTP_X_FORWARDED',           // Older proxy header
+            'HTTP_FORWARDED_FOR',         // RFC 7239 variant
+            'HTTP_FORWARDED',             // RFC 7239
+            'HTTP_CLIENT_IP',             // Some proxies
+        ];
+
+        foreach ($headers as $header) {
+            if (!empty($_SERVER[$header])) {
+                // X-Forwarded-For can contain a comma-separated list; take the first (client) IP
+                $ip = trim(explode(',', $_SERVER[$header])[0]);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
         }
-        return $clientIp;
+
+        return $_SERVER['REMOTE_ADDR'];
     }
     public static function isPublicIp($ip): bool
     {
