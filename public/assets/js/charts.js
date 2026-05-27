@@ -610,24 +610,28 @@ const createDonutChart = (title, parentDiv, width, height, labels, data, customC
         backgroundColorArray = colors;
     }
 
-    let total = data.reduce((a, b) => a + b, 0);
-
     // Custom plugin to add text in the center
     const centerTextPlugin = {
         id: 'centerText',
         beforeDraw: function (chart) {
             let { width, height, ctx } = chart;
-            
+
+            // Recompute the total from only the currently-visible slices, so that
+            // hiding a category via the legend decreases the centered total.
+            const total = chart.data.datasets[0].data.reduce((sum, value, index) => {
+                return chart.getDataVisibility(index) ? sum + value : sum;
+            }, 0);
+
             // Get the chart area (excludes title, legend, padding)
             const chartArea = chart.chartArea;
             const centerX = (chartArea.left + chartArea.right) / 2;
             const centerY = (chartArea.top + chartArea.bottom) / 2;
-    
+
             // Dynamically adjust font size based on chart area size - made smaller
             const chartAreaHeight = chartArea.bottom - chartArea.top;
             let fontSize = Math.floor(chartAreaHeight / 12); // Reduced from 7 to 12 for smaller text
             ctx.font = `bold ${fontSize}px Arial`;
-    
+
             ctx.save();
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
