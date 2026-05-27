@@ -480,12 +480,24 @@ if (searchInputs.length > 0) {
         input.addEventListener('input', () => {
             const searchValue = input.value.toLowerCase();
             const select = input.parentNode.querySelector('select');
+            if (!select) {
+                return;
+            }
             const options = select.querySelectorAll('option');
             options.forEach(option => {
-                if (option.value.toLowerCase().indexOf(searchValue) > -1) {
+                // Match on both the option value and its visible text so users can
+                // search by what they actually see in the list.
+                const matches = option.value.toLowerCase().includes(searchValue)
+                    || option.text.toLowerCase().includes(searchValue);
+                if (matches) {
                     option.style.display = '';
-                    // Also make sure that the option is selected
-                    option.selected = true;
+                    // For single selects, keep the original "type-to-pick" behaviour of
+                    // selecting the match. For multiple selects we must NOT touch the
+                    // selection while filtering — otherwise every search hit would be
+                    // added to the selection. The user picks entries manually instead.
+                    if (!select.multiple) {
+                        option.selected = true;
+                    }
                 } else {
                     option.style.display = 'none';
                 }

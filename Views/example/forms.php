@@ -174,11 +174,32 @@ $formOptions = [
                         'text' => 'Australia'
                     ]
                 ],
-                'selected' => 'ca',
+                'selected_option' => 'ca',
                 'searchable' => true,
                 'searchFlex' => 'flex-col',
                 'description' => 'Select your country',
                 'required' => true
+            ],
+            // Searchable multiple-select. Submits as skills[] (an array).
+            [
+                'label' => 'Skills',
+                'name' => 'skills',
+                'id' => 'skills-form',
+                'title' => 'Skills',
+                'multiple' => true,
+                'searchable' => true,
+                'selectSize' => 6,
+                'searchFlex' => 'flex-col',
+                'selected_option' => ['php', 'js'],
+                'options' => [
+                    ['value' => 'php', 'text' => 'PHP'],
+                    ['value' => 'js', 'text' => 'JavaScript'],
+                    ['value' => 'python', 'text' => 'Python'],
+                    ['value' => 'go', 'text' => 'Go'],
+                    ['value' => 'rust', 'text' => 'Rust'],
+                    ['value' => 'sql', 'text' => 'SQL'],
+                ],
+                'description' => 'Select one or more skills. Hold Ctrl/Cmd to pick multiple, and type to filter.'
             ]
         ],
         'textarea' => [
@@ -405,10 +426,31 @@ $formOptions = [
                         \'text\' => \'Australia\'
                     ]
                 ],
-                \'selected\' => \'ca\',
+                \'selected_option\' => \'ca\',
                 \'searchable\' => true,
                 \'searchFlex\' => \'flex-col\',
                 \'description\' => \'Select your country\'
+            ],
+            // Searchable multiple-select. Submits as skills[] (an array).
+            [
+                \'label\' => \'Skills\',
+                \'name\' => \'skills\',
+                \'id\' => \'skills-form\',
+                \'title\' => \'Skills\',
+                \'multiple\' => true,
+                \'searchable\' => true,
+                \'selectSize\' => 6,
+                \'searchFlex\' => \'flex-col\',
+                \'selected_option\' => [\'php\', \'js\'],
+                \'options\' => [
+                    [\'value\' => \'php\', \'text\' => \'PHP\'],
+                    [\'value\' => \'js\', \'text\' => \'JavaScript\'],
+                    [\'value\' => \'python\', \'text\' => \'Python\'],
+                    [\'value\' => \'go\', \'text\' => \'Go\'],
+                    [\'value\' => \'rust\', \'text\' => \'Rust\'],
+                    [\'value\' => \'sql\', \'text\' => \'SQL\'],
+                ],
+                \'description\' => \'Select one or more skills. Hold Ctrl/Cmd to pick multiple, and type to filter.\'
             ]
         ],
         \'textarea\' => [

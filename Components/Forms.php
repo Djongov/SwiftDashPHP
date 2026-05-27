@@ -149,14 +149,24 @@ class Forms
                     if (isset($inputOptionsArray['search']) && $inputOptionsArray['search']) {
                         $html .= Html::searchInput($theme);
                     }
-                                $html .= '<select id="' . $id . '" name="' . $inputOptionsArray['name'] . '" class="' . Html::selectInputClasses($theme) . '" ' . $disabled . $title . ' autocomplete="on">';
+                                // Multiple selection support: add the `multiple` attribute and
+                                // append `[]` to the name so PHP receives the selection as an array.
+                                $multiple = (isset($inputOptionsArray['multiple']) && $inputOptionsArray['multiple']) ? 'multiple ' : '';
+                                $selectName = $inputOptionsArray['name'] . ($multiple ? '[]' : '');
+                                // Optional number of visible rows (useful for multi-selects)
+                                $selectSize = (isset($inputOptionsArray['selectSize'])) ? 'size="' . (int) $inputOptionsArray['selectSize'] . '" ' : '';
+                                $html .= '<select id="' . $id . '" name="' . $selectName . '" class="' . Html::selectInputClasses($theme) . '" ' . $multiple . $selectSize . $disabled . $title . ' autocomplete="on">';
+                                // selected_option may be a single value or an array of values (for multiple selects)
                                 $selectedOption = $inputOptionsArray['selected_option'] ?? null;
+                                $selectedValues = [];
+                    if (is_array($selectedOption)) {
+                        $selectedValues = $selectedOption;
+                    } elseif ($selectedOption !== null) {
+                        $selectedValues = [$selectedOption];
+                    }
                     foreach ($inputOptionsArray['options'] as $array) {
-                        if ($selectedOption !== null && $selectedOption === $array['value']) {
-                            $html .= '<option value="' . $array['value'] . '" selected>' . $array['text'] . '</option>';
-                        } else {
-                            $html .= '<option value="' . $array['value'] . '">' . $array['text'] . '</option>';
-                        }
+                        $selectedAttr = in_array($array['value'], $selectedValues) ? ' selected' : '';
+                        $html .= '<option value="' . $array['value'] . '"' . $selectedAttr . '>' . $array['text'] . '</option>';
                     }
                                 $html .= '</select>';
                                 $html .= (isset($inputOptionsArray['description'])) ? '<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">' . $inputOptionsArray['description'] . '</p>' : null;
