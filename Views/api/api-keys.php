@@ -32,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     $data = [
+        'api_key' => randomString(64),
+        'access' => 'read',
         'note' => $loginInfo['usernameArray']['username'],
-        'type' => 'read',
         'created_by' => $loginInfo['usernameArray']['username'],
-        'owner' => $loginInfo['usernameArray']['username'],
-        'daily_execution_limit' => FREE_TIER_DAILY_EXECUTION_LIMIT ?? 1000,
+        'executions_limit' => FREE_TIER_DAILY_EXECUTION_LIMIT ?? 1000,
     ];
 
     // If no existing key, create a new one
