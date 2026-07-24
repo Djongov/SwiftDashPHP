@@ -25,11 +25,16 @@ final class JsonLogger
             'run_id'  => self::$runId,
         ];
 
-        $output = in_array($level, ['error', 'warning'], true)
-            ? STDERR
-            : STDOUT;
+        $line    = json_encode($entry, JSON_UNESCAPED_SLASHES);
+        $isError = in_array($level, ['error', 'warning'], true);
 
-        fwrite($output, json_encode($entry, JSON_UNESCAPED_SLASHES) . PHP_EOL);
+        // STDOUT/STDERR are only defined in the CLI SAPI. Under a web SAPI (e.g. an admin
+        // "Run now" request) they don't exist, so fall back to error_log() there.
+        if (defined('STDOUT') && defined('STDERR')) {
+            fwrite($isError ? STDERR : STDOUT, $line . PHP_EOL);
+        } else {
+            error_log($line);
+        }
     }
 
     public static function info(string $message, array $context = []): void

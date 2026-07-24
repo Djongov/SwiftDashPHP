@@ -30,6 +30,7 @@ class SystemConfig
         }
         
         self::loadEnvironment();
+        self::applyPublicHost();
         self::validateSystemRequirements();
         self::defineConstants();
         
@@ -77,7 +78,25 @@ class SystemConfig
         }
     }
 
-    
+    /**
+     * CLI runs (cron reports, scripts) have no HTTP request, so $_SERVER['HTTP_HOST']
+     * is unset and host-based constants (JWT_ISSUER, SYSTEM_USER_AGENT, OG_LOGO) and
+     * links in generated emails would fall back to 'localhost'. PUBLIC_HOST in the
+     * environment supplies the canonical public hostname; a real request's Host
+     * header always takes precedence.
+     */
+    private static function applyPublicHost(): void
+    {
+        if (($_SERVER['HTTP_HOST'] ?? '') !== '') {
+            return;
+        }
+
+        $publicHost = trim((string) (getenv('PUBLIC_HOST') ?: ($_ENV['PUBLIC_HOST'] ?? '')), "\"' ");
+        if ($publicHost !== '') {
+            $_SERVER['HTTP_HOST'] = $publicHost;
+        }
+    }
+
     private static function validateSystemRequirements(): void
     {
         // Check PHP version

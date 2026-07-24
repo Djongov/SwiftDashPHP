@@ -38,6 +38,8 @@ date_default_timezone_set('UTC');
 // Initialize minimal $_SERVER globals for CLI context (DOCUMENT_ROOT already set above)
 $_SERVER['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'] ?? 'CLI';
 $_SERVER['REQUEST_URI'] = $_SERVER['REQUEST_URI'] ?? '/cli';
+// system-settings.php already fills HTTP_HOST from PUBLIC_HOST (.env) when set;
+// 'localhost' is only the last-resort fallback when PUBLIC_HOST is not configured.
 $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 

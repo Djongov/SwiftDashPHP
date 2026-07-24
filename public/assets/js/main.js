@@ -370,24 +370,26 @@ async function fetchData(form, resultDivId = null, resultType = null) {
     const responseStatus = response.status;
     let responseData = null;
 
-    if (response.status === 0 || response.status === 403) {
-        if (response.type === 'opaqueredirect') {
-            // redirect to the desired page response.url
-            location.reload(response.url);
-        } else {
-            location.reload();
-        }
+    // Status 0 means an opaque redirect (e.g. expired auth session) - the body is unreadable,
+    // so reload and let the browser follow the login flow. Real error statuses (401/403/...)
+    // fall through so the response body is displayed instead of being lost to a reload.
+    if (response.status === 0 && response.type === 'opaqueredirect') {
+        location.reload();
+        return;
     }
 
-    if (form.getAttribute("data-reload") === "true") {
-        location.reload();
-        // Otherwise display the returned data
-    } else if (form.getAttribute("data-redirect")) {
-        location.href = form.getAttribute("data-redirect");
-        // If data-delete-current-row, delete the current <tr> element
-    } else if (form.getAttribute("data-delete-current-row")) {
-        // Now find the closest tr and delete it
-        currentEvent.target.closest("tr").remove();
+    // Only reload/redirect/remove rows on success - an error body must stay visible
+    if (response.ok) {
+        if (form.getAttribute("data-reload") === "true") {
+            location.reload();
+            // Otherwise display the returned data
+        } else if (form.getAttribute("data-redirect")) {
+            location.href = form.getAttribute("data-redirect");
+            // If data-delete-current-row, delete the current <tr> element
+        } else if (form.getAttribute("data-delete-current-row")) {
+            // Now find the closest tr and delete it
+            currentEvent.target.closest("tr").remove();
+        }
     }
 
     const resultDiv = (resultDivId) ? document.getElementById(resultDivId) : document.getElementById(`${form.id}-result`);
@@ -774,8 +776,10 @@ const initializeEditButtons = () => {
                     }).then(response => {
                         responseStatus = response.status;
                         console.log(responseStatus);
-                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                            modalBody.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                        // Only an opaque redirect (status 0, e.g. expired session) forces a reload;
+                        // 401/403 fall through so the error body is displayed below
+                        if (responseStatus === 0) {
+                            modalBody.innerHTML = `<p class="text-red-500 font-semibold">Session expired, refreshing</p>`;
                             location.reload();
                         } else {
                             // Check if the response is JSON or text/HTML
@@ -882,8 +886,10 @@ const initializeDeleteButtons = () => {
                         body: formData
                     }).then(response => {
                         responseStatus = response.status;
-                        if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                        // Only an opaque redirect (status 0, e.g. expired session) forces a reload;
+                        // 401/403 fall through so the error body is displayed below
+                        if (responseStatus === 0) {
+                            modalResult.innerHTML = `<p class="text-red-500 font-semibold">Session expired, refreshing</p>`;
                             location.reload();
                         } else {
                             // Check if the response is JSON or text/HTML
@@ -1136,8 +1142,10 @@ if (createButtons.length > 0) {
                     body: formData
                 }).then(response => {
                     responseStatus = response.status;
-                    if (responseStatus === 403 || responseStatus === 401 || responseStatus === 0) {
-                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">Response not ok, refreshing</p>`;
+                    // Only an opaque redirect (status 0, e.g. expired session) forces a reload;
+                    // 401/403 fall through so the error body is displayed below
+                    if (responseStatus === 0) {
+                        modalResult.innerHTML = `<p class="text-red-500 font-semibold">Session expired, refreshing</p>`;
                         location.reload();
                     } else {
                         // Check if the response is JSON or text/HTML

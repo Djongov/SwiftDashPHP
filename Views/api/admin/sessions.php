@@ -132,7 +132,7 @@ try {
             
         case 'clear-all-sessions':
             $currentSessionId = session_id();
-            $deletedCount = $sessionsModel->deleteAllExcept($currentSessionId, $username);
+            $deletedCount = $sessionsModel->deleteAllExcept($currentSessionId, $loginInfo['usernameArray']['username'] ?? Response::output('username not found', 500));
             
             Response::output([
                 'success' => true, 

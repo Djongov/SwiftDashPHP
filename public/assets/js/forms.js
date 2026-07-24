@@ -246,6 +246,7 @@ const handleFormFetch = (form, currentEvent, resultType) => {
     }
 
     // Fetch function
+    let responseStatus = null;
     fetch(form.action, fetchOptions)
         // Handle response
         .then(response => {
@@ -255,16 +256,17 @@ const handleFormFetch = (form, currentEvent, resultType) => {
             }
             
             currentEvent.submitter.disabled = false;
+            responseStatus = response.status;
             const contentType = response.headers.get("content-type");
-            // If response is redirect (0) or 403 return by the server, usually token expired, reload the page
-            if (response.status === 0 || response.status === 403) {
+            // Status 0 means an opaque redirect (e.g. expired auth session) - the body is unreadable,
+            // so reload and let the browser follow the login flow. Real error statuses (401/403/...)
+            // fall through so the response body is parsed and displayed instead of being lost to a reload.
+            if (response.status === 0) {
                 if (response.type === 'opaqueredirect') {
-                    // redirect to the desired page response.url
-                    location.reload(response.url);
+                    location.reload();
                 } else {
                     // Handle fetch interruption
-                    newResultDiv.innerHTML = '<p class="font-semibold text-red-500">Fetch interrupted. Refreshing page</p>';
-                    location.reload();
+                    newResultDiv.innerHTML = '<p class="font-semibold text-red-500">Fetch interrupted</p>';
                 }
             } else if (response.status === 405) {
                 //window.alert(`Receiving HTTP Status 405 means that you might have a misconfiguration on the server not accepting verbs such as ${formMethod}`);
@@ -290,6 +292,10 @@ const handleFormFetch = (form, currentEvent, resultType) => {
             }
             // If the response is of type text()
             if (typeof response === 'string') {
+                if (responseStatus >= 400) {
+                    // Error responses stay on screen - no reload/redirect below
+                    newResultDiv.classList.add('text-red-500', 'font-semibold', 'ml-0');
+                }
                 if (resultType === 'html') {
                     newResultDiv.innerHTML = `${response}`;
                 } else {
@@ -321,20 +327,23 @@ const handleFormFetch = (form, currentEvent, resultType) => {
                     console.log('forms.js: AGGrid initialization function not available');
                 }
                 
-                if (form.getAttribute("data-reload") === "true") {
-                    location.reload();
-                    // Otherwise display the returned data
-                } else if (form.getAttribute("data-redirect")) {
-                    location.href = form.getAttribute("data-redirect");
-                    // If data-delete-current-row, delete the current <tr> element
-                } else if (form.getAttribute("data-delete-current-row")) {
-                    // Now find the closest tr and delete it
-                    currentEvent.target.closest("tr").remove();
-                    /*
-                    let td = currentEvent.target.parentNode.parentNode;
-                    let tr = td.parentNode;
-                    tr.parentNode.removeChild(tr);
-                    */
+                // Only reload/redirect/remove rows on success - an error body must stay visible
+                if (responseStatus < 400) {
+                    if (form.getAttribute("data-reload") === "true") {
+                        location.reload();
+                        // Otherwise display the returned data
+                    } else if (form.getAttribute("data-redirect")) {
+                        location.href = form.getAttribute("data-redirect");
+                        // If data-delete-current-row, delete the current <tr> element
+                    } else if (form.getAttribute("data-delete-current-row")) {
+                        // Now find the closest tr and delete it
+                        currentEvent.target.closest("tr").remove();
+                        /*
+                        let td = currentEvent.target.parentNode.parentNode;
+                        let tr = td.parentNode;
+                        tr.parentNode.removeChild(tr);
+                        */
+                    }
                 }
                 // If there were copy buttons in the response, let's initiate them
                 copyToClipboard();

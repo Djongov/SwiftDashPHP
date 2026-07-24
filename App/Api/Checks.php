@@ -232,13 +232,8 @@ class Checks
             Response::output('API key executions limit reached', 429);
         }
 
-        // Let's check if the access is allowed.
-        // Access is hierarchical: a 'write' key can also perform 'read' actions,
-        // while a 'read' key is limited to 'read' actions only.
-        $accessLevels = ['read' => 1, 'write' => 2];
-        $keyLevel = $accessLevels[$get['access']] ?? 0;
-        $requiredLevel = $accessLevels[$action] ?? PHP_INT_MAX;
-        if ($keyLevel < $requiredLevel) {
+        // Let's check if the access is allowed
+        if ($get['access'] !== $action) {
             Response::output('API key does not have access to perform this action', 403);
         }
 
