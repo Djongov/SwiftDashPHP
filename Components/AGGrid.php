@@ -16,6 +16,7 @@ class AGGrid
     private bool $enableSelection = false;
     private string $dbTable = '';
     private string $theme = COLOR_SCHEME;
+    private bool $disableFitToWidth = false;
 
     public function __construct(string $gridId = '')
     {
@@ -76,6 +77,15 @@ class AGGrid
     public function setTheme(string $theme): void
     {
         $this->theme = $theme;
+    }
+
+    /**
+     * When enabled, columns are always auto-sized to their content and the grid scrolls
+     * horizontally instead of shrinking columns to fit the browser width.
+     */
+    public function disableFitToWidth(bool $disable = true): void
+    {
+        $this->disableFitToWidth = $disable;
     }
 
     /**
@@ -449,6 +459,7 @@ public function render(): string
     $enableSelectionJS = $this->enableSelection ? 'true' : 'false';
     $enableDeleteJS = $this->enableDelete ? 'true' : 'false';
     $rowSelectionMode = $this->enableSelection ? 'multiple' : 'single';
+    $disableFitToWidthJS = $this->disableFitToWidth ? 'true' : 'false';
 
     // Generate button code based on enabled features
     $columnsStr = implode(',', $this->columns);
@@ -1139,21 +1150,26 @@ HTML;
             }
         }, 100);
 
-        // Smart auto-sizing based on content and container
+        // Smart auto-sizing based on content and container.
+        // disableFitToWidth grids (e.g. WAF log tables) always keep content-based column
+        // widths and rely on the container's horizontal scroll instead of shrinking columns.
+        const disableFitToWidth_{$jsGridId} = {$disableFitToWidthJS};
         setTimeout(() => {
             const isFullWidth = eGridDiv.classList.contains('w-full');
             const gridWidth = eGridDiv.offsetWidth;
             const columnCount = gridApi.getColumns().length;
-            
-            if (isFullWidth) {
+
+            if (disableFitToWidth_{$jsGridId}) {
+                gridApi.autoSizeAllColumns();
+            } else if (isFullWidth) {
                 // For full-width grids, balance between auto-sizing and filling space
                 gridApi.autoSizeAllColumns();
-                
+
                 // Check if auto-sized columns are too narrow for the available space
                 const columnsWidth = gridApi.getColumns().reduce((total, col) => {
                     return total + (col.getActualWidth() || 150);
                 }, 0);
-                
+
                 // If columns take up less than 70% of available space, size to fit
                 if (columnsWidth < gridWidth * 0.7) {
                     gridApi.sizeColumnsToFit();
@@ -1161,21 +1177,25 @@ HTML;
             } else {
                 // For fixed-width grids, just auto-size to content
                 gridApi.autoSizeAllColumns();
-                
+
                 // If content is much smaller than fixed width, allow some expansion
                 const columnsWidth = gridApi.getColumns().reduce((total, col) => {
                     return total + (col.getActualWidth() || 150);
                 }, 0);
-                
+
                 if (columnsWidth < gridWidth - 100) {
                     gridApi.sizeColumnsToFit();
                 }
             }
         }, 100);
-        
+
         // Handle window resize with smarter responsive behavior
         const resizeHandler = () => {
             setTimeout(() => {
+                if (disableFitToWidth_{$jsGridId}) {
+                    gridApi.autoSizeAllColumns();
+                    return;
+                }
                 const isFullWidth = eGridDiv.classList.contains('w-full');
                 if (isFullWidth) {
                     // Full-width grids should always try to fill available space

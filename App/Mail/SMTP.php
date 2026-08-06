@@ -99,11 +99,17 @@ class SMTP
         return $configArray;
     }
 
-    public function sendEmail(string $to, string $subject, string $body): bool
+    public function sendEmail(string|array $to, string $subject, string $body): bool
     {
         try {
-            // Recipients
-            $this->mailer->addAddress($to);
+            // Recipients - all go on the To: header of a single email
+            $this->mailer->clearAddresses();
+            foreach ((array) $to as $recipient) {
+                $recipient = trim($recipient);
+                if ($recipient !== '') {
+                    $this->mailer->addAddress($recipient);
+                }
+            }
 
             // Content
             $this->mailer->isHTML(true);
@@ -117,7 +123,7 @@ class SMTP
         }
     }
 
-    public function send(string $to, string $subject, string $body, null|array $config = null ) : bool
+    public function send(string|array $to, string $subject, string $body, null|array $config = null ) : bool
     {
         if ($config === null) {
             $config = $this->setConfig();
