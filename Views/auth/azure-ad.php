@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Api\Response;
 use App\Authentication\JWT;
 use App\Authentication\Azure\AzureAD;
+use App\Authentication\Azure\MsLive;
 use Controllers\User;
 use Models\User as UserModel;
 use App\Authentication\AuthToken;
@@ -35,8 +36,14 @@ foreach ($requiredClaims as $claim) {
 }
 
 // If it is an MSLIVE token, then the issueer wil; be https://login.live.com or https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0
-if ($idTokenArray['iss'] === 'https://login.live.com' || $idTokenArray['iss'] === 'https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0') {
-    // No check for now
+if (MsLive::isMsLiveIssuer($idTokenArray['iss'])) {
+    // Personal Microsoft account token: verify signature, audience and expiry against the consumer JWKS.
+    // The nonce is compared with the session only over HTTPS: the session cookie is SameSite=None there, so it
+    // survives Microsoft's cross-site form POST. On plain http (localhost) browsers withhold it, so the check would always fail.
+    $secureRequest = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+    if (!MsLive::check($idToken, $secureRequest)) {
+        Response::output('Invalid token', 400);
+    }
 } else {
     // Let's call the function to check the JWT token which is returned. We are checking stuff like expiration, issuer, app id. We also do validation of the token signature
     if (!AzureAD::check($idToken)) {

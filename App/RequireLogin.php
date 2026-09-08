@@ -30,9 +30,10 @@ class RequireLogin
         if (AuthToken::get() !== null) {
             // First parse the JWT token
             $tokenPayload = JWT::parseTokenPayLoad(AuthToken::get());
+            $issuer = $tokenPayload['iss'] ?? '';
 
             // If the issuer is $_SERVER['HTTP_HOST'], we are dealing with a local login
-            if ($tokenPayload['iss'] === JWT_ISSUER) {
+            if ($issuer === JWT_ISSUER) {
                 // Check if valid
                 if (JWT::checkToken(AuthToken::get())) {
                     $provider = 'local';
@@ -49,7 +50,7 @@ class RequireLogin
             }
 
             // Now check if the issuer is the AzureAD endpoint
-            if (str_starts_with($tokenPayload['iss'], 'https://login.microsoftonline.com/')) {
+            if (str_starts_with($issuer, 'https://login.microsoftonline.com/') && !\App\Authentication\Azure\MsLive::isMsLiveIssuer($issuer)) {
                 // Check
                 if (AzureAD::check(AuthToken::get())) {
                     $provider = 'azure';
@@ -65,7 +66,7 @@ class RequireLogin
                 }
             }
             // Now check Google
-            if ($tokenPayload['iss'] === 'https://accounts.google.com') {
+            if ($issuer === 'https://accounts.google.com') {
                 if (Google::check(AuthToken::get())) {
                     $provider = 'google';
                     $loggedIn = true;
@@ -80,9 +81,9 @@ class RequireLogin
                 }
             }
             // Now check Microsoft Live
-            if ($tokenPayload['iss'] === 'https://login.live.com') {
-                // No current way of verifying the token so we will just check if it's not expired
-                if (JWT::checkExpiration(AuthToken::get())) {
+            if (\App\Authentication\Azure\MsLive::isMsLiveIssuer($issuer)) {
+                // Verify signature, audience and expiry against the Microsoft consumer JWKS
+                if (\App\Authentication\Azure\MsLive::check(AuthToken::get())) {
                     $provider = 'mslive';
                     $loggedIn = true;
                 } else {

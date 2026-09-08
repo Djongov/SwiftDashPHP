@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Database\DB;
 use Components\Html;
 use Components\DataGrid;
-use Google\Service\CCAIPlatform\Component;
 
 echo Html::h1('DataGrid', true);
 
@@ -17,7 +16,12 @@ echo Html::h2('Example 1: Displaying data from a MySQL table');
 
 echo Html::p('This example will display the data from the users table in the database. There are switches for Editing or Deleting the data. This is only available for database related DataGrids. The table is filterable and paginated.');
 
-echo DataGrid::fromDBTable('users', 'Users', $theme);
+// The users table holds password hashes and emails, so the live examples are for administrators only
+if ($isAdmin) {
+    echo DataGrid::fromDBTable('users', 'Users', $theme);
+} else {
+    echo Components\Alerts::info('Log in as an administrator to see the live users table here.');
+}
 
 echo Html::horizontalLine();
 
@@ -29,17 +33,21 @@ $query = "SELECT id, username, theme FROM users";
 
 echo Html::p('This example will render data from a custom query - ' . Html::code($query));
 
-echo Html::divBox(
-    DataGrid::fromQuery(
-        'users', $query, 'Custom query', $theme, true, false, [
-        'filters' => true,
-        'ordering' => true,
-        'order' => [0, 'desc'],
-        'paging' => true,
-        'lengthMenu' => [[10, 50, 100], [10, 50, 100]],
-        ]
-    )
-);
+if ($isAdmin) {
+    echo Html::divBox(
+        DataGrid::fromQuery(
+            'users', $query, 'Custom query', $theme, true, false, [
+            'filters' => true,
+            'ordering' => true,
+            'order' => [0, 'desc'],
+            'paging' => true,
+            'lengthMenu' => [[10, 50, 100], [10, 50, 100]],
+            ]
+        )
+    );
+} else {
+    echo Components\Alerts::info('Log in as an administrator to see the live query example here.');
+}
 
 echo Html::horizontalLine();
 
@@ -205,28 +213,30 @@ $grid->enableDelete(true, 'users');    // Enable delete buttons and mass delete
 
 echo $grid->render();
 
-// Method 2: Using static factory method from database (similar to DataGrid::fromDBTable)
-echo Components\AGGrid::fromDBTable(
-    'users',           // table name
-    'User Management', // title
-    $theme,           // theme
-    true,             // enable edit
-    true,             // enable delete
-    'id',             // order by column
-    'desc',           // sort direction
-    1000              // limit
-);
+// Method 2: Using static factory method from database (similar to DataGrid::fromDBTable), admins only
+if ($isAdmin) {
+    echo Components\AGGrid::fromDBTable(
+        'users',           // table name
+        'User Management', // title
+        $theme,           // theme
+        true,             // enable edit
+        true,             // enable delete
+        'id',             // order by column
+        'desc',           // sort direction
+        1000              // limit
+    );
 
-echo Components\AGGrid::fromDBTable(
-    'api_access_log',           // table name
-    'api_access_log Management', // title
-    $theme,           // theme
-    true,             // enable edit
-    true,             // enable delete
-    'id',             // order by column
-    'desc',           // sort direction
-    1000              // limit
-);
+    echo Components\AGGrid::fromDBTable(
+        'api_access_log',           // table name
+        'api_access_log Management', // title
+        $theme,           // theme
+        true,             // enable edit
+        true,             // enable delete
+        'id',             // order by column
+        'desc',           // sort direction
+        1000              // limit
+    );
+}
 
 // Method 3: Using static factory method from data array (similar to DataGrid::fromData)
 $userData = [

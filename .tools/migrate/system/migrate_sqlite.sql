@@ -10,6 +10,11 @@ CREATE TABLE IF NOT EXISTS app_settings (
     updated_at TEXT DEFAULT (datetime('now'))
 );
 
+-- Ensure unique names so the INSERT OR IGNORE below is idempotent (mirrors the mysql/pgsql
+-- unique constraint). Dedupe first, keeping the earliest row per name, as mysql's cleanup does.
+DELETE FROM app_settings WHERE id NOT IN (SELECT MIN(id) FROM app_settings GROUP BY name);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_app_settings_name ON app_settings (name);
+
 INSERT OR IGNORE INTO app_settings (name, value, type, owner, admin_setting, description)
 VALUES 
     ('default_data_grid_engine', 'DataGrid', 'string', 'system', TRUE, 'AGGrid or DataGrid for values.'),

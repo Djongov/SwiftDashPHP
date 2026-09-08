@@ -135,6 +135,14 @@ class User extends BasicModel
 
         $pdo = $this->_db->getConnection();
 
+        // Column names are interpolated into the SET clause below, so only real columns may pass
+        $tableColumns = $this->getColumns($this->_table);
+        foreach (array_keys($data) as $column) {
+            if (!in_array($column, $tableColumns, true)) {
+                throw (new UserExceptions())->genericError('Invalid field ' . $column, 400);
+            }
+        }
+
         $query = 'UPDATE users SET ';
         $updates = [];
         // Check if all keys in $reports_array match the columns

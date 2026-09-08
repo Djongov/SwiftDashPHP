@@ -15,6 +15,8 @@ $checks->checkParams(['table', 'id', 'columns'], $_POST);
 // We need the most strict checks for this endpoint
 $checks->apiChecks();
 
+$checks->dataGridTableCheck($_POST['table']);
+
 // We will only fetch the columns that are passed in the request
 
 $selectColumnsArray = explode(',', $_POST['columns']);
@@ -124,8 +126,8 @@ foreach ($dataArray as $key => $value) {
     }
         $html .= '</div>';
 }
-    $html .= '<input type="hidden" name="table" value="' . $_POST['table'] . '" />';
+    $html .= '<input type="hidden" name="table" value="' . htmlspecialchars($_POST['table'], ENT_QUOTES, 'UTF-8') . '" />';
     // Include the CSRF token
-    $html .= '<input type="hidden" name="csrf_token" value="' . $_POST['csrf_token'] . '" />';
+    $html .= '<input type="hidden" name="csrf_token" value="' . htmlspecialchars((string) ($_POST['csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') . '" />';
 $html .= '</div>';
 echo $html;

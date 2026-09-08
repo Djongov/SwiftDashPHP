@@ -16,6 +16,8 @@ $checks->apiChecks();
 
 $table = $_POST['table'];
 
+$checks->dataGridTableCheck($table);
+
 $id = (int) $_POST['id'];
 
 unset($_POST['id']);

@@ -16,6 +16,9 @@ if (!isset($_POST['table'], $_POST['id']) xor isset($_POST['deleteRecords'], $_P
 
 $checks->apiChecks();
 
+// Whichever form the request takes, the table must exist and the user must be allowed to touch it
+$checks->dataGridTableCheck((string) ($_POST['table'] ?? $_POST['deleteRecords'] ?? ''));
+
 $db = new DB();
 
 $pdo = $db->getConnection();

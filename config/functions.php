@@ -101,8 +101,40 @@ function searchArrayForKey($array, $key)
     return null;
 }
 
+/**
+ * Is this address one of the reverse proxies we accept forwarding headers from?
+ * TRUSTED_PROXIES (env) is a comma-separated list of IPs and IPv4 CIDRs, or "*" to trust every upstream.
+ * When it is not set, forwarding headers are ignored and REMOTE_ADDR is used as-is.
+ */
+function isTrustedProxy(string $ip): bool
+{
+    $raw = trim((string) (getenv('TRUSTED_PROXIES') ?: ($_ENV['TRUSTED_PROXIES'] ?? '')), "\"' ");
+    if ($raw === '') {
+        return false;
+    }
+    foreach (explode(',', $raw) as $entry) {
+        $entry = trim($entry);
+        if ($entry === '') {
+            continue;
+        }
+        if ($entry === '*' || $entry === $ip) {
+            return true;
+        }
+        if (str_contains($entry, '/') && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && \App\Security\Firewall::cirdMatch($ip, $entry)) {
+            return true;
+        }
+    }
+    return false;
+}
 function currentIP(): string
 {
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+
+    // Forwarding headers are client-controlled, only honour them when the direct peer is a trusted proxy
+    if (!isTrustedProxy($remoteAddr)) {
+        return $remoteAddr;
+    }
+
     $ipSources = [
         'HTTP_CF_CONNECTING_IP',
         'HTTP_X_AZURE_CLIENTIP',
@@ -134,7 +166,7 @@ function currentIP(): string
     }
 
     // Fallback
-    return $_SERVER['REMOTE_ADDR'];
+    return $remoteAddr;
 }
 function getUserCountry(): ?string
 {

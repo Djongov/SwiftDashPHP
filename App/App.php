@@ -42,6 +42,8 @@ class App
         
         // Early exit for CSP reports - no session needed
         if ($uri === '/api/csp-report') {
+            // Tell SystemConfig not to start a session for this request
+            define('SKIP_SESSION', true);
             // Load minimal config
             require_once dirname(__DIR__) . '/config/functions.php';
             require_once dirname(__DIR__) . '/config/system-settings.php';
@@ -391,6 +393,11 @@ class App
         $isAdmin = $loginInfo['isAdmin'];
         $theme = $loginInfo['usernameArray']['theme'] ?? COLOR_SCHEME;
         $loggedIn = $loginInfo['loggedIn'];
+
+        // Central admin gate for the admin panel and admin API, so a view that forgets its own check is still protected
+        if ((str_starts_with($uri, '/adminx') || str_starts_with($uri, '/api/admin/')) && !$isAdmin) {
+            Response::output('This action requires admin privileges', 403);
+        }
 
         // API Endpoints: Directly include and run
         if ($isApi) {

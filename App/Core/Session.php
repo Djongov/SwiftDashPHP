@@ -10,6 +10,11 @@ class Session
     
     public static function start(): void
     {
+        // Safe to call more than once (SystemConfig starts the session early so the OAuth login URLs get the nonce)
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            self::ensureNonce();
+            return;
+        }
         // Only start session if the consent cookie is set and the value is accept
         //if (isset($_COOKIE['cookie-consent']) && $_COOKIE['cookie-consent'] === 'accept') {
             $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
@@ -60,7 +65,19 @@ class Session
                 // This is critical for long-lived sessions with file storage
                 $_SESSION['_last_activity'] = time();
             }
+
+            self::ensureNonce();
         //}
+    }
+    /**
+     * The nonce sent in the OpenID Connect login requests (Entra ID, MS Live, Google) and checked on return.
+     * Created once per session.
+     */
+    public static function ensureNonce(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE && !isset($_SESSION['nonce'])) {
+            $_SESSION['nonce'] = \App\Utilities\General::randomString(24);
+        }
     }
     // Reset the session
     public static function reset(): void

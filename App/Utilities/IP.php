@@ -6,30 +6,13 @@ namespace App\Utilities;
 
 class IP
 {
+    /**
+     * Single source of truth is currentIP() in config/functions.php, which only trusts
+     * forwarding headers when the peer is listed in TRUSTED_PROXIES.
+     */
     public static function currentIP(): string
     {
-        $headers = [
-            'HTTP_CF_CONNECTING_IP',      // Cloudflare
-            'HTTP_X_CLIENT_IP',           // Azure App Service / Front Door
-            'HTTP_X_FORWARDED_FOR',       // Standard proxy header (may contain multiple IPs)
-            'HTTP_X_REAL_IP',             // Nginx proxy
-            'HTTP_X_FORWARDED',           // Older proxy header
-            'HTTP_FORWARDED_FOR',         // RFC 7239 variant
-            'HTTP_FORWARDED',             // RFC 7239
-            'HTTP_CLIENT_IP',             // Some proxies
-        ];
-
-        foreach ($headers as $header) {
-            if (!empty($_SERVER[$header])) {
-                // X-Forwarded-For can contain a comma-separated list; take the first (client) IP
-                $ip = trim(explode(',', $_SERVER[$header])[0]);
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    return $ip;
-                }
-            }
-        }
-
-        return $_SERVER['REMOTE_ADDR'];
+        return currentIP();
     }
     public static function isPublicIp($ip): bool
     {

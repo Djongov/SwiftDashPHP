@@ -19,6 +19,8 @@ $checks->apiChecks();
 
 $table = $_POST['table'];
 
+$checks->dataGridTableCheck($table);
+
 // Remove system fields that shouldn't be set manually
 unset($_POST['table']);
 unset($_POST['csrf_token']);

@@ -317,6 +317,13 @@ class SystemConfig
         // Set variables needed by auth config files
         $GLOBALS['destination'] = (isset($_GET['destination'])) ? $_GET['destination'] : $_SERVER['REQUEST_URI'] ?? '/';
         $GLOBALS['protocol'] = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost')) ? 'http' : 'https';
+
+        // The provider login URLs below embed $_SESSION['nonce'], so the session must exist before they are built.
+        // AUTH_EXPIRY (needed by Session::start) is already defined by configureDBAppSettings().
+        // SKIP_SESSION is defined by App for endpoints that must not create a session (e.g. /api/csp-report).
+        if (php_sapi_name() !== 'cli' && !defined('SKIP_SESSION') && session_status() === PHP_SESSION_NONE) {
+            \App\Core\Session::start();
+        }
         // Configure JWT keys if we're using our own tokens (not remote ID tokens)
         if (!USE_REMOTE_ID_TOKEN) {
             self::configureJWTKeys();

@@ -267,10 +267,9 @@ class User
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception getting user for deleting profile picture', 'unable to get username');
         }
 
-        $currentPicture = $usernameConfirmed['picture'];
-        $profilePicturePath = ROOT . '/public' . $currentPicture;
+        $profilePicturePath = self::resolveProfilePicturePath((string) ($usernameConfirmed['picture'] ?? ''));
 
-        if (file_exists($profilePicturePath)) {
+        if ($profilePicturePath !== null) {
             unlink($profilePicturePath);
         }
 
@@ -281,6 +280,26 @@ class User
         } catch (\Exception $e) {
             $this->handleUserErrorsApiResponse($e, 'user controller: Exception deleting profile picture', 'unable to delete profile picture');
         }
+    }
+    /**
+     * Resolve a stored picture value (e.g. /assets/images/profile/x.jpeg) to a real file path,
+     * but only if it lives inside the profile pictures folder. Returns null for anything else
+     * (remote URLs, the shared dummy image, path traversal attempts, missing files).
+     */
+    public static function resolveProfilePicturePath(string $storedPicture): ?string
+    {
+        if ($storedPicture === '') {
+            return null;
+        }
+        $profileDir = realpath(ROOT . '/public/assets/images/profile');
+        $resolved = realpath(ROOT . '/public/' . ltrim($storedPicture, '/\\'));
+        if ($profileDir === false || $resolved === false || !is_file($resolved)) {
+            return null;
+        }
+        if (!str_starts_with($resolved, $profileDir . DIRECTORY_SEPARATOR) || basename($resolved) === 'dummy.jpg') {
+            return null;
+        }
+        return $resolved;
     }
     private function handleUserErrorsApiResponse(\Exception $e, string $verboseError, string $publicError): never
     {

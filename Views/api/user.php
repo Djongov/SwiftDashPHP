@@ -68,19 +68,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
     }
 
-    if (isset($data['role']) && !in_array('administrator', $tokenData['roles'])) {
-        Response::output('Only administrators can change roles', 401);
+    // Only administrators may touch privilege-related columns
+    $protectedColumns = ['id', 'role', 'provider', 'enabled', 'date_created', 'last_updated'];
+    foreach ($protectedColumns as $column) {
+        if (array_key_exists($column, $data) && !$loginInfo['isAdmin']) {
+            Response::output('Only administrators can change ' . $column, 401);
+        }
     }
 
     unset($data['confirm_password'], $data['csrf_token'], $data['username']);
 
     if (isset($data['picture']) && empty($data['picture'])) {
-        $currentPicture = $user->get($userId)['picture'];
-        $profilePicturePath = ROOT . '/public' . $currentPicture;
-        if (file_exists($profilePicturePath)) {
+        $currentPicture = (string) ($user->get($userId)['picture'] ?? '');
+        $profilePicturePath = User::resolveProfilePicturePath($currentPicture);
+        // Only files that really live in the profile pictures folder may be deleted
+        if ($profilePicturePath !== null) {
             unlink($profilePicturePath);
         } else {
-            SystemLog::write('Could not delete the picture: ' . $profilePicturePath . '. Full payload was ' . json_encode($data), 'error');
+            SystemLog::write('Could not delete the picture: ' . $currentPicture . '. Full payload was ' . json_encode($data), 'error');
         }
     }
     try {
@@ -115,11 +120,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $checks = new Checks($loginInfo, $_GET);
 
-    $checks->checkCSRFDelete($_GET['csrf_token']);
+    // Login, token integrity and CSRF (from the query string, DELETE has no body)
+    $checks->apiChecksDelete($_GET['csrf_token'], false);
 
-    $id = $routeInfo[2]['id'];
+    $id = (int) $routeInfo[2]['id'];
+
+    // Users may only delete themselves, administrators may delete anyone
+    $targetUser = $controller->get($id);
+    if (!$loginInfo['isAdmin'] && $targetUser['username'] !== JWT::extractUserName(AuthToken::get())) {
+        Response::output('You cannot delete another user', 401);
+    }
+
     try {
-        $controller->delete((int) $id);
+        $controller->delete($id);
     } catch (\Throwable $e) {
         Response::output('Error deleting user: ' . $e->getMessage(), 400);
     }

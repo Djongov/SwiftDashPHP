@@ -73,10 +73,13 @@ define(
     '/privacy-policy',
     '/charts',
     '/forms',
-    '/datagrid',
     '/blablabla', // to showcase the 404 page,
     ]
 );
+
+// Tables that non-admin users may read/edit/delete through the DataGrid CRUD API (/api/datagrid/*).
+// Every other table requires an administrator.
+define('DATAGRID_USER_TABLES', []);
 
 // $expectedCert = realpath(CURL_CERT);
 

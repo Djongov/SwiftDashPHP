@@ -28,6 +28,19 @@ Makes it easy to start with built-in features such as:
 
 SwiftDashPHP comes with a built-in authentication system that is easy to use and customize. Check it out on our [Docs section](/docs/authentication). We also have security features such as a Firewall that stops IPs from accessing parts we want to protect, as well as parts that we want to keep public.
 
+### Running behind a reverse proxy / load balancer
+
+Client IPs (used by the Firewall, logs and UTM capture) come from `REMOTE_ADDR`. Forwarding headers such as `X-Forwarded-For`, `X-Client-IP` and `CF-Connecting-IP` are only honoured when the direct peer is listed in `TRUSTED_PROXIES` in `.env`, otherwise anyone could spoof their IP:
+
+```bash
+# comma separated IPs and IPv4 CIDRs, or * to trust every upstream (e.g. Azure App Service, Cloudflare)
+TRUSTED_PROXIES="10.0.0.0/8,172.16.0.0/12"
+```
+
+### DataGrid CRUD API
+
+The `/api/datagrid/*` endpoints (used by the DataGrid/AGGrid edit and delete buttons) are admin-only. To let regular users edit specific tables, list them in `DATAGRID_USER_TABLES` in `config/site-settings.php`.
+
 ---
 
 ## Tailwind setup on clone

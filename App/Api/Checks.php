@@ -59,7 +59,7 @@ class Checks
                 return true;
             }
         }
-        return true;
+        return false;
     }
     /**
      * Performs the actual check if the user is admin on both DB and JWT token and outputs an error if not
@@ -287,7 +287,7 @@ class Checks
      */
     public function apiAdminChecks(bool $checkSecretHeader = true): void
     {
-        $this->isAdminJWT();
+        $this->adminCheck();
         $this->checkJWT();
         $this->checkUsernameIntegrity();
         $this->checkCSRF();
@@ -299,7 +299,9 @@ class Checks
     }
     public function apiAdminChecksNoJWT(bool $checkSecretHeader = true): void
     {
-        $this->isAdmin();
+        if (!$this->isAdmin()) {
+            Response::output('This action requires admin privileges', $this->defaultStatusCode);
+        }
         $this->checkJWT();
         $this->checkUsernameIntegrity();
         $this->checkCSRF();
@@ -357,6 +359,22 @@ class Checks
             $this->checkSecretHeader();
         }
         $this->checkCSRFDelete($csrf);
+    }
+    /**
+     * Guard for the DataGrid CRUD endpoints (/api/datagrid/*).
+     * The table must exist in the database, which stops SQL injection through the table name,
+     * and the user must be an admin unless the table is listed in DATAGRID_USER_TABLES (config/site-settings.php).
+     */
+    public function dataGridTableCheck(string $table): void
+    {
+        $existingTables = (new \App\Database\DB())->getTableNames();
+        if (!in_array($table, $existingTables, true)) {
+            Response::output('Unknown table', 400);
+        }
+        $userTables = defined('DATAGRID_USER_TABLES') ? DATAGRID_USER_TABLES : [];
+        if (!in_array($table, $userTables, true)) {
+            $this->adminCheck();
+        }
     }
     /**
      * Checks if the required parameters are present
