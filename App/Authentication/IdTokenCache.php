@@ -22,19 +22,15 @@ class IdTokenCache
     }
     public static function save(string $token): void
     {
-        if (!self::exist($token)) {
-            $parsedToken = JWT::parseTokenPayLoad($token);
+        // The cache is keyed by username, so resolve it first (the old code looked the token string up)
+        $parsedToken = JWT::parseTokenPayLoad($token);
+        $username = $parsedToken['upn'] ?? $parsedToken['username'] ?? $parsedToken['email'] ?? null;
+        if ($username === null || !isset($parsedToken['exp'])) {
+            return;
+        }
+        if (!self::exist($username)) {
             // Set the expiration to the token's expiration but convert to mysql datetime
-            $expiration = date('Y-m-d H:i:s', $parsedToken['exp']);
-            if (isset($parsedToken['email'])) {
-                $username = $parsedToken['email'];
-            }
-            if (isset($parsedToken['username'])) {
-                $username = $parsedToken['username'];
-            }
-            if (isset($parsedToken['upn'])) {
-                $username = $parsedToken['upn'];
-            }
+            $expiration = date('Y-m-d H:i:s', (int) $parsedToken['exp']);
             DBCache::create($token, $expiration, 'id_token', $username);
         }
     }

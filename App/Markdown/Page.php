@@ -15,7 +15,8 @@ class Page
         // Now let's get the contents of the file
         if (file_exists($fileName . '.md') === false) {
             http_response_code(404);
-            return Alerts::danger($fileName . ' page does not exist');
+            // The name comes from the request URI, escape it (Alerts does not)
+            return Alerts::danger(htmlspecialchars(basename($fileName), ENT_QUOTES, 'UTF-8') . ' page does not exist');
         }
         $fileContents = file_get_contents($fileName . '.md');
 

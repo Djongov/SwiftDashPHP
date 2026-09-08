@@ -9,23 +9,20 @@ $checks = new Checks($loginInfo, $_POST);
 
 $checks->apiChecksNoCSRFHeader(false);
 
-if (isset($_POST['data'])) {
-    $data = $_POST['data'];
-} else {
-    $data = '';
+$data = isset($_POST['data']) ? json_decode((string) $_POST['data'], true) : null;
+
+if (!is_array($data) || count($data) === 0 || !is_array(reset($data))) {
+    Response::output('No data to export', 400);
 }
 
-$data = json_decode($_POST['data'], true); // Decode JSON string into associative array
-
-if ($data === null) {
-    // Handle JSON decoding error
-    error_log('JSON Decode Error: ' . json_last_error_msg());
-    Response::output('JSON Decode Error: ' . json_last_error_msg());
-}
-
-if (count($data) === 0) {
-    Response::output('No data to export');
-}
+// Cells starting with = + - @ or a tab/CR are interpreted as formulas by spreadsheets, neutralise them
+$neutraliseCell = function ($cell) {
+    if (is_array($cell) || is_object($cell)) {
+        $cell = json_encode($cell);
+    }
+    $cell = (string) $cell;
+    return ($cell !== '' && strpbrk($cell[0], "=+-@\t\r") !== false) ? "'" . $cell : $cell;
+};
 
 
 if (isset($_POST['type'])) {
@@ -49,7 +46,7 @@ fputcsv($output, $columnNames, ";", '"', "\\");
 
 
 foreach ($data as $row) {
-    fputcsv($output, $row, ";", '"', "\\");
+    fputcsv($output, array_map($neutraliseCell, (array) $row), ";", '"', "\\");
 }
 
 

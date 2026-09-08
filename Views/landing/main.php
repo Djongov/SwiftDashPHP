@@ -25,13 +25,18 @@ try {
         $databaseName = explode('database ', $errorMessage)[1];
         $errorMessage = 'Database ' . $databaseName . '. Please install the application by going to ' . Components\Html::a(INSTALL_PATH, INSTALL_PATH, $theme);
     }
+    // Only the install hint is safe to show to anonymous visitors; details go to the error log
+    if (!ERROR_VERBOSE && !str_contains($errorMessage, INSTALL_PATH)) {
+        $errorMessage = 'Database connection failed. Check the server error log.';
+    }
     echo Alerts::danger($errorMessage); // Handle the exception
     return;
 }
 
 if ($usernameArray && DB_DRIVER !== 'sqlite') {
     echo \Components\DBButton::editButton('users', ['email'], $usernameArray['id'], 'qwe', $theme);
-    echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . $usernameArray['username'] . '">Hover over me</div>';
+    // Username is user-controlled, escape it in the attribute
+    echo '<div class="tooltip w-fit border border-black p-1 m-2 cursor-pointer" data-tooltip="' . htmlspecialchars($usernameArray['username'], ENT_QUOTES, 'UTF-8') . '">Hover over me</div>';
 
   // Let's try to connect to SQLite DB while the main connection is to a MySQL DB
     try {

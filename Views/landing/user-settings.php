@@ -46,7 +46,8 @@ if (!empty($usernameArray['picture']) && isset($token['picture'])) {
         } else {
             // If no picture is set, use the ui-avatars.com service to generate a picture
             echo Alerts::danger('Failed to get profile picture from Azure: ' . json_encode($response));
-            $picture = 'https://ui-avatars.com/api/?name=' . $usernameArray['name'] . '&background=0D8ABC&color=fff';
+            // The name goes into a URL, so it must be url-encoded
+            $picture = 'https://ui-avatars.com/api/?name=' . urlencode((string) $usernameArray['name']) . '&background=0D8ABC&color=fff';
             // Save the picture to the user
             try {
                 $user->update(['picture' => $picture], $usernameArray['id']);
@@ -60,8 +61,8 @@ if (!empty($usernameArray['picture']) && isset($token['picture'])) {
         }
     // If Local account
     } else {
-        // If no picture is set, use the ui-avatars.com service to generate a picture
-        $picture = 'https://ui-avatars.com/api/?name=' . $usernameArray['name'] . '&background=0D8ABC&color=fff';
+        // If no picture is set, use the ui-avatars.com service to generate a picture (name url-encoded)
+        $picture = 'https://ui-avatars.com/api/?name=' . urlencode((string) $usernameArray['name']) . '&background=0D8ABC&color=fff';
         // Save the picture to the user
         try {
             $user->update(['picture' => $picture], $usernameArray['id']);
@@ -106,7 +107,8 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                     echo Html::h3('Profile Picture');
                     echo '<div class="flex flex-col items-center space-y-4">';
                         echo '<div class="relative inline-block">';
-                            echo '<img src="' . $usernameArray['picture'] . '" class="rounded-full w-32 h-32 object-cover border-4 border-gray-200 dark:border-gray-600" alt="Profile Picture">';
+                            // The picture URL comes from the provider or the user, escape it in the attribute
+                            echo '<img src="' . htmlspecialchars((string) $usernameArray['picture'], ENT_QUOTES, 'UTF-8') . '" class="rounded-full w-32 h-32 object-cover border-4 border-gray-200 dark:border-gray-600" alt="Profile Picture">';
                             $deleteProfilePictureForm = [
                                 'inputs' => [
                                     'hidden' => [
@@ -235,7 +237,8 @@ echo '<div class="max-w-6xl mx-auto p-4">';
                         echo '</div>';
                         
                         if (filter_var($usernameArray['username'], FILTER_VALIDATE_EMAIL)) {
-                            $missingEmailText = str_replace('{email}', '<b>' . $usernameArray['username'] . '</b>', translate('missing_email_text_username'));
+                            // Username is user-controlled, escape it before placing it in HTML
+                            $missingEmailText = str_replace('{email}', '<b>' . htmlspecialchars($usernameArray['username'], ENT_QUOTES, 'UTF-8') . '</b>', translate('missing_email_text_username'));
                         } else {
                             $missingEmailText = translate('missing_email_text');
                         }

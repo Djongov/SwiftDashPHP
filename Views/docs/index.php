@@ -5,7 +5,8 @@ declare(strict_types=1);
 use App\Markdown\Page;
 use Components\DocsMenu;
 
-$fileName = $_SERVER['REQUEST_URI'];
+// Only the path decides which markdown file to render, never the query string
+$fileName = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $basePath = '/docs';
 $fileName = str_replace($basePath, '', $fileName);
 if ($fileName === '') {

@@ -219,7 +219,8 @@ class RequireLogin
             }
             if ($usernameArray) {
                 // Let's check if the last_ip is different from what we have in the DB, and update it
-                if ($usernameArray['last_ips'] !== $idTokenInfoArray["last_ip"]) {
+                // Only when the token carries an IP claim, otherwise this would UPDATE on every request
+                if (!empty($idTokenInfoArray["last_ip"]) && $usernameArray['last_ips'] !== $idTokenInfoArray["last_ip"]) {
                      $user->update(['last_ips' => $idTokenInfoArray["last_ip"]], $usernameArray['id']);
                 }
             } else {
@@ -252,12 +253,12 @@ class RequireLogin
         }
 
         // Kill disabled users early
-        if (isset($usernameArray["enabled"])) {
-            if ($usernameArray["enabled"] === 0 || $usernameArray["enabled"] === false) {
-                echo 'Your user has been disabled';
-                JWT::handleValidationFailure();
-                exit();
-            }
+        // Drivers return 0, '0', false or 'f' here, so normalise before comparing
+        if (isset($usernameArray["enabled"]) && !filter_var($usernameArray["enabled"], FILTER_VALIDATE_BOOLEAN)) {
+            http_response_code(403);
+            echo 'Your user has been disabled';
+            JWT::handleValidationFailure();
+            exit();
         }
 
         // If this gets executed on /login, we need to keep logged in users away from the login page

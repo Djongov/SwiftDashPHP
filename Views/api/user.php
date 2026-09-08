@@ -95,11 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         }
     }
     try {
-        $rowCount = $user->update($data, $userId);
-        if ($rowCount === 0) {
-            Response::output('user not updated', 400);
-        }
-        Response::output('user updated', 200);
+        // The controller sends the API response itself
+        $user->update($data, $userId);
     } catch (\Throwable $e) {
         Response::output('Invalid field: ' . $e->getMessage(), 400);
     }
@@ -107,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 // Handle DELETE requests
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // Check if body is empty
-    if ($_SERVER['CONTENT_LENGTH'] > 0) {
+    // Check if body is empty (CONTENT_LENGTH is not set at all on most empty requests)
+    if (!empty($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
         Response::output('body must be empty in DELETE requests', 400);
         exit();
     }

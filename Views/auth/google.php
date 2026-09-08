@@ -61,6 +61,11 @@ if (!Google::verifyIdToken($idToken)) {
 
 $idTokenArray = JWT::parseTokenPayLoad($idToken);
 
+// Only accounts with a verified email may log in, the email is our username
+if (($idTokenArray['email_verified'] ?? false) !== true) {
+    Response::output('Google account email is not verified', 400);
+}
+
 $user = new User();
 
 $userModel = new UserModel();
@@ -75,6 +80,8 @@ if ($userModel->exists($idTokenArray['email'])) {
 } else {
     // User does not exist, let's create it (this will also update the last login)
     $user->create($idTokenArray, 'google', false);
+    // Load the new record so the local token gets the real role
+    $userDetailsArray = $userModel->get($idTokenArray['email']);
 }
 
 // Issue a local JWT token if not using remote ID token

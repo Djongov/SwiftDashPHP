@@ -162,8 +162,9 @@ class User extends BasicModel
         $stmt = $pdo->prepare($query);
         try {
             $stmt->execute(array_values($values));
+            // Log before returning (it sat after the return before), and only the column names, not values like password hashes
+            SystemLog::write('User with id ' . $id . ' updated with ' . json_encode(array_keys($data)), 'User API');
             return $stmt->rowCount();
-            SystemLog::write('User with id ' . $id . ' updated with ' . json_encode($data), 'User API');
         } catch (\PDOException $e) {
             if (ini_get('display_errors') === '1') {
                 throw new \PDOException($e->getMessage());

@@ -10,7 +10,15 @@ class Cookies
 {
     public static function set(string $name, string $value, int $expiration = 86400, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = true, string $samesite = 'Lax'): void
     {
-        setcookie($name, $value, time() + $expiration, $path, $domain, $secure, $httponly);
+        // Options array so secure/httponly/samesite are actually applied
+        setcookie($name, $value, [
+            'expires' => time() + $expiration,
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+            'httponly' => $httponly,
+            'samesite' => $samesite,
+        ]);
     }
     public static function setAuthCookie($token, $expiry = AUTH_COOKIE_EXPIRY): void
     {

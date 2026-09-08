@@ -33,13 +33,16 @@ if (!$cspArray) {
 
 // Let's build some autoload charts
 
-function filterValidValues($array)
-{
-    return array_filter(
-        $array, function ($value) {
-        return $value !== null && (is_string($value) || is_int($value));
-        }
-    );
+// Guard against a redeclare fatal if this view is included twice in one request
+if (!function_exists('filterValidValues')) {
+    function filterValidValues($array)
+    {
+        return array_filter(
+            $array, function ($value) {
+            return $value !== null && (is_string($value) || is_int($value));
+            }
+        );
+    }
 }
 
 // We will need an array with the values of domain

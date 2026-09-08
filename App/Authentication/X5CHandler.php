@@ -13,15 +13,13 @@ class X5CHandler
 {
     public static function load(string $appId, string $tenant, string $kid, string $provider): bool|string
     {
-        $providerValues = ['azure', 'mslive', 'google'];
-        if (!in_array($provider, $providerValues)) {
-            return null;
-        }
-        // Let's set some provider-specific variables
+        // Let's set some provider-specific variables (MS Live is handled by App\Authentication\Azure\MsLive)
         if ($provider === 'azure') {
             $type = 'x5c';
         } elseif ($provider === 'google') {
             $type = 'x509';
+        } else {
+            return false;
         }
         $x5c = DBCache::get($type, $kid);
 

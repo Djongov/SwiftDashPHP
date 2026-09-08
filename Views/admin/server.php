@@ -18,10 +18,6 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-if (!$isAdmin) {
-    SystemLog::write('Got unauthorized for admin page', 'Access');
-    Response::output('You are not authorized to view this page', 401);
-}
 
 // First check if error_log is there
 $errorLog = ini_get('error_log');
@@ -144,7 +140,9 @@ if (SESSION_STORAGE === 'database') {
 // Display Server Info
 $engine = DEFAULT_DATA_GRID_ENGINE;
 $componentClass = "\\Components\\$engine";
-echo $componentClass::fromData('Server Info (' . $engine . ')', $_SERVER, $theme);
+// $_SERVER also carries environment variables (DB_PASS, client secrets, ...), keep those out of the page
+$serverInfo = array_filter($_SERVER, fn($key) => !preg_match('/(PASS|SECRET|KEY|TOKEN|PWD)/i', (string) $key), ARRAY_FILTER_USE_KEY);
+echo $componentClass::fromData('Server Info (' . $engine . ')', $serverInfo, $theme);
 
 echo Html::h2('PHP Info', true);
 

@@ -76,6 +76,8 @@ if ($userModel->exists($idTokenArray['preferred_username'])) {
     try {
         $user->create($idTokenArray, $provider);
         SystemLog::write('User created with email: ' . $idTokenArray['preferred_username'] . ' and provider ' . $provider, 'User Creation');
+        // Load the new record so the local token gets the real role
+        $userDetailsArray = $userModel->get($idTokenArray['preferred_username']);
     } catch (Exception $e) {
         SystemLog::write('Could not create user with email: ' . $idTokenArray['preferred_username'] . '. Error: ' . $e->getMessage(), 'User Creation Error');
         Response::output('Could not create user', 500);

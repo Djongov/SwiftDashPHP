@@ -21,8 +21,8 @@ class Session
             $secure = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? false : $httpsActive;
             // Session name based on secure connection
             $sesstionName = $secure ? '__Secure-SSID' : 'SSID';
-            // Define the domain based on localhost or actual host
-            $domain = (str_contains($_SERVER['HTTP_HOST'] ?? '', 'localhost') || str_contains($_SERVER['HTTP_HOST'] ?? '', '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'] ?? '';
+            // Empty domain = host-only cookie: not shared with subdomains and valid when the host carries a port (localhost:8080)
+            $domain = '';
             
             // Set session garbage collection and cookie lifetime to match AUTH_EXPIRY
             // This ensures sessions aren't deleted before the auth token expires

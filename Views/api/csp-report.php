@@ -15,6 +15,11 @@ if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] !== 'application
 
 $jsonData = file_get_contents('php://input'); // Read the data from the POST request as it's JSON and won't show up on $_POST
 
+// This endpoint is anonymous, so keep what it can write bounded
+if (strlen((string) $jsonData) > 20000) {
+    Response::output('Payload too large', 413);
+}
+
 // Check if the data is JSON
 if (!($jsonArray = json_decode($jsonData, true))) {
     Response::output('Needs json data', 400);
@@ -42,8 +47,10 @@ foreach ($expectedDirectives as $directive) {
 // Now let's check if the domain is allowed
 $domain = parse_url($jsonArray['csp-report']['document-uri'], PHP_URL_HOST);
 
+// "about" documents cannot be attributed to any page and would only flood the table, acknowledge and drop them
 if (!$domain && $jsonArray['csp-report']['document-uri'] === 'about') {
-    $domain = 'about';
+    http_response_code(204);
+    exit();
 }
 
 $sandboxSourceFiles = ['moz-extension', 'chrome-extension', 'safari-extension', 'sandbox eval code'];
@@ -75,5 +82,5 @@ try {
     exit();
 } catch (ContentSecurityPolicyExceptions $e) {
     SystemLog::write($e->getMessage(), 'CSP Report Not Saved');
-    Response::output($e->getMessage(), $e->getCode());
+    Response::output('Could not save the report', 500);
 }

@@ -111,11 +111,12 @@ class DatabaseSessionHandler implements SessionHandlerInterface
                     'lifetime2' => $this->maxLifetime
                 ]);
             } elseif ($driver === 'pgsql') {
+                // make_interval() takes a bound parameter; a placeholder inside a quoted INTERVAL literal is not a parameter
                 $sql = "INSERT INTO {$this->tableName} (id, data, expires_at, last_activity) 
-                        VALUES (:id, :data, NOW() + INTERVAL ':lifetime seconds', NOW())
+                        VALUES (:id, :data, NOW() + make_interval(secs => :lifetime), NOW())
                         ON CONFLICT (id) DO UPDATE SET 
                         data = EXCLUDED.data, 
-                        expires_at = NOW() + INTERVAL ':lifetime2 seconds', 
+                        expires_at = NOW() + make_interval(secs => :lifetime2), 
                         last_activity = NOW()";
                 
                 $stmt = $this->pdo->prepare($sql);

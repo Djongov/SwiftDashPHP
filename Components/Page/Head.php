@@ -22,6 +22,9 @@ class Head
                 })();
         </script>
         HTML;
+        // Title/description can be derived from the request URI, escape them for HTML
+        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
         $html .=  '<title>' . $title . ' - ' . SITE_TITLE . '</title>' . PHP_EOL;
         // Icon
         $html .= '<link rel="icon" type="image/x-icon" href="' . LOGO . '" >' . PHP_EOL;
@@ -30,7 +33,7 @@ class Head
         $html .= '<meta charset="UTF-8">' . PHP_EOL;
         $html .= '<meta name="robots" content="index, follow" >' . PHP_EOL;
         $html .= '<meta name="author" content="Dimitar Dzhongov" >' . PHP_EOL;
-        $html .= '<meta name="keywords" content="' . implode(",", $keywords) . '" >' . PHP_EOL;
+        $html .= '<meta name="keywords" content="' . htmlspecialchars(implode(",", $keywords), ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
         $html .= '<meta name="description" content="' . $description . '" >' . PHP_EOL;
         if (isset($_SESSION['csrf_token'])) {
             $html .= '<meta name="csrf-token" content="' . $_SESSION['csrf_token'] . '">' . PHP_EOL;
@@ -61,11 +64,12 @@ class Head
     public static function ogTags(string $title, string $description, string $thumbimage): string
     {
         $html = '';
+        // og:url is built from the request URI, so everything below is escaped
         $html .= '<meta property="og:type" content="website" >' . PHP_EOL;
-        $html .= '<meta property="og:url" content="https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '" >' . PHP_EOL;
-        $html .= '<meta property="og:title" content="' . $title . '" >' . PHP_EOL;
-        $html .= '<meta property="og:description" content="' . $description . '" >' . PHP_EOL;
-        $html .= '<meta property="og:image" content="' . $thumbimage . '" >' . PHP_EOL;
+        $html .= '<meta property="og:url" content="' . htmlspecialchars('https://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '/'), ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
+        $html .= '<meta property="og:title" content="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
+        $html .= '<meta property="og:description" content="' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
+        $html .= '<meta property="og:image" content="' . htmlspecialchars($thumbimage, ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
         $html .= '<meta property="og:image:width" content="250">' . PHP_EOL;
         $html .= '<meta property="og:image:height" content="236">' . PHP_EOL;
         $html .= '<meta property="og:image:type" content="image/png">' . PHP_EOL;
@@ -74,12 +78,13 @@ class Head
     public static function twitterTags(string $title, string $description, string $thumbimage, string $site, string $creator): string
     {
         $html = '';
+        // Same values as the og tags, escaped
         $html .= '<meta name="twitter:card" content="summary_large_image" >' . PHP_EOL;
         $html .= '<meta name="twitter:site" content="' . $site . '" >' . PHP_EOL;
         $html .= '<meta name="twitter:creator" content="' . $creator . '" >' . PHP_EOL;
-        $html .= '<meta name="twitter:title" content="' . $title . '" >' . PHP_EOL;
-        $html .= '<meta name="twitter:description" content="' . $description . '" >' . PHP_EOL;
-        $html .= '<meta name="twitter:image" content="' . $thumbimage . '" >' . PHP_EOL;
+        $html .= '<meta name="twitter:title" content="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
+        $html .= '<meta name="twitter:description" content="' . htmlspecialchars($description, ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
+        $html .= '<meta name="twitter:image" content="' . htmlspecialchars($thumbimage, ENT_QUOTES, 'UTF-8') . '" >' . PHP_EOL;
         $html .= '<meta name="twitter:image:alt" content="' . SITE_TITLE . ' logo" >' . PHP_EOL;
         return $html;
     }

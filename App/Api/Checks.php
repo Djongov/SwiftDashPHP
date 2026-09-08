@@ -256,7 +256,8 @@ class Checks
         }
         // Check if the image is the proper format
         $imageFileType = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
-        if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'affif'])) {
+        // "avif" was misspelled as "affif", so AVIF uploads were always rejected
+        if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'])) {
             Response::output('Invalid image type', 400);
         }
     }

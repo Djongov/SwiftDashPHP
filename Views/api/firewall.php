@@ -32,13 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $checks = new Checks($loginInfo, $_GET);
     $checks->apiChecksNoCSRF();
+    // The allow list is admin information, for listing and lookups alike
+    $checks->adminCheck();
 
     if (empty($_GET)) {
         // Return all firewall entries
         $firewall = new BasicModel('firewall');
-
-        // Do an admin check for this one
-        $checks->adminCheck();
 
         try {
             $result = $firewall->getAll();

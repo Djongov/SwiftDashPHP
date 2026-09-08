@@ -12,8 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $checks->apiChecks();
 
-    $checks->checkParams([], $_POST);
-
     $apiKeyModel = new APIKeys();
 
     // First let's check if the user already has an API key
@@ -36,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'access' => 'read',
         'note' => $loginInfo['usernameArray']['username'],
         'created_by' => $loginInfo['usernameArray']['username'],
-        'executions_limit' => FREE_TIER_DAILY_EXECUTION_LIMIT ?? 1000,
+        // ?? does not guard an undefined constant, defined() does
+        'executions_limit' => defined('FREE_TIER_DAILY_EXECUTION_LIMIT') ? FREE_TIER_DAILY_EXECUTION_LIMIT : 1000,
     ];
 
     // If no existing key, create a new one
@@ -94,9 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         Response::output('No API key found for this user', 404);
     }
 
-    // If the user has an API key, delete it
+    // If the user has an API key, delete it (getApiKeyByNote returns the key string, fetch the row for its id)
     try {
-        $delete = $apiKeyModel->delete((int) $existingKey['id']);
+        $existingRow = $apiKeyModel->get($existingKey);
+        $delete = $apiKeyModel->delete((int) $existingRow['id']);
         Response::output('API key deleted successfully');
     } catch (Exception $e) {
         if (ERROR_VERBOSE) {

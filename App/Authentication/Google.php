@@ -122,14 +122,9 @@ class Google
             IdTokenCache::save($idToken);
             SystemLog::write('Token for ' . $payload['email'] . ' verified and saved', 'Google Auth');
         } else {
-            // If it exists, let's check if it's the same token, if not we will save it
-            //echo 'Pulling token';
-            $cachedToken = IdTokenCache::get(JWT::parseTokenPayLoad($idToken)['email']);
-            // Let's check if the expiration time of the token is different from the cached one, if not we need to update it, however the expiration in the cached token needs to eb converted to timestamp
-            $cachedTokenExpiration = strtotime($cachedToken['expiration']);
-            // Check if the Token's expiration is different from the cached one
-            $tokenExpiration = JWT::parseTokenPayLoad($idToken)['exp'];
-            if ($tokenExpiration !== $cachedTokenExpiration) {
+            // A cached entry only proves that the cached token string was verified. Any other token must be verified again.
+            $cachedToken = IdTokenCache::get($payload['email']);
+            if (!hash_equals((string) ($cachedToken['value'] ?? ''), $idToken)) {
                 // Replace the token with the current one but verify it first
                 $client = new Client(['client_id' => GOOGLE_CLIENT_ID]);
                 $client->setHttpClient(new \GuzzleHttp\Client(['verify' => CURL_CERT, 'timeout' => 60, 'http_errors' => false]));
@@ -144,7 +139,7 @@ class Google
                     }
                 }
                 IdTokenCache::update($idToken, JWT::parseTokenPayLoad($idToken)['email']);
-                SystemLog::write('Token updated because there was a different between token expiration (' . $tokenExpiration . ') and cached token expiration (' . $cachedTokenExpiration . ')', 'Google Auth');
+                SystemLog::write('Token for ' . $payload['email'] . ' re-verified and cache updated', 'Google Auth');
                 //echo 'Token updated';
             }
         }

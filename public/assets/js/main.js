@@ -1246,9 +1246,15 @@ if (cookieConsentLink) {
 
 const handleCookieFetchData = async (formElement) => {
     try {
+        const formData = new FormData(formElement);
+        // The consent endpoint checks the CSRF token for revocation, take it from the page head
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta && !formData.has('csrf_token')) {
+            formData.append('csrf_token', csrfMeta.content);
+        }
         const response = await fetch('/api/cookie-consent', {
             method: 'POST',
-            body: new FormData(formElement),
+            body: formData,
         });
         if (!response.ok) {
             throw new Error('Failed to fetch data');

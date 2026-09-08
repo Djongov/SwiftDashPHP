@@ -25,6 +25,8 @@ if (isset($_POST['consent'])) {
         Response::output('no consent');
     }
 } elseif (isset($_POST['delete-consent'])) {
+    // Revoking destroys the session, so it must not be triggerable cross-site
+    (new \App\Api\Checks($loginInfo, $_POST))->checkCSRF();
     if (isset($_COOKIE['cookie-consent'])) {
         // So after a while I understood that we need to pass the same parameters to delete the cookie as we did to set it, otherwise it won't work
         $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';

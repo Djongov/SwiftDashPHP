@@ -94,21 +94,22 @@ foreach ($files as $file) {
 
 // Now the POST request to delete the file
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // The delete form is rendered by Forms::render, so it carries the CSRF token
+    (new \App\Api\Checks($loginInfo, $_POST))->checkCSRF();
     // Check if the file is set
     if (!isset($_POST['file'])) {
         Response::output('No file set', 400);
     }
-    // Check if the file exists
-    if (!file_exists($filePath . '/' . $_POST['file'])) {
+    // Only files from the listing above may be touched
+    $file = basename((string) $_POST['file']);
+    if (!in_array($file, $files, true)) {
         Response::output('The access log file does not exist', 404);
     }
+    $fullPath = $filePath . '/' . $file;
     // Check if the file is writable
-    if (!is_writable($filePath . '/' . $_POST['file'])) {
+    if (!is_writable($fullPath)) {
         Response::output('The access log file is not writable', 403);
     }
-    // Delete the file
-    $file = basename($_POST['file']);
-    $fullPath = $filePath . '/' . $file;
 
     $errorMessage = null;
 
@@ -201,10 +202,11 @@ if (!isset($_GET['file'])) {
     return;
 }
 
-$file = $_GET['file'];
+// Only files from the listing above may be opened
+$file = basename((string) $_GET['file']);
 
 // Check if the file exists
-if (!file_exists($filePath . '/' . $file)) {
+if (!in_array($file, array_column($files, 'file'), true) || !file_exists($filePath . '/' . $file)) {
     echo Alerts::danger('The access log file does not exist');
     return;
 }

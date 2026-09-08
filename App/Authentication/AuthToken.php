@@ -58,7 +58,7 @@ class AuthToken
         // Determine security settings
         $httpsActive = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
         $secure = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? false : $httpsActive;
-        $domain = (str_contains($_SERVER['HTTP_HOST'], 'localhost') || str_contains($_SERVER['HTTP_HOST'], '[::1]')) ? 'localhost' : $_SERVER['HTTP_HOST'];
+        $domain = ''; // host-only, same as Session::start()
         
         // Update the existing session cookie with new expiry
         // We can't use session_set_cookie_params() because the session is already active

@@ -35,7 +35,8 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
         Response::output('Invalid username or password', 404); // Do not say if the user exists or not to reduce the risk of enumeration attacks
     }
 
-    if ($userArray['enabled'] === '0') {
+    // enabled comes back as int, string or bool depending on the driver, so normalise before comparing
+    if (isset($userArray['enabled']) && !filter_var($userArray['enabled'], FILTER_VALIDATE_BOOLEAN)) {
         Response::output('User is disabled', 401);
     }
 

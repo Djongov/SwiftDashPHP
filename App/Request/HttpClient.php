@@ -50,7 +50,8 @@ class HttpClient
             $options['form_params'] = $data;
         }
 
-        if ($method === 'PUT' || $method === 'PATCH' && $sendJson) {
+        // Parentheses matter: && binds tighter than ||, so PUT was always treated as JSON
+        if (($method === 'PUT' || $method === 'PATCH') && $sendJson) {
             $headers['Content-Type'] = 'application/json';
             $options['json'] = $data;
         }

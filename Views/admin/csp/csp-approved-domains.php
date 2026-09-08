@@ -16,7 +16,8 @@ if (!$isAdmin) {
     Response::output('You are not an admin', 403);
 }
 
-echo Html::p('Here you can control the CSP approved domains list. You can add domains to the list. A domain in the list is available to send CSP reports to the CSP reporting endpoint on this app /csp-report - https://' . $_SERVER['HTTP_HOST'] . '/csp-report. If the domain is not in the list, the reporting endpoint will return 401 Domain not allowed error.');
+// HTTP_HOST is client-supplied, escape it
+echo Html::p('Here you can control the CSP approved domains list. You can add domains to the list. A domain in the list is available to send CSP reports to the CSP reporting endpoint on this app /csp-report - https://' . htmlspecialchars($_SERVER['HTTP_HOST'] ?? '', ENT_QUOTES, 'UTF-8') . '/csp-report. If the domain is not in the list, the reporting endpoint will return 401 Domain not allowed error.');
 
 // Provide a form that will allow the user to add a new domain to the CSP approved domains list
 echo '<div class="p-4 m-4 max-w-md ' . LIGHT_COLOR_SCHEME_CLASS . ' rounded-lg border border-gray-200 shadow-md ' . DARK_COLOR_SCHEME_CLASS . ' dark:border-gray-700">';

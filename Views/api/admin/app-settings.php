@@ -27,17 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $adminSetting = isset($_POST['admin_setting']) ? (bool)$_POST['admin_setting'] : false;
         $description = isset($_POST['description']) ? htmlspecialchars($_POST['description']) : null;
 
+        // owner/admin_setting/description must be part of the array, BasicModel::create() ignores extra arguments
         $data = [
             'name' => htmlspecialchars($_POST['name']),
             'value' => htmlspecialchars($_POST['value']),
-            'type' => htmlspecialchars($_POST['type'])
+            'type' => htmlspecialchars($_POST['type']),
+            'owner' => $owner,
+            'admin_setting' => $adminSetting ? 1 : 0,
         ];
-        
-        $appSetting = $appSettingModel->create($data,
-            $owner,
-            $adminSetting,
-            $description
-        );
+        if ($description !== null) {
+            $data['description'] = $description;
+        }
+
+        $appSetting = $appSettingModel->create($data);
         Response::output('app setting created successfully with ID ' . $appSetting, 201);
     } catch (Exception $e) {
         if (ERROR_VERBOSE) {
@@ -92,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $updatedBy = $loginInfo['usernameArray']['username'] ?? Response::output('Unauthorized', 401);
     
     try {
-        // Update the setting - let exceptions propagate
-        $updated = $appSettingModel->update($updateData, (int)$putData['id'], $updatedBy);
+        // Update the setting - let exceptions propagate (BasicModel::update() takes data and id only)
+        $updated = $appSettingModel->update($updateData, (int)$putData['id']);
         if ($updated) {
             Response::output('Setting updated successfully', 200);
         } else {

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 use App\Api\Response;
 
-sleep(1);
-
-// Run htmlspecialchars on $_POST with array_map intead of array_filter to avoid removing empty values
-$_POST = array_map('htmlspecialchars', $_POST);
+// Run htmlspecialchars on $_POST (nested arrays too, e.g. multi-selects) instead of array_filter to keep empty values
+$escape = function ($value) use (&$escape) {
+    return is_array($value) ? array_map($escape, $value) : htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+};
+$_POST = array_map($escape, $_POST);
 
 if (isset($_POST['terms']) && $_POST['terms'] === "0") {
     Response::output('You must agree to the terms and conditions', 409);

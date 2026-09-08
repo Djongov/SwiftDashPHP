@@ -295,6 +295,15 @@ class App
             return;
         }
 
+        // One capture per session is enough, and it keeps anonymous requests from filling the table
+        if (!empty($_SESSION['utm_captured'])) {
+            return;
+        }
+        $_SESSION['utm_captured'] = true;
+
+        // Bound the stored values
+        $currentUtms = array_map(fn($value) => is_string($value) ? mb_substr($value, 0, 255) : null, $currentUtms);
+
         // Capture UTM parameters
         $captureUtm = new \Models\BasicModel('utm_captures');
         $data = [

@@ -43,7 +43,8 @@ class Install
                 $conn = new PDO($dsn, DB_USER, DB_PASS, $options);
             }
         } catch (PDOException $e) {
-            Response::output('Database connection error: ' . $e->getMessage(), 400);
+            // Driver error details only in verbose mode
+            Response::output('Database connection error: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
         }
 
         // Create the database if it doesn't exist
@@ -71,7 +72,8 @@ class Install
                 }
             }
         } catch (PDOException $e) {
-            Response::output('Database creation error: ' . $e->getMessage(), 400);
+            // Driver error details only in verbose mode
+            Response::output('Database creation error: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
         }
         // Reconnect to the newly created database
         try {
@@ -88,7 +90,8 @@ class Install
 
             $conn = new PDO($dsnWithDb, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
-            Response::output('Database selection error: ' . $e->getMessage(), 400);
+            // Driver error details only in verbose mode
+            Response::output('Database selection error: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
         }
 
         // Read and execute queries from the SQL file to create tables. We have a different migrate file for different database drivers
@@ -99,7 +102,8 @@ class Install
             // Execute multiple queries
             $conn->exec($migrate);
         } catch (PDOException $e) {
-            Response::output('Error in system migrate file: ' . $e->getMessage(), 400);
+            // Driver error details only in verbose mode
+            Response::output('Error in system migrate file: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
         }
 
         $ip = IP::currentIP();
@@ -120,7 +124,8 @@ class Install
                 // Execute multiple queries
                 $conn->exec($projectMigrate);
             } catch (PDOException $e) {
-                Response::output('Error in project migrate file: ' . $e->getMessage(), 400);
+                // Driver error details only in verbose mode
+                Response::output('Error in project migrate file: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
             }
         }
 
@@ -170,7 +175,8 @@ class Install
                 $stmt->execute([$hashedPassword, $ip, $countryCode, COLOR_SCHEME, 1]);
             }
         } catch (PDOException $e) {
-            Response::output('Inserting admin user error: ' . $e->getMessage(), 400);
+            // Driver error details only in verbose mode
+            Response::output('Inserting admin user error: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
         }
     }
     public function createFirewallRule($conn, $ip)
@@ -195,8 +201,9 @@ class Install
             $stmt->execute([$cidr]);
 
         } catch (PDOException $e) {
+            // Driver error details only in verbose mode
             Response::output(
-                'Inserting firewall rule for IP ' . $ip . ' error: ' . $e->getMessage(),
+                'Inserting firewall rule for IP ' . $ip . ' error: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'),
                 400
             );
         }
@@ -216,7 +223,8 @@ class Install
             $stmt = $conn->prepare("INSERT INTO csp_approved_domains (domain, created_by) VALUES (?, 'System')");
             $stmt->execute([$domain]);
         } catch (PDOException $e) {
-            Response::output('Inserting csp_approved_domains rule for domain ' . $domain . ' error: ' . $e->getMessage(), 400);
+            // Driver error details only in verbose mode
+            Response::output('Inserting csp_approved_domains rule for domain ' . $domain . ' error: ' . (ERROR_VERBOSE ? $e->getMessage() : 'check the server error log'), 400);
         }
     }
 }
