@@ -9,6 +9,7 @@ use App\Utilities\JsonSettingEditor;
 $checks = new Checks($loginInfo, $_POST);
 
 $checks->apiChecks();
+$checks->adminCheck();
 
 try {
     // Process the JSON editor form submission
@@ -22,7 +23,7 @@ try {
 } catch (Exception $e) {
     // Log error for debugging
     error_log('JSON Editor API Error: ' . $e->getMessage());
-    Response::output('An error occurred while processing the request: ' . $e->getMessage(), 500);
+    Response::output('An error occurred while processing the request', 500);
 }
 
 Response::output('Invalid api action', 400);

@@ -397,7 +397,7 @@ zend.exception_string_param_max_len = 0
 ; threat in any way, but it makes it possible to determine whether you use PHP
 ; on your server or not.
 ; https://php.net/expose-php
-expose_php = On
+expose_php = Off
 
 ;;;;;;;;;;;;;;;;;;;
 ; Resource Limits ;
@@ -1300,7 +1300,7 @@ session.save_handler = files
 ; vulnerability. It is disabled by default for maximum compatibility, but
 ; enabling it is encouraged.
 ; https://wiki.php.net/rfc/strict_sessions
-session.use_strict_mode = 0
+session.use_strict_mode = 1
 
 ; Whether to use cookies.
 ; https://php.net/session.use-cookies

@@ -37,6 +37,14 @@ Client IPs (used by the Firewall, logs and UTM capture) come from `REMOTE_ADDR`.
 TRUSTED_PROXIES="10.0.0.0/8,172.16.0.0/12"
 ```
 
+### Content Security Policy
+
+The CSP header is sent by PHP (`App::bootstrap`) on HTTPS requests with a fresh nonce per request (`CSP_NONCE`). Edit the policy, e.g. to allow another CDN, in `CSP_POLICY` in `config/site-settings.php`. Inline scripts in your own views must carry `nonce="<?= CSP_NONCE ?>"`.
+
+### Database TLS
+
+With `DB_SSL=true` the MySQL server certificate is verified against the bundled DigiCert CA. Set `DB_SSL_VERIFY=false` in `.env` only for self-signed test servers.
+
 ### DataGrid CRUD API
 
 The `/api/datagrid/*` endpoints (used by the DataGrid/AGGrid edit and delete buttons) are admin-only. To let regular users edit specific tables, list them in `DATAGRID_USER_TABLES` in `config/site-settings.php`.

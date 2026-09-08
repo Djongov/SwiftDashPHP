@@ -86,6 +86,12 @@ class App
             @ini_set('session.gc_maxlifetime', (string) \AUTH_EXPIRY);
         }
 
+        // Content Security Policy with the per-request nonce. Sent from PHP (not .htaccess/web.config) so the nonce
+        // can differ on every request. HTTPS only, matching the previous web server rules.
+        if (php_sapi_name() !== 'cli' && defined('CSP_POLICY') && CSP_POLICY !== '' && isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            header('Content-Security-Policy: ' . str_replace('{nonce}', CSP_NONCE, CSP_POLICY));
+        }
+
         // Start session (now AUTH_EXPIRY is available and ini settings are configured)
         \App\Core\Session::start();
 

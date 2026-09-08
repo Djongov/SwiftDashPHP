@@ -102,5 +102,5 @@ AuthToken::set($idToken);
 
 $destinationUrl = $_POST['state'] ?? null;
 // Valid destination, proceed to redirect to the destination
-header("Location: " . filter_var($destinationUrl, FILTER_SANITIZE_URL));
+header("Location: " . \App\Utilities\General::safeRedirectPath($destinationUrl));
 exit();

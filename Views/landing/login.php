@@ -9,7 +9,7 @@ use Components\Html;
 use Components\Forms;
 use Components\Alerts;
 
-$destinationUrl = $_GET['destination'] ?? '/';
+$destinationUrl = \App\Utilities\General::safeRedirectPath($_GET['destination'] ?? '/');
 if ($destinationUrl === '/logout') {
     $destinationUrl = '/';
 }

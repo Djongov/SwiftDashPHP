@@ -75,12 +75,11 @@ if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
     // Record last login
     $user->updateLastLogin($userArray['username']);
 
-    $destinationUrl = $_POST['state'] ?? null;
-    if ($destinationUrl !== null && (substr($destinationUrl, 0, 1) === '/')) {
-        // Invalid destination or state, set a default state
+    // Only local paths are accepted as a destination, anything else lands on /
+    $destinationUrl = \App\Utilities\General::safeRedirectPath($_POST['state'] ?? null);
+    if (in_array($destinationUrl, ['/login', '/logout'], true)) {
         $destinationUrl = '/';
     }
-    // Valid destination, proceed with your script
-    header("Location: " . filter_var($destinationUrl, FILTER_SANITIZE_URL));
+    header("Location: " . $destinationUrl);
     exit();
 }

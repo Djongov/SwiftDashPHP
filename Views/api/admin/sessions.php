@@ -19,6 +19,7 @@ $expectedParams = ['api-action'];
 $checks->checkParams($expectedParams, $_POST);
 
 $checks->adminCheck();
+$checks->checkCSRF();
 
 // Check if using database sessions
 if (SESSION_STORAGE !== 'database') {

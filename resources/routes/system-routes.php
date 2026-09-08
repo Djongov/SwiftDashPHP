@@ -25,8 +25,9 @@ function systemRoutes(RouteCollector $router, string $viewsFolder, string $contr
 
     // Azure and MS Live auth
     $router->addRoute('GET', '/auth/azure/request-access-token', [$viewsFolder . '/auth/azure/request-access-token.php']);
-    $router->addRoute('POST', '/auth/azure/azure-ad-code-exchange', [$viewsFolder . '/auth/azure/azure-ad-code-exchange.php']);
-    $router->addRoute('POST', '/auth/azure/mslive-code-exchange', [$viewsFolder . '/auth/azure/mslive-code-exchange.php']);
+    // Code exchange callbacks use response_mode=query, so Microsoft sends a GET that carries the session cookie
+    $router->addRoute('GET', '/auth/azure/azure-ad-code-exchange', [$viewsFolder . '/auth/azure/azure-ad-code-exchange.php']);
+    $router->addRoute('GET', '/auth/azure/mslive-code-exchange', [$viewsFolder . '/auth/azure/mslive-code-exchange.php']);
 
     // CSP report endpoiont
     $router->addRoute('POST', '/api/csp-report', [$viewsFolder . '/api/csp-report.php']);

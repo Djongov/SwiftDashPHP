@@ -328,6 +328,25 @@ class JsonSettingEditor
     }
 
     /**
+     * Only files listed in JSON_EDITABLE_FILES (config/site-settings.php) may be written through the editor.
+     */
+    public static function isEditableFile(string $filePath): bool
+    {
+        $allowed = defined('JSON_EDITABLE_FILES') ? JSON_EDITABLE_FILES : [];
+        $real = realpath($filePath);
+        if ($real === false) {
+            return false;
+        }
+        foreach ($allowed as $candidate) {
+            $allowedReal = realpath((string) $candidate);
+            if ($allowedReal !== false && $allowedReal === $real) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Process form submission and save to JSON file
      * 
      * @param array $postData The $_POST data from form submission
@@ -347,6 +366,11 @@ class JsonSettingEditor
 
         $filePath = $postData['json_file_path'];
         unset($postData['json_file_path'], $postData['save_json']);
+
+        // The path comes from the form, so only files explicitly allowed in config may be written
+        if (!self::isEditableFile($filePath)) {
+            return ['success' => false, 'message' => 'This file is not editable'];
+        }
 
         // Remove CSRF token if present
         if (isset($postData['csrf_token'])) {

@@ -6,6 +6,31 @@ namespace App\Utilities;
 
 class General
 {
+    /**
+     * Only allow redirects to a local path. Anything with a scheme or host, a protocol-relative
+     * prefix (// or /\) or control characters falls back to $default. Use it wherever a redirect
+     * target (destination, state) comes from the request.
+     */
+    public static function safeRedirectPath(?string $url, string $default = '/'): string
+    {
+        if ($url === null) {
+            return $default;
+        }
+        $url = trim($url);
+        if ($url === '' || $url[0] !== '/') {
+            return $default;
+        }
+        if (isset($url[1]) && ($url[1] === '/' || $url[1] === '\\')) {
+            return $default;
+        }
+        if (preg_match('/[\x00-\x1F\x7F]/', $url)) {
+            return $default;
+        }
+        if (parse_url($url, PHP_URL_SCHEME) !== null || parse_url($url, PHP_URL_HOST) !== null) {
+            return $default;
+        }
+        return $url;
+    }
     public static function fullUri(): string
     {
         return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";

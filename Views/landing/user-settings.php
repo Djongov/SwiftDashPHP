@@ -367,7 +367,7 @@ echo '<div class="max-w-6xl mx-auto p-4">';
 echo '</div>';
 ?>
 
-<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+<script nonce="<?= CSP_NONCE ?>">
 document.addEventListener("DOMContentLoaded", function() {
     function switchTab(tabName) {
         const allButtons = document.querySelectorAll(".tab-button");

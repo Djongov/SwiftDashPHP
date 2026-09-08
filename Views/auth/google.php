@@ -95,22 +95,13 @@ if (!USE_REMOTE_ID_TOKEN) {
 
 AuthToken::set($idToken);
 
+// Only local paths are accepted as a destination, anything else lands on /
+$state = \App\Utilities\General::safeRedirectPath($state);
 if (str_contains($state, 'login') || str_contains($state, 'logout')) {
-    // Invalid destination or state, set a default state
     $state = '/';
 }
 
-// Parse the URL
-$parsedState = parse_url($state);
-
-// Extract the path and query components
-$path = isset($parsedState['path']) ? $parsedState['path'] : '';
-$query = isset($parsedState['query']) ? '?' . $parsedState['query'] : '';
-
-// Combine the path and query string
-$pathAndQuery = $path . $query;
-
-header("Location: " . $pathAndQuery);
+header("Location: " . $state);
 
 exit();
 

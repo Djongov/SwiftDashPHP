@@ -13,7 +13,11 @@ $controller = new User();
 
 // Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = array_map('trim', $_POST);
+    // Self-registration is only possible when local login and manual registration are enabled
+    if (!LOCAL_USER_LOGIN || !defined('MANUAL_REGISTRATION') || !MANUAL_REGISTRATION) {
+        Response::output('Registration is disabled', 403);
+    }
+    $data = array_map(fn($value) => is_string($value) ? trim($value) : $value, $_POST);
     $expectedParams = [
         'username',
         'email',
@@ -24,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
     $checks = new Checks($loginInfo, $data);
     $checks->checkParams($expectedParams, $data);
+    // The token must match the session, not merely be present
+    $checks->checkCSRF();
     if ($data['password'] !== $data['confirm_password']) {
         Response::output('Passwords do not match', 400);
     }

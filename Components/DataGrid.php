@@ -486,8 +486,9 @@ class DataGrid
         }
         unset($tableOptions['filters']);
         $jsonEncodedTableOptions = json_encode($tableOptions);
+        $nonce = CSP_NONCE;
         $html .= <<<JS
-            <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+            <script nonce="{$nonce}">
                 $(document).ready(() => {
                     const table = drawDataGrid('$id', $jsonEncodedTableOptions, '$theme');
                     $filterJS

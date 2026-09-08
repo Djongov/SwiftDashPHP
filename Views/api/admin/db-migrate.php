@@ -16,6 +16,7 @@ $expectedParams = ['migrate_type', 'csrf_token'];
 $checks->checkParams($expectedParams, $_POST);
 
 $checks->adminCheck();
+$checks->checkCSRF();
 
 $db = new DB();
 $pdo = $db->getConnection();

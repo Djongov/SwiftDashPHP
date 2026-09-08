@@ -3,7 +3,7 @@ FROM php:8.5.0-apache
 # Copy application and configuration files before executing RUN commands
 COPY . /var/www/html/
 COPY .tools/deployment/default.conf /etc/apache2/sites-available/000-default.conf
-COPY .tools/deployment/php.ini-development /usr/local/etc/php/php.ini
+COPY .tools/deployment/php.ini-production /usr/local/etc/php/php.ini
 COPY .tools/deployment/sshd_config /etc/ssh/sshd_config
 COPY .tools/deployment/entrypoint.sh /usr/local/bin/entrypoint.sh
 

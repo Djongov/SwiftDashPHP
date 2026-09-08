@@ -32,9 +32,10 @@ class SMTP
             
             $this->mailer->SMTPOptions = [
                 'ssl' => [
-                    'verify_peer'       => $config['verify_peer'] ?? false,
-                    'verify_peer_name'  => $config['verify_peer_name'] ?? false,
-                    'allow_self_signed' => $config['allow_self_signed'] ?? true,
+                    // Verify the mail server certificate unless the SMTP app settings say otherwise
+                    'verify_peer'       => $config['verify_peer'] ?? true,
+                    'verify_peer_name'  => $config['verify_peer_name'] ?? true,
+                    'allow_self_signed' => $config['allow_self_signed'] ?? false,
                 ],
             ];
 

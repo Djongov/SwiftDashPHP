@@ -77,6 +77,31 @@ define(
     ]
 );
 
+// JSON files that may be edited through /api/edit-json-settings (absolute paths). Empty = editor disabled.
+define('JSON_EDITABLE_FILES', []);
+
+// Content Security Policy. Sent by App on HTTPS requests with {nonce} replaced by the per-request CSP_NONCE.
+// Add CDNs here as needed. Set to '' to not send the header from PHP.
+define(
+    'CSP_POLICY',
+    "upgrade-insecure-requests;"
+    . "default-src 'self';"
+    . "style-src 'self' 'unsafe-inline' https://cdn.tiny.cloud/ https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-grid.css https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-theme-alpine.css;"
+    . "script-src 'self' https://cdn.tailwindcss.com/ https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/dist/ag-grid-community.min.noStyle.js https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js https://cdn.jsdelivr.net/npm/apexcharts https://cdn.tiny.cloud/1/ https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js 'nonce-{nonce}';"
+    . "font-src 'self' data:;"
+    . "img-src 'self' https://flagcdn.com/ https://sp.tinymce.com/ https://ui-avatars.com/api/ https://lh3.googleusercontent.com/ https://quickchart.io/;"
+    . "frame-ancestors 'none';"
+    . "frame-src 'self' https://www.youtube.com/;"
+    . "child-src 'none';"
+    . "connect-src 'self' https://cdn.tiny.cloud/ https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js.map https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js.map;"
+    . "base-uri 'none';"
+    . "object-src 'none';"
+    . "media-src 'none';"
+    . "manifest-src 'none';"
+    . "worker-src 'none';"
+    . "report-uri /api/csp-report;"
+);
+
 // Tables that non-admin users may read/edit/delete through the DataGrid CRUD API (/api/datagrid/*).
 // Every other table requires an administrator.
 define('DATAGRID_USER_TABLES', []);

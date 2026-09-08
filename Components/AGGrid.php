@@ -102,8 +102,9 @@ class AGGrid
      */
     public static function getInitializationScript(): string
     {
+        $nonce = CSP_NONCE;
         return <<<HTML
-<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+<script nonce="{$nonce}">
 console.log('AGGrid: getInitializationScript executed');
 // Initialize any AGGrid instances that were loaded via AJAX
 if (typeof window.initializeAGGrids === 'function') {
@@ -121,8 +122,9 @@ HTML;
      */
     public static function getSpecificInitializationScript(string $gridId): string
     {
+        $nonce = CSP_NONCE;
         return <<<HTML
-<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+<script nonce="{$nonce}">
 console.log('AGGrid: getSpecificInitializationScript executed for: {$gridId}');
 // Initialize specific AGGrid instance
 if (typeof window.initializeAGGrid === 'function') {
@@ -576,12 +578,13 @@ HTML;
     $widthStyle = "width: {$dynamicWidth};";
     $minWidthStyle = $useFullWidth ? 'min-width: 100%;' : 'min-width: 400px;';
     
+    $nonce = CSP_NONCE;
     $html .= <<<HTML
 <div class="ag-grid-responsive-container mb-6 {$containerClass}">
     <div id="{$this->gridId}" class="ag-theme-alpine {$gridClass}" style="height: {$dynamicHeight}px; {$widthStyle} {$minWidthStyle}"></div>
 </div>
 
-<style nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+<style nonce="{$nonce}">
 .ag-grid-responsive-container {
     overflow-x: auto;
     width: 100%;
@@ -606,7 +609,7 @@ HTML;
 }
 </style>
 
-<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+<script nonce="{$nonce}">
 (function() {
     const initGrid_{$jsGridId} = () => {
         const eGridDiv = document.querySelector("#{$this->gridId}");

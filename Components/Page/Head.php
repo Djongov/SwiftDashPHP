@@ -9,12 +9,13 @@ class Head
     public static function render(string $title, string $description, array $keywords, string $thumbimage, array $scriptsArray, array $cssArray): string
     {
         $html = '';
+        $nonce = CSP_NONCE;
         $html .= '<!DOCTYPE html>' . PHP_EOL;
         $html .= '<html lang="en" class="h-full">' . PHP_EOL;
         $html .= '<head>' . PHP_EOL;
         // Make sure that the theme is applied before anything else to prevent FOUC
         $html .= <<<HTML
-        <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+        <script nonce="{$nonce}">
                 (function() {
                     const theme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                     document.documentElement.classList.add(theme);
@@ -47,7 +48,7 @@ class Head
                 darkMode: 'class'
             };";
             $html .= <<< InlineScript
-                    <script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+                    <script nonce="{$nonce}">
                         $tailwindConfig
                     </script>
                 InlineScript . PHP_EOL;

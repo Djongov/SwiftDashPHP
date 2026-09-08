@@ -257,7 +257,7 @@ class AppSetting
         $html .= '</div>'; // Close main container
 
         // Add comprehensive JavaScript for settings management (scoped per instance)
-        $nonce = '1nL1n3JsRuN1192kwoko2k323WKE';
+        $nonce = CSP_NONCE;
         $html .= '<script nonce="' . $nonce . '">';
         $html .= <<<JAVASCRIPT
 (function() {

@@ -73,6 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $checks = new Checks($loginInfo, $_POST);
     $checks->apiChecks();
+    // Only administrators may change the allow list
+    $checks->adminCheck();
 
     $checks->checkParams(['ip_cidr'], $_POST);
 
@@ -113,6 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     // Let's catch php input stream
     $data = Checks::jsonBody();
 
+    // Login + admin. A JSON body cannot be sent cross-site without a CORS preflight, so no CSRF token is needed here
+    $checks = new Checks($loginInfo, $data);
+    $checks->apiChecksNoCSRF(false);
+    $checks->adminCheck();
+
     // Also the router info should bring us the id
     if (!isset($routeInfo[2]['id'])) {
         Response::output('missing id paramter', 400);
@@ -130,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $update = new BasicModel('firewall');
 
     try {
-        $result = $update->update($data, $routeInfo[2]['id']);
+        $result = $update->update($data, (int) $routeInfo[2]['id']);
         Response::output($result);
     } catch (Exception $e) {
         Response::output($e->getMessage(), (int) $e->getCode());
@@ -158,9 +165,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $checks = new Checks($loginInfo, $_GET);
 
-    $checks->checkCSRFDelete($_GET['csrf_token']);
+    // Login, token integrity, CSRF from the query string, and admin
+    $checks->apiChecksDelete($_GET['csrf_token'], false);
+    $checks->adminCheck();
 
-    $id = $routeInfo[2]['id'];
+    $id = (int) $routeInfo[2]['id'];
 
     $delete = new BasicModel('firewall');
 

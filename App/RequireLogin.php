@@ -263,7 +263,7 @@ class RequireLogin
         // If this gets executed on /login, we need to keep logged in users away from the login page
         if (str_contains($_SERVER['REQUEST_URI'], 'login') && $loggedIn) {
             if (isset($_GET['destination'])) {
-                header('Location: ' . $_GET['destination']);
+                header('Location: ' . General::safeRedirectPath($_GET['destination']));
                 exit();
             } else {
                 header('Location: /');

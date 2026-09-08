@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 define('ROOT', dirname($_SERVER['DOCUMENT_ROOT']) ?? dirname(__DIR__));
 
+// Per-request nonce for inline <script>/<style> tags. Components print it as nonce="..." and App sends it in
+// the Content-Security-Policy header (see CSP_POLICY in site-settings.php).
+define('CSP_NONCE', bin2hex(random_bytes(16)));
+
 if (ini_get('display_errors') == 1) {
     error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
     define('ERROR_VERBOSE', true);
@@ -178,8 +182,6 @@ class SystemConfig
                 '/auth/azure-ad',
                 '/auth/google',
                 '/auth/local',
-                '/auth/azure/azure-ad-code-exchange',
-                '/auth/azure/mslive-code-exchange',
                 '/api/user',
                 '/install',
                 '/logout',
@@ -241,6 +243,8 @@ class SystemConfig
         // SSL certificates
         define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'NewDigiCertGlobalRootCA.crt.pem');
         define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
+        // Verify the database server certificate when DB_SSL is on (MySQL). Only disable for self-signed test servers.
+        define("DB_SSL_VERIFY", filter_var($_ENV['DB_SSL_VERIFY'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
     }
 
     

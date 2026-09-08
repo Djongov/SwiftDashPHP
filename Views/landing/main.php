@@ -156,7 +156,7 @@ foreach ($currentIssues as $category => $array) {
   <div id="line-chart"></div>
 </div>
 
-<script nonce="1nL1n3JsRuN1192kwoko2k323WKE">
+<script nonce="<?= CSP_NONCE ?>">
     
     const options = {
   chart: {
