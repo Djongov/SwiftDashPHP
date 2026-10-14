@@ -10,6 +10,11 @@ use App\Logs\SystemLog;
 use App\Authentication\JWT;
 use App\Authentication\AuthToken;
 
+// Local accounts must not be able to sign in when local login is disabled, even if they exist in the users table
+if (!LOCAL_USER_LOGIN) {
+    Response::output('Local login is disabled', 403);
+}
+
 // If the request is coming from local login, we should have a $_POST['username'] and a $_POST['password'] parameter
 if (isset($_POST['username'], $_POST['password'], $_POST['csrf_token'])) {
     // First check the CSRF token
