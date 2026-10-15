@@ -43,6 +43,8 @@ class Session
             }
             // If 'file', use PHP's default file-based session handling
             
+            self::expireLegacyDomainCookie($sesstionName, $secure);
+
             // Set session name
             session_name($sesstionName);
             // Set session cookie parameters
@@ -68,6 +70,37 @@ class Session
 
             self::ensureNonce();
         //}
+    }
+    /**
+     * Older versions set the session cookie with Domain=<host>; it is now host-only. Browsers keep both and send the
+     * older one first, and PHP only reads the first. With session.use_strict_mode the stale id is rejected, a new
+     * session is created on every request and logins fail (Missing Session CSRF Token / nonce mismatch).
+     * When the cookie arrives more than once, expire the domain-scoped copy.
+     */
+    private static function expireLegacyDomainCookie(string $name, bool $secure): void
+    {
+        $rawCookies = $_SERVER['HTTP_COOKIE'] ?? '';
+        if (preg_match_all('/(?:^|;\s*)' . preg_quote($name, '/') . '=/', $rawCookies) < 2) {
+            return;
+        }
+        $host = preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'] ?? '');
+        if ($host === '' || $host === null) {
+            return;
+        }
+        setcookie($name, '', [
+            'expires' => time() - 42000,
+            'path' => '/',
+            'domain' => $host,
+            'secure' => $secure,
+            'httponly' => true,
+            'samesite' => $secure ? 'None' : 'Lax'
+        ]);
+        // Drop the stale value so session_start() picks up the current host-only cookie
+        $parts = array_values(array_filter(
+            array_map('trim', explode(';', $rawCookies)),
+            fn ($c) => str_starts_with($c, $name . '=')
+        ));
+        $_COOKIE[$name] = substr(end($parts), strlen($name) + 1);
     }
     /**
      * The nonce sent in the OpenID Connect login requests (Entra ID, MS Live, Google) and checked on return.
