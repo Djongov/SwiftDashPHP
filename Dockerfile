@@ -1,4 +1,4 @@
-FROM php:8.5.0-apache
+FROM php:8.5.12-apache
 
 # Copy application and configuration files before executing RUN commands
 COPY . /var/www/html/
