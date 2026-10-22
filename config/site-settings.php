@@ -25,9 +25,9 @@ function parseIniSize(string $size): int
 
 $phpIniSettings = [
     'memory_limit' => '128M',
-    'post_max_size' => '12M',
-    'upload_max_filesize' => '12M',
-    'max_execution_time' => 60,
+    'post_max_size' => '8M',
+    'upload_max_filesize' => '2M',
+    'max_execution_time' => 30,
     'max_input_time' => 60,
 ];
 
