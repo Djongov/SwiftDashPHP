@@ -33,8 +33,10 @@ $db->checkDBColumns($selectColumnsArray, $_POST['table']);
 
 $dataTypes = $db->describe($_POST['table']);
 
-// Normalize the datatypes
+// Normalize the datatypes, keeping nullability so only NOT NULL columns are marked required
+$nullableColumns = [];
 foreach ($dataTypes as $key => $value) {
+    $nullableColumns[$key] = $value['nullable'] ?? false;
     $dataTypes[$key] = $db->mapDataTypesArray($value['type']);
 }
 
@@ -66,6 +68,7 @@ foreach ($dataArray as $key => $value) {
     } else {
         $readonly = false;
     }
+    $required = !$readonly && !($nullableColumns[$key] ?? false);
         // Now let's map the data types to the input types
     if ($dataTypes[$key] === 'bool') {
         if ($value === 1 || $value === "1" || $value === true) {
@@ -76,10 +79,10 @@ foreach ($dataArray as $key => $value) {
         $html .= Html::toggleCheckBox(uniqid(), $key, $key, ($value === 1 || $value === "1" || $value === true) ? true : false, $theme, $readonly);
     }
     if ($dataTypes[$key] === 'int') {
-        $html .= Html::input('default', 'number', uniqid(), $key, $key, $value, '', '', $key, $theme, false, true, ($readonly) ? true : false);
+        $html .= Html::input('default', 'number', uniqid(), $key, $key, $value, '', '', $key, $theme, false, $required, ($readonly) ? true : false);
     }
     if ($dataTypes[$key] === 'float') {
-        $html .= Html::input('default', 'number', uniqid(), $key, $key, $value, '', '', $key, $theme, false, true, ($readonly) ? true : false);
+        $html .= Html::input('default', 'number', uniqid(), $key, $key, $value, '', '', $key, $theme, false, $required, ($readonly) ? true : false);
     }
     if ($dataTypes[$key] === 'datetime') {
         // We first need to handle null datetime values, which might be true for new records, but we also don't want to add default values
@@ -109,16 +112,16 @@ foreach ($dataArray as $key => $value) {
         }
 
         // Generate the input field with the formatted datetime value
-        $html .= Html::input('default', 'datetime-local', uniqid(), $key, $key, $formattedDatetime, '', '', $key, $theme, false, true, ($readonly) ? true : false);
+        $html .= Html::input('default', 'datetime-local', uniqid(), $key, $key, $formattedDatetime, '', '', $key, $theme, false, $required, ($readonly) ? true : false);
     }
 
     if ($dataTypes[$key] === 'string') {
         if ($key === 'password') {
-            $html .= Html::input('default', 'password', uniqid(), $key, $key, $value, '', 'This is most likely a hashed value of the password', $key, $theme, false, true, ($readonly) ? true : false);
+            $html .= Html::input('default', 'password', uniqid(), $key, $key, $value, '', 'This is most likely a hashed value of the password', $key, $theme, false, $required, ($readonly) ? true : false);
         } elseif ($value !== null && strlen($value) > 255) {
             $html .= Html::textArea(null, $key, $value, '', $key, '', '', $theme, false, false, false, 10, 50);
         } else {
-            $html .= Html::input('default', 'text', uniqid(), $key, $key, $value, '', '', $key, $theme, false, true, ($readonly) ? true : false);
+            $html .= Html::input('default', 'text', uniqid(), $key, $key, $value, '', '', $key, $theme, false, $required, ($readonly) ? true : false);
         }
     }
     if ($dataTypes[$key] === 'json') {

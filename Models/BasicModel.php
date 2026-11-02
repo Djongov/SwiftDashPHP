@@ -118,6 +118,13 @@ class BasicModel implements BasicModelInterface
             return $stmt->fetch(\PDO::FETCH_ASSOC);
         }
     }
+    // Quote a column name so names with hyphens or reserved words (e.g. CSP directives like script-src) are valid SQL.
+    // Callers validate the column against the table schema first, this only handles the syntax
+    private static function quoteIdentifier(string $column): string
+    {
+        $quote = (DB_DRIVER === 'mysql') ? '`' : '"';
+        return $quote . str_replace($quote, $quote . $quote, $column) . $quote;
+    }
     private static function buildWhere(array $where): array
     {
         $clauses = [];
@@ -170,7 +177,7 @@ class BasicModel implements BasicModelInterface
 
         $placeholders = array_fill(0, count($columns), '?');
 
-        $query = "INSERT INTO $this->_table (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
+        $query = "INSERT INTO $this->_table (" . implode(', ', array_map([self::class, 'quoteIdentifier'], $columns)) . ") VALUES (" . implode(', ', $placeholders) . ")";
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute(array_values($data));
@@ -215,7 +222,7 @@ class BasicModel implements BasicModelInterface
         // Check if all keys in $array match the columns
         foreach ($data as $key => $value) {
             // Add the column to be updated to the SET clause
-            $updates[] = "$key = ?";
+            $updates[] = self::quoteIdentifier((string) $key) . " = ?";
         }
         // Combine the SET clauses with commas
         $sql .= implode(', ', $updates);

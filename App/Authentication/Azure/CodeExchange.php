@@ -80,7 +80,8 @@ class CodeExchange
             $params = [
                 'client_id' => ENTRA_ID_CLIENT_ID,
                 'redirect_uri' => ENTRA_ID_CODE_REDIRECT_URI,
-                'scope' => $scope,
+                // offline_access returns a refresh token, so AccessToken can renew the access token without a redirect
+                'scope' => self::withOfflineAccess($scope),
             ];
         } elseif ($provider === 'mslive') {
             $url = self::MSLIVE_AUTHORIZE_URL;
@@ -134,6 +135,33 @@ class CodeExchange
             'code' => $code,
         ];
 
+        return self::tokenRequest($tokenUrl, $postData);
+    }
+
+    /**
+     * Redeem an Entra ID refresh token for a new access token. Entra ID refresh tokens are not tied to one
+     * resource, so this can also return a token for a different scope than the original one.
+     *
+     * @return array Token response from Microsoft, or ['error' => string, 'statusCode' => int] on failure
+     */
+    public static function refresh(string $refreshToken, string $scope): array
+    {
+        return self::tokenRequest(ENTRA_ID_TOKEN_URL, [
+            'client_id' => ENTRA_ID_CLIENT_ID,
+            'client_secret' => ENTRA_ID_CLIENT_SECRET,
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refreshToken,
+            'scope' => self::withOfflineAccess($scope),
+        ]);
+    }
+
+    private static function withOfflineAccess(string $scope): string
+    {
+        return in_array('offline_access', explode(' ', $scope), true) ? $scope : $scope . ' offline_access';
+    }
+
+    private static function tokenRequest(string $tokenUrl, array $postData): array
+    {
         $client = new HttpClient($tokenUrl);
         $response = $client->call('POST', '', $postData, null, false, [], true);
 

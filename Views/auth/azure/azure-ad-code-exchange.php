@@ -81,6 +81,10 @@ if (strtolower((string) $usernameFromToken) !== strtolower($username)) {
 
 try {
     AccessToken::save($token['access_token'], $username);
+    // Lets AccessToken renew the access token on the server when it expires, instead of redirecting the user
+    if (!empty($token['refresh_token'])) {
+        AccessToken::saveRefreshToken($token['refresh_token'], $username);
+    }
 } catch (Exception $e) {
     Response::output($e->getMessage(), 400);
 }

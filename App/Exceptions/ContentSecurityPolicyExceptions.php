@@ -30,4 +30,8 @@ class ContentSecurityPolicyExceptions extends ExceptionsTemplate
     {
         return new self('missing column: ' . $column, 400);
     }
+    public function invalidCSPType(): self
+    {
+        return new self('invalid CSP type, expected Content-Security-Policy or Content-Security-Policy-Report-Only', 400);
+    }
 }

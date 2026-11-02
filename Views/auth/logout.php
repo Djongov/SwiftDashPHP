@@ -7,6 +7,15 @@ use App\Authentication\JWT;
 
 JWT::handleValidationFailure();
 
+// Drop the cached Azure access and refresh tokens, they must not outlive the login
+if (!empty($usernameArray['username'])) {
+    try {
+        \App\Authentication\Azure\AccessToken::forget($usernameArray['username']);
+    } catch (\Exception $e) {
+        // Logging out must not fail because of the cache
+    }
+}
+
 \App\Core\Session::reset();
 
 if (!isset($usernameArray['provider']) || empty($usernameArray['provider'])) {
