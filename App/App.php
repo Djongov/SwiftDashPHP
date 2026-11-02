@@ -206,7 +206,7 @@ class App
                 case 'pgsql':
                     $dsn = 'pgsql:host=' . DB_HOST . ';dbname=' . DB_NAME;
                     if (defined("DB_SSL") && DB_SSL) {
-                        $dsn .= ';sslmode=require;sslrootcert=' . DB_CA_CERT;
+                        $dsn .= ';sslmode=require' . (DB_SSL_VERIFY ? ';sslrootcert=' . DB_CA_CERT : '');
                     }
                     break;
                 case 'sqlite':

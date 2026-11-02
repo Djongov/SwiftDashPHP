@@ -43,7 +43,7 @@ The CSP header is sent by PHP (`App::bootstrap`) on HTTPS requests with a fresh 
 
 ### Database TLS
 
-With `DB_SSL=true` the MySQL server certificate is verified against the bundled DigiCert CA. Set `DB_SSL_VERIFY=false` in `.env` only for self-signed test servers.
+With `DB_SSL=true` the MySQL or PostgreSQL server certificate is verified against the bundled DigiCert CA. Set `DB_SSL_VERIFY=false` for servers with a self-signed certificate: the connection is still encrypted (PostgreSQL: plain `sslmode=require`), only the certificate check is skipped.
 
 ### DataGrid CRUD API
 

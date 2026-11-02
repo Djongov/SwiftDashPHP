@@ -98,8 +98,10 @@ class DB
             // Add SSL options if enabled
             if (defined("DB_SSL") && DB_SSL) {
                 $dsn .= "sslmode=require;";
-                // Add CA certificate path
-                $dsn .= "sslrootcert=" . DB_CA_CERT . ";";
+                // Add CA certificate path. libpq then verifies the server certificate (require acts as verify-ca)
+                if (DB_SSL_VERIFY) {
+                    $dsn .= "sslrootcert=" . DB_CA_CERT . ";";
+                }
             }
         }
 

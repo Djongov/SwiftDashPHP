@@ -243,7 +243,8 @@ class SystemConfig
         // SSL certificates
         define("DB_CA_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'NewDigiCertGlobalRootCA.crt.pem');
         define("CURL_CERT", ROOT . DIRECTORY_SEPARATOR . '.tools' . DIRECTORY_SEPARATOR . 'cacert.pem');
-        // Verify the database server certificate when DB_SSL is on (MySQL). Only disable for self-signed test servers.
+        // Verify the database server certificate against DB_CA_CERT when DB_SSL is on (MySQL and PostgreSQL).
+        // false still encrypts (pgsql: plain sslmode=require); use it for servers with a self-signed certificate.
         define("DB_SSL_VERIFY", filter_var($_ENV['DB_SSL_VERIFY'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
     }
 

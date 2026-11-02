@@ -31,7 +31,7 @@ class Install
                 // Connect to a common default database, like 'postgres'
                 $dsn = sprintf("pgsql:host=%s;port=%d;dbname=postgres", DB_HOST, DB_PORT);
                 if (defined("DB_SSL") && DB_SSL) {
-                    $dsn .= sprintf(";sslmode=require;sslrootcert=%s", DB_CA_CERT);
+                    $dsn .= ';sslmode=require' . (DB_SSL_VERIFY ? ';sslrootcert=' . DB_CA_CERT : '');
                 }
             } elseif (DB_DRIVER === 'sqlite') {
                 // Nothing to do, except pass the unsupported driver
@@ -82,7 +82,7 @@ class Install
             } elseif (DB_DRIVER === 'pgsql') {
                 $dsnWithDb = sprintf("pgsql:host=%s;port=%d;dbname=%s", DB_HOST, DB_PORT, DB_NAME);
                 if (defined("DB_SSL") && DB_SSL) {
-                    $dsnWithDb .= sprintf(";sslmode=require;sslrootcert=%s", DB_CA_CERT);
+                    $dsnWithDb .= ';sslmode=require' . (DB_SSL_VERIFY ? ';sslrootcert=' . DB_CA_CERT : '');
                 }
             } elseif (DB_DRIVER === 'sqlite') {
                 $dsnWithDb = 'sqlite:' . ROOT . '/.tools/' . DB_NAME . '.db';
